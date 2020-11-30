@@ -32,7 +32,9 @@
           </el-header>
           <el-container>
             <el-main>
-              <router-view />
+              <transition :name="transitionName">
+              　<router-view class="Router"></router-view>
+              </transition>
             </el-main>
           </el-container>
         </el-container>
@@ -49,6 +51,7 @@ export default {
   },
   data(){
     return {
+      transitionName: 'slide-right',
       collapse: false,
       activePath:'/device',
       tabName:'设备管理',
@@ -103,67 +106,14 @@ export default {
           icon: 'icon-changjing',
           children: []
         },
-        // {
-        //   id: '009',
-        //   name: '语料管理',
-        //   path: 'scene',
-        //   icon: 'icon-changjing',
-        //   children: [
-        //     {
-        //       path: '/scenemanage',
-        //       name: '场景任务管理'
-        //     },
-        //     {
-        //       path: '/newtask',
-        //       name: '场景任务测试'
-        //     }
-        //   ]
-        // },
-        // {
-        //   id: '008',
-        //   name: '任务管理',
-        //   path: 'custom',
-        //   icon: 'icon-zidingyirenwu',
-        //   children: [
-        //     {
-        //       path: 'rousetask',
-        //       name: '测试任务',
-        //       children: [
-        //         {
-        //           path: '/rousetask',
-        //           name: '单设备'
-        //         },
-        //         {
-        //           path: '/manywakeuptask',
-        //           name: '双设备'
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       path: '/errrousetask',
-        //       name: '误唤醒任务'
-        //     },
-        //     {
-        //       path: '/discerntask',
-        //       name: '识别任务'
-        //     },
-        //     {
-        //       path: 'link',
-        //       name: '链路任务',
-
-        //       children: [
-        //         {
-        //           path: '/linkway',
-        //           name: '语音交互'
-        //         },
-        //         {
-        //           path: '/touchinter',
-        //           name: '触控交互'
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // }
+        {
+          id:'008',
+          name:'接口调试',
+          icon: 'icon-changjing',
+          path: '/api',
+          url: 'http://192.168.220.139/cies/swagger-ui.html',
+          children: []
+        }
       ],
     }
   },
@@ -181,17 +131,11 @@ export default {
   },
   watch: {
     $route(to, from) {
-      console.log(to,from)
-      switch(to.name) {
-        case "Device":
-          this.tabName = "设备管理"
-          break;
-        case "AddDevice":
-          this.tabName = "添加设备"
-          break;
-        default:
-          break;
-      }
+      const toDepth = to.path.split('/').length
+      const fromDepth = from.path.split('/').length
+      console.log(toDepth)
+      console.log(fromDepth)
+      this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
     }
   }
 }
@@ -238,17 +182,35 @@ export default {
   
   .el-main {
     height: 100%;
+    width: 100%;
     // background-color: #E9EEF3;
     color: #333;
     text-align: center;
     padding: 0 0 20px 0;
+    // .Router {
+    //   position: absolute;
+    //   width: 100%;
+    //   transition: all .3s ease;
+    //   // top: 40px;
+    // }
   }
   
  .el-container {
     height: 100%;
     // margin-bottom: 40px;
   }
-
+  .slide-left-enter,
+  .slide-right-leave-active {
+      opacity: 0;
+      -webkit-transform: translate(100%, 0);
+      transform: translate(100%, 0);
+  }
+  .slide-left-leave-active,
+  .slide-right-enter {
+      opacity: 0;
+      -webkit-transform: translate(-100%, 0);
+      transform: translate(-100% 0);
+  }
 }
 </style>
 

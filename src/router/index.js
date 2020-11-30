@@ -4,6 +4,7 @@ import Layout from '../views/Layout.vue'
 
 Vue.use(VueRouter)
 
+
 const routes = [
   {
     path: '/',
@@ -17,6 +18,12 @@ const routes = [
         component: () => import('../views/task-manage/Index.vue')
       },
       {
+        //接口文档与调试
+        path: '/api',
+        name:'Api',
+        component: () => import('../views/other/Api.vue')
+      },
+      {
         //设备管理
         path: '/device',
         name: 'Device',
@@ -28,6 +35,7 @@ const routes = [
         name:'AddDevice',
         component: () => import('../views/device-manage/Add.vue')
       },
+
     ]
   },
 ]
@@ -37,5 +45,4 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-
 export default router

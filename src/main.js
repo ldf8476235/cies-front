@@ -18,6 +18,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import httpRequest from '@/utils/request'
 import PageUtil from '@/components/utils/PageUtil'
 
+
 Vue.component('PageUtil', PageUtil)
 Vue.use(ElementUI);
 // 引入菜单栏变化问题

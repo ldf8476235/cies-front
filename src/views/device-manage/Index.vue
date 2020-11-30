@@ -2,14 +2,28 @@
   <div class="device">
     <div class="tab">
       设备管理
-      {{this.pageSize}}
     </div>
     <div style="margin:20px;border:1px solid #e8e8e8;">
       <div class="action">
         <div class="search">
+          <el-select style="width:90px" v-model="value" placeholder="请选择" size="small">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+          <el-input
+            style="margin:20px 0 0 10px;width:180px"
+            size="small"
+            placeholder="请输入关键字"
+            v-model="input4">
+            <i slot="suffix" class="el-input__icon el-icon-search" style="cursor: pointer;"></i>
+          </el-input>
         </div>
-        <el-button size="small" @click="goAdd" style="float:right;margin-top:20px">
-          增加设备
+        <el-button type="primary" size="small" @click="goAdd" style="float:right;margin-top:20px">
+          <i class="el-icon-plus" style="margin:0 4px 0 -10px"></i>添加设备
         </el-button>
       </div>
       <div class="devicetable">
@@ -17,6 +31,7 @@
           <el-table
             size="small"
             ref="deviceList"
+            v-loading="loading"
             :data="deviceList"
             :row-key="getRowKeys"
             tooltip-effect="dark"
@@ -75,7 +90,20 @@
             </el-table-column>
             <el-table-column
               label="操作"
-              width="50">
+              width="50"
+              align="center">
+              <template slot-scope="scope">
+                <el-dropdown trigger="click">
+                  <span class="el-dropdown-link">
+                    <i class="el-icon-more"></i>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item icon="el-icon-edit-outline">编辑</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-document-copy">复制</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-delete" @click.native="del(scope.row.deviceId)">删除</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </template>
             </el-table-column>
           </el-table>
         </template>
@@ -93,9 +121,26 @@ export default {
   data(){
     return{
       total:0,
+      loading:true,
       pageSize:10,
       currPage:1,
       deviceList : [],
+      options: [{
+          value: 'deviceName',
+          label: '设备名称'
+        }, {
+          value: 'deviceAdmin',
+          label: '负责人'
+        }, {
+          value: 'deviceType',
+          label: '设备类型'
+        }, {
+          value: 'deviceIp',
+          label: 'IP地址'
+        }, {
+          value: 'deviceStatus',
+          label: '状态'
+        }],
     }
   },
   methods: {
@@ -103,6 +148,7 @@ export default {
       this.$router.push('/device/add')
     },
     getList(){
+      this.loading = true;
       this.$http({
         url: 'device/list',
         method: 'get',
@@ -113,6 +159,7 @@ export default {
       }).then((res) =>{
         this.deviceList = res.data.data.list
         this.total = res.data.data.totalCount
+        this.loading = false;
       })
     },
     getRowKeys(row){
@@ -130,6 +177,15 @@ export default {
         });
         return type.substring(2)
       }
+    },
+    del(id) {
+      this.$http({
+        url: 'device/delete/'+id,
+        method: 'delete',
+      }).then((res) =>{
+        this.$message.success('删除成功')
+        this.getList()
+      })
     }
   },
   mounted: function(){
@@ -155,14 +211,29 @@ export default {
     border-bottom: solid 2px rgba(221, 221, 221, 1);
     height: 70px;
     margin: 0 20px;
+    .search{
+      float: left;
+    }
     // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   .devicetable{
     margin: 0 20px;
     border-bottom: solid 2px rgba(221, 221, 221, 1);
+    .el-dropdown-link {
+      cursor: pointer;
+      // color: #409EFF;
+    }
+    .el-icon-arrow-down {
+      font-size: 12px;
+    }
+    .demonstration {
+      display: block;
+      color: #8492a6;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
   }
   .page{
-    
     margin: 20 0px!important;
   }
 }

@@ -1,8 +1,9 @@
 <template>
   <div class="addDevice">
       <div class="tab">
+        <i class="el-icon-back back" @click="back()"></i>
         添加设备
-        <el-button @click="submit" size="small" style="float:right;margin:10px 20px 0 0">保存</el-button>
+        <el-button @click="submit" type="primary" size="small" style="float:right;margin:10px 20px 0 0">保存</el-button>
       </div>
       <div style="margin:20px;border:1px solid #e8e8e8;">
         <div class="title">
@@ -58,12 +59,17 @@ export default {
   },
   methods: {
     submit(){
-      console.log(this)
       this.$http({
-            url: 'device/add',
-            method: 'post',
-            data: this.deviceMsg
+        url: 'device/add',
+        method: 'post',
+        data: this.deviceMsg
+      }).then((data)=>{
+        this.$message.success('保存成功')
+        this.$router.replace('/device')
       })
+    },
+    back(){
+      this.$router.replace('/device')
     }
   },
 }
@@ -85,6 +91,9 @@ export default {
       line-height: 50px;
       text-align: left;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      .back{
+        cursor: pointer;
+      }
     }
     .title{
         max-height: 30px;
