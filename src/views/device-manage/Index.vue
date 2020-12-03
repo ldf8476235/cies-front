@@ -6,7 +6,7 @@
     <div style="margin:20px;border:1px solid #e8e8e8;">
       <div class="action">
         <div class="search">
-          <el-select style="width:90px" v-model="value" placeholder="请选择" size="small">
+          <el-select style="width:100px" v-model="condition" placeholder="请选择" size="small">
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -18,13 +18,18 @@
             style="margin:20px 0 0 10px;width:180px"
             size="small"
             placeholder="请输入关键字"
-            v-model="input4">
-            <i slot="suffix" class="el-input__icon el-icon-search" style="cursor: pointer;"></i>
+            v-model="value">
+            <i slot="suffix" class="el-input__icon el-icon-search" style="cursor: pointer;" @click="getList()"></i>
           </el-input>
         </div>
         <el-button type="primary" size="small" @click="goAdd" style="float:right;margin-top:20px">
           <i class="el-icon-plus" style="margin:0 4px 0 -10px"></i>添加设备
         </el-button>
+        <div class="batchDelete">
+          <el-button size="small" @click="goAdd" style="float:right;margin-top:20px;margin-right:10px">
+            <i class="el-icon-delete" style="margin:0 4px 0 -10px"></i>批量删除
+          </el-button>
+        </div>
       </div>
       <div class="devicetable">
         <template>
@@ -82,12 +87,12 @@
                 <span v-else style="color:#7ED321">online</span>
               </template>
             </el-table-column>
-            <el-table-column
+            <!-- <el-table-column
               label="挂载设备"
               show-overflow-tooltip
               prop="deviceMount"
               width="80">
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column
               label="操作"
               width="50"
@@ -98,8 +103,8 @@
                     <i class="el-icon-more"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item icon="el-icon-edit-outline">编辑</el-dropdown-item>
-                    <el-dropdown-item icon="el-icon-document-copy">复制</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-edit-outline" @click.native="edit(scope.row)">编辑</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-document-copy" @click.native="copy(scope.row)">复制</el-dropdown-item>
                     <el-dropdown-item icon="el-icon-delete" @click.native="del(scope.row.deviceId)">删除</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
@@ -120,25 +125,27 @@ export default {
   name:'Device',
   data(){
     return{
+      condition:'',
+      value:'',
       total:0,
       loading:true,
       pageSize:10,
       currPage:1,
       deviceList : [],
       options: [{
-          value: 'deviceName',
+          value: 'device_name',
           label: '设备名称'
         }, {
-          value: 'deviceAdmin',
+          value: 'device_admin',
           label: '负责人'
         }, {
-          value: 'deviceType',
+          value: 'device_type',
           label: '设备类型'
         }, {
-          value: 'deviceIp',
+          value: 'device_ip',
           label: 'IP地址'
         }, {
-          value: 'deviceStatus',
+          value: 'device_status',
           label: '状态'
         }],
     }
@@ -149,13 +156,17 @@ export default {
     },
     getList(){
       this.loading = true;
+      var params = {
+        page:this.currPage,
+        limit:this.pageSize
+      }
+      if(this.condition!=''){
+        params[this.condition] = this.value
+      }
       this.$http({
         url: 'device/list',
         method: 'get',
-        params: {
-          page:this.currPage,
-          limit:this.pageSize
-        }
+        params:params
       }).then((res) =>{
         this.deviceList = res.data.data.list
         this.total = res.data.data.totalCount
@@ -177,6 +188,13 @@ export default {
         });
         return type.substring(2)
       }
+    },
+    edit(row){
+      row['update'] = true
+      this.$router.push({path:'/device/update',query: row})
+    },
+    copy(row){
+      this.$router.push({path:'/device/update',query: row})
     },
     del(id) {
       this.$http({

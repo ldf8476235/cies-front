@@ -35,6 +35,12 @@ const routes = [
         name:'AddDevice',
         component: () => import('../views/device-manage/Add.vue')
       },
+      {
+        //更新设备
+        path: '/device/update',
+        name:'AddDevice',
+        component: () => import('../views/device-manage/Add.vue')
+      },
 
     ]
   },
