@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2020-12-02 18:32:38
+ * @LastEditTime: 2020-12-03 12:43:35
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\router\index.js
@@ -87,7 +87,13 @@ const routes = [
         path: '/api',
         name:'Api',
         component: () => import('../views/other/Api.vue')
-      }
+      },
+      {
+        //更新设备
+        path: '/device/update',
+        name:'AddDevice',
+        component: () => import('../views/device-manage/Add.vue')
+      },
 
     ]
   },

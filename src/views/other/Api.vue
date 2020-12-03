@@ -9,7 +9,7 @@ export default {
   name:'Api',
   data(){
     return{
-        src:"http://192.168.220.139/cies/swagger-ui.html"
+        src:"http://192.168.220.201/cies/swagger-ui.html"
     }
   },
   methods: {
