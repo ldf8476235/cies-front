@@ -1,15 +1,15 @@
 <!--
  * @Author: wh
- * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2020-12-01 16:58:19
+ * @Date: 2020-11-30 17:34:55
+ * @LastEditTime: 2020-12-03 12:36:38
  * @LastEditors: wh
  * @Description: In User Settings Edit
- * @FilePath: \cies-front\src\views\task-manage\Index.vue
+ * @FilePath: \cies-front\src\views\case-manage\Index.vue
 -->
 <template>
-  <div class="task">
+  <div class="case">
     <div class="crumbs">
-      <span>任务列表</span>
+      <span>用例列表</span>
     </div>
     <div class="container">
       <div class="content">
@@ -24,22 +24,20 @@
               >
               </el-option>
             </el-select>
-
             <el-input v-model="inputKey" placeholder="请输入内容">
               <i slot="suffix" class="el-input__icon el-icon-search"></i>
             </el-input>
           </div>
           <div class="newBtn">
-            <el-button @click="goNewTask" type="primary" icon="el-icon-plus"
-              >新建任务</el-button
-            >
+            <el-button @click="goNewCase" type="primary" icon="el-icon-plus"
+              >新建用例</el-button>
           </div>
         </div>
         <div class="tableContent">
-          <el-table :data="taskList" border style="width: 100%">
+          <el-table :data="caseList" border style="width: 100%">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="date" label="任务名称" width="180">
+            <el-table-column prop="date" label="用例名称" width="180">
             </el-table-column>
             <el-table-column prop="name" label="所属项目" min-width="180">
             </el-table-column>
@@ -49,7 +47,7 @@
             </el-table-column>
             <el-table-column prop="name" label="创建时间" width="140">
             </el-table-column>
-            <el-table-column prop="name" label="状态" width="180">
+            <el-table-column prop="name" label="更新时间" width="180">
             </el-table-column>
             <el-table-column prop="name" label="操作" width="180">
             </el-table-column>
@@ -68,7 +66,7 @@
 
 <script>
 export default {
-  name: "Task",
+  name: "Case",
   data() {
     return {
       total: 0,
@@ -99,13 +97,13 @@ export default {
       ],
       selectVal: "", // 选中项
       inputKey: "", // 搜索输入项
-      taskList: [{}], // 任务列表
+      caseList: [{}], // 任务列表
     };
   },
   methods: {
     // 新建任务
-    goNewTask() {
-      this.$router.push("/task/newtask");
+    goNewCase() {
+      this.$router.push("/case/newcase");
     },
   },
 };
@@ -113,7 +111,7 @@ export default {
 
 <style lang='less' scoped>
 @import "../../assets/css/pub.less";
-.task {
+.case {
   .content {
     padding: 20px;
   }
@@ -152,5 +150,3 @@ export default {
   }
 }
 </style>
-
-

@@ -1,3 +1,11 @@
+/*
+ * @Author: wh
+ * @Date: 2020-11-30 17:12:31
+ * @LastEditTime: 2020-12-02 18:32:38
+ * @LastEditors: wh
+ * @Description: In User Settings Edit
+ * @FilePath: \cies-front\src\router\index.js
+ */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Layout from '../views/Layout.vue'
@@ -18,10 +26,34 @@ const routes = [
         component: () => import('../views/task-manage/Index.vue')
       },
       {
-        //接口文档与调试
-        path: '/api',
-        name:'Api',
-        component: () => import('../views/other/Api.vue')
+        path: '/task/newtask',
+        name: 'NewTask',
+        component: () => import('../views/task-manage/new-task/Index.vue')
+      },
+      {
+        path: '/case',
+        name: 'Case',
+        component: () => import('../views/case-manage/Index.vue')
+      },
+      {
+        path: '/case/newcase',
+        name: 'NewCase',
+        component: () => import('../views/case-manage/new-case/Index.vue')
+      },
+      {
+        path: '/action',
+        name: 'Action',
+        component: () => import('../views/action-manage/Index.vue')
+      },
+      {
+        path: '/action/newaction',
+        name: 'NewAction',
+        component: () => import('../views/action-manage/new-action/Index.vue')
+      },
+      {
+        path: '/verify',
+        name: 'verify',
+        component: () => import('../views/verify-manage/Index.vue')
       },
       {
         //设备管理
@@ -35,6 +67,27 @@ const routes = [
         name:'AddDevice',
         component: () => import('../views/device-manage/Add.vue')
       },
+      {
+        path: '/script',
+        name: 'Script',
+        component: () => import('../views/script-manage/Index.vue')
+      },
+      {
+        path: '/role',
+        name: 'Role',
+        component: () => import('../views/role-manage/Index.vue')
+      },
+      {
+        path: '/user',
+        name: 'User',
+        component: () => import('../views/user-manage/Index.vue')
+      },
+      {
+        //接口文档与调试
+        path: '/api',
+        name:'Api',
+        component: () => import('../views/other/Api.vue')
+      }
 
     ]
   },

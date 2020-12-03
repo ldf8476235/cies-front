@@ -1,19 +1,27 @@
+<!--
+ * @Description: 
+ * @Version: 1.0
+ * @Autor: wh
+ * @Date: 2020-11-30 17:12:31
+ * @LastEditors: wh
+ * @LastEditTime: 2020-12-01 11:38:56
+-->
 <template>
   <div class="page">
-    <el-select v-model="pageSize2" slot="prepend" size="small" placeholder="" style="width: 80px;margin-left:30px;float:left" @change="handleSizeChange()">
+    <el-select v-model="pageSize2" slot="prepend" placeholder="" style="width: 80px;" @change="handleSizeChange()">
       <el-option label=10 value=10></el-option>
       <el-option label=20 value=20></el-option>
       <el-option label=30 value=30></el-option>
       <el-option label=50 value=50></el-option>
-  </el-select>
-  <el-pagination
-    background
-    layout="prev, pager, next"
-    :total="total2"
-    :pager-count=5
-    :page-size="pageSize2"
-    @current-change="handleCurrChange">
-  </el-pagination>
+    </el-select>
+    <el-pagination
+      background
+      layout="prev, pager, next"
+      :total="total2"
+      :pager-count=5
+      :page-size="pageSize2"
+      @current-change="handleCurrChange">
+    </el-pagination>
   </div>
 </template>
 
@@ -47,11 +55,17 @@ export default {
   }
 }
 </script>
-<style>
+<style lang='less' scoped>
+.page {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
 .el-pagination{
-  float: right;
-  margin-right: 20px;
-  margin-top: 0px;
+  /* float: right; */
+  /* margin-right: 20px;
+  margin-top: 0px; */
+
   background-color: white!important;
   padding-top:0px !important;
 }

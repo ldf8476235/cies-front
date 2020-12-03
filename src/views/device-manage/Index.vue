@@ -1,29 +1,43 @@
 <template>
   <div class="device">
-    <div class="tab">
-      设备管理
-    </div>
-    <div style="margin:20px;border:1px solid #e8e8e8;">
+    <div class="tab">设备管理</div>
+    <div style="margin: 20px; border: 1px solid #e8e8e8">
       <div class="action">
         <div class="search">
-          <el-select style="width:90px" v-model="value" placeholder="请选择" size="small">
+          <el-select
+            style="width: 90px"
+            v-model="value"
+            placeholder="请选择"
+            size="small"
+          >
             <el-option
               v-for="item in options"
               :key="item.value"
               :label="item.label"
-              :value="item.value">
+              :value="item.value"
+            >
             </el-option>
           </el-select>
           <el-input
-            style="margin:20px 0 0 10px;width:180px"
+            style="margin: 20px 0 0 10px; width: 180px"
             size="small"
             placeholder="请输入关键字"
-            v-model="input4">
-            <i slot="suffix" class="el-input__icon el-icon-search" style="cursor: pointer;"></i>
+            v-model="input4"
+          >
+            <i
+              slot="suffix"
+              class="el-input__icon el-icon-search"
+              style="cursor: pointer"
+            ></i>
           </el-input>
         </div>
-        <el-button type="primary" size="small" @click="goAdd" style="float:right;margin-top:20px">
-          <i class="el-icon-plus" style="margin:0 4px 0 -10px"></i>添加设备
+        <el-button
+          type="primary"
+          size="small"
+          @click="goAdd"
+          style="float: right; margin-top: 20px"
+        >
+          <i class="el-icon-plus" style="margin: 0 4px 0 -10px"></i>添加设备
         </el-button>
       </div>
       <div class="devicetable">
@@ -35,72 +49,86 @@
             :data="deviceList"
             :row-key="getRowKeys"
             tooltip-effect="dark"
-            style="width: 100%">
+            style="width: 100%"
+          >
             <el-table-column width="10px"></el-table-column>
             <el-table-column
               type="selection"
               :reserve-selection="true"
-              :span="1">
+              :span="1"
+            >
             </el-table-column>
-            <el-table-column
-              label="设备名称"
-              show-overflow-tooltip
-              :span="10">
-              <template slot-scope="scope">{{scope.row.deviceName}}</template>
+            <el-table-column label="设备名称" show-overflow-tooltip :span="10">
+              <template slot-scope="scope">{{ scope.row.deviceName }}</template>
             </el-table-column>
             <el-table-column
               label="负责人"
               prop="deviceAdmin"
               show-overflow-tooltip
-              width="80">
+              width="80"
+            >
             </el-table-column>
             <el-table-column
               label="IP地址"
               prop="deviceIp"
               show-overflow-tooltip
-              width="120">
+              width="120"
+            >
             </el-table-column>
             <el-table-column
               label="端口号"
               prop="devicePort"
               show-overflow-tooltip
-              width="80">
+              width="80"
+            >
             </el-table-column>
             <el-table-column
               label="类型"
               show-overflow-tooltip
               width="130"
-              :formatter="formatterType">
+              :formatter="formatterType"
+            >
             </el-table-column>
             <el-table-column
               label="状态"
               align="center"
               show-overflow-tooltip
-              width="80">
+              width="80"
+            >
               <template slot-scope="scope">
-                <span v-if="scope.row.deviceStatus == 0" style="color:rgba(0, 0, 0, 0.3)">offline</span>
-                <span v-else style="color:#7ED321">online</span>
+                <span
+                  v-if="scope.row.deviceStatus == 0"
+                  style="color: rgba(0, 0, 0, 0.3)"
+                  >offline</span
+                >
+                <span v-else style="color: #7ed321">online</span>
               </template>
             </el-table-column>
             <el-table-column
               label="挂载设备"
               show-overflow-tooltip
               prop="deviceMount"
-              width="80">
+              width="80"
+            >
             </el-table-column>
-            <el-table-column
-              label="操作"
-              width="50"
-              align="center">
+            <el-table-column label="操作" width="50" align="center">
               <template slot-scope="scope">
                 <el-dropdown trigger="click">
                   <span class="el-dropdown-link">
                     <i class="el-icon-more"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item icon="el-icon-edit-outline">编辑</el-dropdown-item>
-                    <el-dropdown-item icon="el-icon-document-copy">复制</el-dropdown-item>
-                    <el-dropdown-item icon="el-icon-delete" @click.native="del(scope.row.deviceId)">删除</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-edit-outline"
+                      >编辑</el-dropdown-item
+                    >
+                    <el-dropdown-item icon="el-icon-document-copy"
+                      >复制</el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      icon="el-icon-delete"
+                      @click.native="del(scope.row.deviceId)"
+                      >删除</el-dropdown-item
+                    >
                   </el-dropdown-menu>
                 </el-dropdown>
               </template>
@@ -108,8 +136,16 @@
           </el-table>
         </template>
       </div>
-      <div class="page" style="height:50px;font-size:15px;margin:20px 0 5px 0">
-        <PageUtil ref="pageutil" :total="total"  :pageSize="pageSize" :currPage="currPage"></PageUtil>
+      <div
+        class="page"
+        style="height: 50px; font-size: 15px; margin: 20px 0 5px 0"
+      >
+        <PageUtil
+          ref="pageutil"
+          :total="total"
+          :pageSize="pageSize"
+          :currPage="currPage"
+        ></PageUtil>
       </div>
     </div>
   </div>
@@ -117,106 +153,114 @@
 
 <script>
 export default {
-  name:'Device',
-  data(){
-    return{
-      total:0,
-      loading:true,
-      pageSize:10,
-      currPage:1,
-      deviceList : [],
-      options: [{
-          value: 'deviceName',
-          label: '设备名称'
-        }, {
-          value: 'deviceAdmin',
-          label: '负责人'
-        }, {
-          value: 'deviceType',
-          label: '设备类型'
-        }, {
-          value: 'deviceIp',
-          label: 'IP地址'
-        }, {
-          value: 'deviceStatus',
-          label: '状态'
-        }],
-    }
+  name: "Device",
+  data() {
+    return {
+      total: 0,
+      loading: true,
+      pageSize: 10,
+      currPage: 1,
+      value: "", //临时命名
+      input4: "", //临时命名
+      deviceList: [],
+      options: [
+        {
+          value: "deviceName",
+          label: "设备名称",
+        },
+        {
+          value: "deviceAdmin",
+          label: "负责人",
+        },
+        {
+          value: "deviceType",
+          label: "设备类型",
+        },
+        {
+          value: "deviceIp",
+          label: "IP地址",
+        },
+        {
+          value: "deviceStatus",
+          label: "状态",
+        },
+      ],
+    };
   },
   methods: {
-    goAdd(){
-      this.$router.push('/device/add')
+    goAdd() {
+      this.$router.push("/device/add");
     },
-    getList(){
+    getList() {
       this.loading = true;
       this.$http({
-        url: 'device/list',
-        method: 'get',
+        url: "device/list",
+        method: "get",
         params: {
-          page:this.currPage,
-          limit:this.pageSize
-        }
-      }).then((res) =>{
-        this.deviceList = res.data.data.list
-        this.total = res.data.data.totalCount
+          page: this.currPage,
+          limit: this.pageSize,
+        },
+      }).then((res) => {
+        this.deviceList = res.data.data.list;
+        this.total = res.data.data.totalCount;
         this.loading = false;
-      })
+      });
     },
-    getRowKeys(row){
+    getRowKeys(row) {
       return row.deviceId;
     },
     //格式化设备类型数据
     formatterType(row) {
       var typelist = row.deviceType;
       if (typelist.length == 1) {
-        return typelist[0]
+        return typelist[0];
       } else {
         var type = "";
-        typelist.forEach(element => {
-          type = type + " | " + element
+        typelist.forEach((element) => {
+          type = type + " | " + element;
         });
-        return type.substring(2)
+        return type.substring(2);
       }
     },
     del(id) {
       this.$http({
-        url: 'device/delete/'+id,
-        method: 'delete',
-      }).then((res) =>{
-        this.$message.success('删除成功')
-        this.getList()
-      })
-    }
+        url: "device/delete/" + id,
+        method: "delete",
+      }).then((res) => {
+        this.$message.success("删除成功");
+        this.getList();
+      });
+    },
   },
-  mounted: function(){
+  mounted: function () {
     this.getList();
-  }
-}
+  },
+};
 </script>
 
 <style lang='less'>
-.device{
+.device {
   border: 1px solid #e8e8e8;
   border-radius: 3px;
   // height: 90%;
-  .tab{
+  .tab {
     height: 50px;
     padding-left: 20px;
-    font-size: 18px;  
+    font-size: 18px;
     line-height: 50px;
     text-align: left;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
-  .action{
+  .action {
     border-bottom: solid 2px rgba(221, 221, 221, 1);
     height: 70px;
     margin: 0 20px;
-    .search{
+    .search {
       float: left;
     }
     // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
-  .devicetable{
+  .devicetable {
     margin: 0 20px;
     border-bottom: solid 2px rgba(221, 221, 221, 1);
     .el-dropdown-link {
@@ -233,8 +277,8 @@ export default {
       margin-bottom: 20px;
     }
   }
-  .page{
-    margin: 20 0px!important;
+  .page {
+    margin: 20 0px !important;
   }
 }
 </style>

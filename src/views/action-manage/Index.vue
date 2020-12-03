@@ -1,16 +1,22 @@
 <!--
  * @Author: wh
- * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2020-12-01 16:58:19
+ * @Date: 2020-11-30 17:35:49
+ * @LastEditTime: 2020-12-02 18:16:17
  * @LastEditors: wh
  * @Description: In User Settings Edit
- * @FilePath: \cies-front\src\views\task-manage\Index.vue
+ * @FilePath: \cies-front\src\views\action-mangage\Index.vue
 -->
 <template>
-  <div class="task">
-    <div class="crumbs">
-      <span>任务列表</span>
-    </div>
+  <div class="action">
+    <!-- <div class="crumbs">
+      <div class="tab">
+        <div @click="tabCut(1)" class="actionTab" :class="tabIndex === 1 ? 'pitch' : ''">动作列表</div>
+        <div @click="tabCut(2)" class="verifyTab" :class="tabIndex === 2 ? 'pitch' : ''">校验点列表</div>
+      </div>
+      <span>动作列表</span>
+      
+    </div> -->
+    <Crumbs :crumbs='crumbs'></Crumbs>
     <div class="container">
       <div class="content">
         <div class="funcTop">
@@ -31,17 +37,21 @@
           </div>
           <div class="newBtn">
             <el-button @click="goNewTask" type="primary" icon="el-icon-plus"
-              >新建任务</el-button
+              >新建动作</el-button
             >
           </div>
         </div>
         <div class="tableContent">
-          <el-table :data="taskList" border style="width: 100%">
+          <el-table :data="actionList" border style="width: 100%">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="date" label="任务名称" width="180">
+            <el-table-column prop="name" label="类型" width="80">
             </el-table-column>
-            <el-table-column prop="name" label="所属项目" min-width="180">
+            <el-table-column prop="date" label="动作名称" width="180">
+            </el-table-column>
+            <el-table-column prop="name" label="引用" min-width="180">
+            </el-table-column>
+            <el-table-column prop="name" label="所属项目" width="180">
             </el-table-column>
             <el-table-column prop="name" label="创建人" width="180">
             </el-table-column>
@@ -49,11 +59,21 @@
             </el-table-column>
             <el-table-column prop="name" label="创建时间" width="140">
             </el-table-column>
-            <el-table-column prop="name" label="状态" width="180">
-            </el-table-column>
-            <el-table-column prop="name" label="操作" width="180">
+            
+            <el-table-column prop="name" label="操作" width="80">
+              <el-popover
+                placement="bottom"
+                width="100"
+                trigger="click">
+                <p><i class="el-icon-plus"></i><span>编辑</span></p>
+                <p><i class="el-icon-plus"></i><span>复制</span></p>
+                <p><i class="el-icon-plus"></i><span>删除</span></p>
+                <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
+              </el-popover>
             </el-table-column>
           </el-table>
+          
+          <!-- <action-list></action-list> -->
         </div>
         <PageUtil
           ref="pageutil"
@@ -68,9 +88,15 @@
 
 <script>
 export default {
-  name: "Task",
+  name: "Action",
+  components:{
+  },
   data() {
     return {
+      crumbs:{ //面包屑内容
+        action:false,
+        name:'动作管理'
+      },
       total: 0,
       pageSize: 10,
       currPage: 1,
@@ -99,21 +125,54 @@ export default {
       ],
       selectVal: "", // 选中项
       inputKey: "", // 搜索输入项
-      taskList: [{}], // 任务列表
+      tabIndex:1,
+      actionList:[{}] // 动作列表
+      
     };
   },
   methods: {
     // 新建任务
     goNewTask() {
-      this.$router.push("/task/newtask");
+      this.$router.push("/action/newaction");
     },
+    // tab切换
+    tabCut(index){
+      console.log(index)
+      this.tabIndex = index
+    }
   },
 };
 </script>
 
 <style lang='less' scoped>
 @import "../../assets/css/pub.less";
-.task {
+.action {
+  .crumbs {
+    // .tab{
+    //   width: 192px;
+    //   display: flex;
+    //   justify-content: space-between;
+    //   font-size: 16px;
+    //   font-family: 'SourceHanSansCN-Normal', SourceHanSansCN;
+    //   font-weight: 400;
+    //   .actionTab{
+    //     cursor: pointer;
+    //     width: 72px;
+    //     text-align: center;
+    //     // border-bottom: 4px solid #006CEB;
+    //   }
+    //   .verifyTab{
+    //     cursor: pointer;
+    //     width: 90px;
+    //     text-align: center;
+    //     // border-bottom: 4px solid #006CEB;
+    //   }
+    //   .pitch{
+    //     border-bottom: 4px solid #006CEB;
+    //   }
+    // }
+    
+  }
   .content {
     padding: 20px;
   }
@@ -152,5 +211,3 @@ export default {
   }
 }
 </style>
-
-
