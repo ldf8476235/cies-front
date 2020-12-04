@@ -19,9 +19,13 @@ p {
   box-sizing: border-box;
 }
 .content {
+  width: 100%;
+  height: 100%;
   /* padding:20px; */
   box-shadow: 0 2px 6px 0 rgba(0,0,0,.1);
   border: 1px solid #ebeef5;
+  /* overflow-y: auto; */
+  /* overflow-x: hidden; */
 }
 /* 处理表格中表头和表体不对齐问题 */
 .el-table th.gutter{

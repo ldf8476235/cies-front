@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2020-12-02 18:15:34
+ * @LastEditTime: 2020-12-04 15:41:29
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\main.js
@@ -10,6 +10,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+// 引入axios请求
+import axios from './axios/api.js'
+Vue.prototype.$axios = axios
 // 引入全局基础样式
 import './assets/css/global.css'
 // 引入elemrntUI
@@ -25,6 +28,7 @@ Vue.component('PageUtil', PageUtil)
 // 引入菜单栏变化问题
 import Fragment from 'vue-fragment'
 Vue.use(Fragment.Plugin)
+// 登峰请求引入
 Vue.prototype.$http = httpRequest
 // 引入阿里矢量图标
 import './assets/iconfont/iconfont.css'
@@ -33,6 +37,14 @@ import './assets/iconfont/iconfont.css'
 import crumbs from './components/crumbs/index'
 Vue.use(crumbs)
 
+// 引入代码编辑器 
+import { codemirror } from "vue-codemirror";
+import "codemirror/lib/codemirror.css";
+Vue.use(codemirror);
+
+// 引入jshint用于实现js自动补全提示 
+import jshint from "jshint";
+window.JSHINT = jshint.JSHINT;
 // 注册一个全局自定义指令 `v-focus`
 Vue.directive('focus', {
   // 当被绑定的元素插入到 DOM 中时……

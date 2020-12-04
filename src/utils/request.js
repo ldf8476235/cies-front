@@ -1,8 +1,8 @@
 /*
  * @Author: your name
  * @Date: 2020-11-18 10:22:01
- * @LastEditTime: 2020-11-18 10:22:01
- * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2020-12-04 15:37:53
+ * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\utils\request.js
  */
@@ -15,7 +15,10 @@ const http = axios.create({
     timeout: 10000,
     baseURL:"http://192.168.220.201/cies"
 });
-
+// request拦截器
+http.interceptors.request.use(config => {
+  return config
+})
 /**
  * 响应拦截
  */
