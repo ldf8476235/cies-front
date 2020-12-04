@@ -71,7 +71,7 @@ export default {
         method: 'post',
         data: this.deviceMsg
       }).then((data)=>{
-        if(data.data.code == 0) {
+        if(data.data.code == 1) {
           this.$message.success('添加成功')
           this.$router.replace('/device')
         } else {
@@ -85,8 +85,11 @@ export default {
         method: 'post',
         data: this.deviceMsg
       }).then((data)=>{
-        this.$message.success('编辑成功')
-        // this.$router.replace('/device')
+        if(data.data.code == 1) {
+          this.$message.success('编辑成功')
+        } else {
+          this.$message.error(data.data.msg)
+        }
       })
     },
     back(){

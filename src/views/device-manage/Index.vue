@@ -1,7 +1,7 @@
 <template>
   <div class="device">
-    <div class="tab">设备管理</div>
-    <div style="margin: 20px; border: 1px solid #e8e8e8">
+    <div class="tab">设备列表</div>
+    <div style="margin: 20px; border: 1px solid #e8e8e8;">
       <div class="action">
         <div class="search">
           <el-select style="width:100px" v-model="condition" placeholder="请选择" size="small">
@@ -30,8 +30,13 @@
           <i class="el-icon-plus" style="margin: 0 4px 0 -10px"></i>添加设备
         </el-button>
         <div class="batchDelete">
-          <el-button size="small" @click="goAdd" style="float:right;margin-top:20px;margin-right:10px">
-            <i class="el-icon-delete" style="margin:0 4px 0 -10px"></i>批量删除
+          <el-button 
+            size="small" 
+            @click="batchDel()" 
+            style="float:right;margin-top:20px;margin-right:10px"
+            v-if="this.deviceIds.length > 0"
+          >
+            <i class="el-icon-delete" style="margin:0 4px 0 -10px"></i>删除
           </el-button>
         </div>
       </div>
@@ -45,10 +50,12 @@
             :row-key="getRowKeys"
             tooltip-effect="dark"
             style="width: 100%"
+            @selection-change="selectHandler"
           >
             <el-table-column width="10px"></el-table-column>
             <el-table-column
               type="selection"
+              align="center"
               :reserve-selection="true"
               :span="1"
             >
@@ -127,7 +134,7 @@
       </div>
       <div
         class="page"
-        style="height: 50px; font-size: 15px; margin: 20px 0 5px 0"
+        style="height: 50px; font-size: 15px; margin: 20px 10px 5px 20px"
       >
         <PageUtil
           ref="pageutil"
@@ -152,6 +159,7 @@ export default {
       pageSize:10,
       currPage:1,
       deviceList : [],
+      deviceIds:[],
       options: [{
           value: 'device_name',
           label: '设备名称'
@@ -173,6 +181,13 @@ export default {
   methods: {
     goAdd() {
       this.$router.push("/device/add");
+    },
+    selectHandler(val){
+      this.deviceIds = [];
+      val.forEach(element => {
+        this.deviceIds.push(element.deviceId)
+      })
+      console.log(this.deviceIds)
     },
     getList() {
       this.loading = true;
@@ -221,10 +236,29 @@ export default {
         url: "device/delete/" + id,
         method: "delete",
       }).then((res) => {
-        this.$message.success("删除成功");
-        this.getList();
+        if(res.data.code == 1){
+          this.$message.success("删除成功");
+          this.getList();
+        } else {
+          this.$message.error(res.data.msg);
+        }
       });
     },
+    batchDel(){
+      this.$http({
+        url: 'device/batchDelete',
+        method: 'post',
+        data:this.deviceIds
+      }).then((res) =>{
+        if(res.data.code == 1){
+          this.$message.success("删除成功");
+          this.deviceIds = []
+          this.getList()
+        } else {
+          this.$message.error(res.data.msg);
+        }
+      });
+    }
   },
   mounted: function () {
     this.getList();
@@ -234,6 +268,7 @@ export default {
 
 <style lang='less'>
 .device {
+  min-width: 1280px;
   border: 1px solid #e8e8e8;
   border-radius: 3px;
   // height: 90%;
