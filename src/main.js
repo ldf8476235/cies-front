@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2020-12-04 15:41:29
+ * @LastEditTime: 2020-12-08 18:44:50
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\main.js
@@ -31,7 +31,7 @@ Vue.use(Fragment.Plugin)
 // 登峰请求引入
 Vue.prototype.$http = httpRequest
 // 引入阿里矢量图标
-import './assets/iconfont/iconfont.css'
+// import './assets/iconfont/iconfont.css'
 
 // 引入自定义面包屑组件
 import crumbs from './components/crumbs/index'
@@ -45,6 +45,13 @@ Vue.use(codemirror);
 // 引入jshint用于实现js自动补全提示 
 import jshint from "jshint";
 window.JSHINT = jshint.JSHINT;
+
+// 引入流程图插件
+import jsPlumb from 'jsplumb'
+Vue.prototype.$jsPlumb = jsPlumb.jsPlumb
+
+// 引入svg图标
+import './icon-svg/index.js'
 // 注册一个全局自定义指令 `v-focus`
 Vue.directive('focus', {
   // 当被绑定的元素插入到 DOM 中时……

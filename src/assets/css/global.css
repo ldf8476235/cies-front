@@ -42,3 +42,26 @@ p {
   background: #f4f4f4 !important;
   padding-top: 15px !important;
 } */
+.finger {
+  position: absolute;
+  border-style: solid;
+  border-radius: 50%;
+  border-color: white;
+  border-width: 0mm;
+  width: 6mm;
+  height: 6mm;
+  top: -3mm;
+  left: -3mm;
+  opacity: 0.7;
+  pointer-events: none;
+  background: white;
+  /*#464646;*/
+  /*background: red;*/
+  display: none;
+}
+
+.finger.active {
+  display: block;
+  border-color: #464646;
+  border-width: 1mm;
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon-configure-on</title>
+    <g id="icon-configure-on" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <polygon id="路径-16备份" fill="#006CEB" fill-rule="nonzero" transform="translate(12.000000, 9.500000) rotate(0.000000) translate(-12.000000, -9.500000) " points="13 5 13 14 11 14 11 5"></polygon>
+        <polygon id="路径-16" fill="#006CEB" fill-rule="nonzero" transform="translate(6.000000, 14.500000) rotate(0.000000) translate(-6.000000, -14.500000) " points="7 10 7 19 5 19 5 10"></polygon>
+        <rect id="矩形" fill="#006CEB" x="4" y="5" width="4" height="4"></rect>
+        <rect id="矩形备份-2" fill="#006CEB" x="16" y="5" width="4" height="4"></rect>
+        <rect id="矩形备份" fill="#006CEB" x="10" y="15" width="4" height="4"></rect>
+        <polygon id="路径-16备份-2" fill="#006CEB" fill-rule="nonzero" transform="translate(18.000000, 14.500000) rotate(0.000000) translate(-18.000000, -14.500000) " points="19 10 19 19 17 19 17 10"></polygon>
+    </g>
+</svg>
