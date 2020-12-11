@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2020-12-03 12:36:38
+ * @LastEditTime: 2020-12-09 17:29:53
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -114,6 +114,7 @@ export default {
 .case {
   .content {
     padding: 20px;
+    box-sizing: border-box;
   }
   .funcTop {
     display: flex;

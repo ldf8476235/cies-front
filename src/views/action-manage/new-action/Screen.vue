@@ -4,10 +4,10 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description: 
- * @LastEditTime: 2020-12-08 19:00:22
+ * @LastEditTime: 2020-12-11 17:47:22
 -->
 <template>
-  <div class="new-action">
+  <div class="new-screen">
     <Crumbs :crumbs='crumbs' @save='save'></Crumbs>
     <div class="container">
       <div class="content">
@@ -94,7 +94,11 @@
                   <div class="gutter">
                     <el-card class="box-card-bottom">
                       <div slot="header" class="action-bottom">
-                        <span>动作序列</span>
+                        <p>
+                          <span @click="tab(0)" :class="tabFlag === 0 ?'active' : ''">动作序列</span>
+                          <span @click="tab(1)" :class="tabFlag === 1 ?'active' : ''">元素结构</span>
+                        </p>
+                        
                         <div class="action-btn">
                           <el-dropdown split-button type="">
                             链接设备
@@ -110,52 +114,64 @@
                         </div>
                       </div>
                       <div class="action-sequence-content">
-
-                        <div class="row" v-for=" item1 in 3" :key="item1">
-                          <div class="action-item" v-if="item1 % 2 === 1" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
-                            <div class="click-icon">
-                              <span>Home</span>
-                              <p>
-                                <img src="../../../assets/iconpng/icon-gesture.png" alt="">
-                              </p>
-                              <span class="iconfont icon-cuo1 red"></span>
-                            </div>
-                            <div class="point-to">
-                              <span class="iconfont" :class="item === 10 ? 'icon-jiang' : 'icon-arrow-up-copy' "></span>
-                            </div>
-                          </div>
-                          <div class="action-item" v-if="item1 % 2 === 0" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
-                            <div class="point-to" v-if="item !== 10">
-                              <span class="iconfont" :class="item === 10 ? 'icon-jiang' : 'icon-jiantou-you' "></span>
-                            </div>
-                            <div class="click-icon">
-                              <span>Home</span>
-                              <p>
-                                <!-- <img src="../../../assets/iconpng/icon-gesture.png" alt=""> -->
+                        <div v-if="tabFlag === 0">
+                          <div class="row" v-for=" item1 in 3" :key="item1">
+                            <div class="action-item" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
+                              <!-- 奇数行 -->
+                              <div class="click-icon" v-if="item1 % 2 === 1">
+                                <span>Home</span>
+                                <p>
+                                  <img src="../../../assets/iconpng/icon-gesture.png" alt="">
+                                </p>
+                                <span class=" el-icon-circle-close red"></span>
+                              </div>
+                              <div class="point-to" v-if="item1 % 2 === 1">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-right' "></span>
+                              </div>
+                              <!-- 偶数行 -->
+                              <div class="point-to" v-if="item !== 10 && item1 % 2 === 0">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-back' "></span>
+                              </div>
+                              <div class="click-icon" v-if="item1 % 2 === 0">
+                                <span>Home</span>
+                                <p>
                                     <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
-                              </p>
-                              <span class="iconfont icon-cuo1 red"></span>
+                                </p>
+                                <span class="el-icon-circle-close red"></span>
+                              </div>
+                              <div class="point-to" v-if="item === 10 && item1 % 2 === 0">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
+                              </div>
                             </div>
-                            <div class="point-to" v-if="item === 10">
-                              <span class="iconfont" :class="item === 10 ? 'icon-jiang' : 'icon-jiantou-you' "></span>
-                            </div>
+                            <!-- <div class="action-item" v-if="item1 % 2 === 0" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
+                              <div class="point-to" v-if="item !== 10">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-back' "></span>
+                              </div>
+                              <div class="click-icon">
+                                <span>Home</span>
+                                <p>
+                                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
+                                </p>
+                                <span class="el-icon-circle-close red"></span>
+                              </div>
+                              <div class="point-to" v-if="item === 10">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
+                              </div>
+                            </div> -->
                           </div>
                         </div>
-                        <!-- <div class="row" v-for=" item1 in 1" :key="item1">
-                          <div class="action-item" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
-                            <div class="point-to">
-                              <span class="iconfont" :class="item === 10 ? 'icon-jiang' : 'icon-jiantou-you' "></span>
-                            </div>
-                            <div class="click-icon">
-                              <span>Home</span>
-                              <p>
-                                <img src="../../../assets/iconpng/icon-gesture.png" alt="">
-                              </p>
-                              <span class="iconfont icon-cuo1 red"></span>
-                            </div>
-                          </div>
-                        </div> -->
-                        
+                        <div v-else>
+                          <v-jstree :data="jsTreeData">
+                              <template slot-scope="scope">
+                                <div style="" 
+                                  @click.exact="itemClick(scope.model)"
+                                  >
+                                  <i :class="scope.model.icon" role="presentation"></i>
+                                  {{scope.model.text}}
+                                </div>
+                              </template>
+                          </v-jstree>
+                        </div>
                       </div>
                     </el-card>
                   </div>
@@ -169,7 +185,7 @@
                 <div slot="header" class="clearfix">
                   <span>实时界面</span>
                 </div>
-                <div class="screen" id="screen">
+                <div class="screen" id="screen" ref="screen">
                   <!-- <img src="../../../assets/images/test.png" alt=""> -->
                   <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
                   <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
@@ -193,12 +209,13 @@
 </template>
 
 <script>
-import Crumbs from '../../../components/crumbs/Crumbs.vue';
 import CodeMirror from '../../../components/codemirror/Codemirror.vue'
+import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool} from "@/utils/common.js";
 export default {
-  components: { Crumbs ,CodeMirror},
-  name: 'NewAction',
+  
+  name: 'NewScreen',
+  components: {CodeMirror,VJstree},
   data() {
     return {
       crumbs:{
@@ -333,7 +350,9 @@ export default {
           height: 1
         }
       },
-      cursor: {}
+      cursor: {},
+      tabFlag:0,
+      jsTreeData:[] // 树形节点对象
     };
   },
   created(){
@@ -351,8 +370,9 @@ export default {
     window.onresize = () => {
       this.resizeScreen()
     }
-    
-    
+  },
+  destroyed(){
+    this.screenWebSocket.close()
   },
   computed:{
     nodes:{
@@ -367,6 +387,15 @@ export default {
   watch:{
   },
   methods: {
+    // 元素节点点击事件
+    itemClick(a,b){
+      console.log('元素节点',a,b)
+    },
+    // 动作/元素结构切换
+    tab(i){
+      console.log(i)
+      this.tabFlag = i
+    },
     // wh-检查版本
     checkVersion: function () {
       this.$axios.get('/api/v1/version').then(res => {
@@ -402,7 +431,6 @@ export default {
     },
     // wh-连接手机
     doConnect() {
-      
       const params = `platform=${'Android'}&deviceUrl=${''}`
       this.$axios.post('/api/v1/connect',params,{headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).then(res => {
         console.log("deviceId", res.deviceId)
@@ -442,7 +470,7 @@ export default {
         // img.src = BLANK_IMG
         // img = null
         // blob = null
-        console.log('------',img)
+        // console.log('------',img)
         // URL.revokeObjectURL(url)
         // url = null
         // dtd.resolve();
@@ -496,7 +524,10 @@ export default {
         return nodes;
       }
       this.originNodes = sourceToNodes(source) //res.nodes;
-      console.log('this.originNodes:',this.originNodes)
+      // console.log('this.originNodes:',source)
+      const jsTreeData = this.sourceToJstree(source)
+      this.jsTreeData = [jsTreeData]
+      console.log('js====',this.jsTreeData)
       this.activeMouseControl()
       this.drawAllNode();
       this.canvasStyle.opacity = 1.0;
@@ -540,7 +571,6 @@ export default {
     },
     // wh-可视区域尺寸变化
     resizeScreen(img) {
-      
       // check if need update
       if (img) {
         if (this.lastScreenSize.canvas.width == img.width &&
@@ -553,24 +583,26 @@ export default {
           return;
         }
       }
-      var screenDiv = document.getElementById('screen');
-      this.lastScreenSize = {
-        canvas: {
-          width: img.width,
-          height: img.height
-        },
-        screen: {
-          width: screenDiv.clientWidth,
-          height: screenDiv.clientHeight,
+        var screenDiv =this.$refs.screen //document.getElementById('screen');
+        console.log(screenDiv.clientWidth)
+        this.lastScreenSize = {
+          canvas: {
+            width: img.width,
+            height: img.height
+          },
+          screen: {
+            width: screenDiv.clientWidth,
+            height: screenDiv.clientHeight,
+          }
         }
-      }
-      var canvasRatio = img.width / img.height;
-      var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
-      console.log('sssssssssssssssss',screenDiv.clientWidth,screenDiv.clientHeight)
-       Object.assign(this.canvasStyle, {
+        var canvasRatio = img.width / img.height;
+        var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
+        console.log('sssssssssssssssss',screenDiv.clientWidth,screenDiv.clientHeight)
+        Object.assign(this.canvasStyle, {
           width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', //'inherit',
           height: Math.floor(screenDiv.clientHeight) + 'px', //'100%',
         })
+      
       // if (canvasRatio > screenRatio) {
       //   Object.assign(this.canvasStyle, {
       //     width: Math.floor(screenDiv.clientWidth) + 'px', //'100%',
@@ -769,6 +801,50 @@ export default {
       ws.onclose = (ev) => {
         this.liveScreen = false;
         console.log("screen websocket closed")
+      }
+    },
+    // 源节点转换成树形节点对象
+    sourceToJstree(source) {
+      // console.log(source)
+      var n = {}
+      n.id = source._id;
+      n.text = source._type
+      if (source.name) {
+        n.text += " - " + source.name;
+      }
+      if (source.resourceId) {
+        n.text += " - " + source.resourceId;
+      }
+      n.icon = this.sourceTypeIcon(source.type);
+      if (source.children) {
+        n.children = []
+        source.children.forEach( (s) => {
+          n.children.push(this.sourceToJstree(s))
+        })
+      }
+      
+      return n
+    },
+    sourceTypeIcon(widgetType) {
+      switch (widgetType) {
+        case "Scene":
+          return "glyphicon glyphicon-tree-conifer"
+        case "Layer":
+          return "glyphicon glyphicon-equalizer"
+        case "Camera":
+          return "glyphicon glyphicon-facetime-video"
+        case "Node":
+          return "glyphicon glyphicon-leaf"
+        case "ImageView":
+          return "glyphicon glyphicon-picture"
+        case "Button":
+          return "glyphicon glyphicon-inbox"
+        case "Layout":
+          return "glyphicon glyphicon-tasks"
+        case "Text":
+          return "glyphicon glyphicon-text-size"
+        default:
+          return "el-icon-s-promotion"
       }
     },
     // wh-鼠标移动，点击事件
@@ -985,15 +1061,18 @@ export default {
 </script>
 
 <style lang='less' scoped>
-.new-action {
+.new-screen {
   // height: 100%;
   // overflow: hidden;
   // .action-content{
     /deep/ .el-card__header{
-      padding: 5px 10px;
+      padding: 5px 10px 0px 10px;
     }
     /deep/ .el-card__body {
       padding: 5px;
+    }
+    span {
+      font-size: 12px;
     }
     .left{
       .el-card {
@@ -1020,40 +1099,16 @@ export default {
             // width: 100px;
             /deep/ .CodeMirror-scroll {
               padding-bottom: 0px;
+              width: 100%;
+              height: 80%;
+              overflow-x: hidden !important;
             }
           }
-          /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar{
-            width:5px;
-            height:5px;
-            // color: red;
+          /deep/ .CodeMirror-vscrollbar {
+            overflow: hidden;
           }
-          /*正常情况下滑块的样式*/
-         /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar-thumb{
-            background-color:rgb(83,98,111);
-            border-radius:10px;
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*鼠标悬浮在该类指向的控件上时滑块的样式*/
-         /deep/ .CodeMirror-vscrollbar:hover::-webkit-scrollbar-thumb{
-            background-color:rgba(0,0,0,.2);
-            border-radius:10px;
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*鼠标悬浮在滑块上时滑块的样式*/
-         /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar-thumb:hover{
-            background-color:rgba(0,0,0,.4);
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*正常时候的主干部分*/
-         /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar-track{
-            border-radius:10px;
-            -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0);
-            background-color: #fff;//rgb(38, 56, 73);
-          }
-          /*鼠标悬浮在滚动条上的主干部分*/
-          /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar-track:hover{
-            -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.4);
-            background-color:rgba(0,0,0,.01);
+          /deep/ .CodeMirror-sizer{
+            // border: none;
           }
         }
       }
@@ -1062,21 +1117,27 @@ export default {
         .action-bottom{
           display: flex;
           justify-content: space-between;
+          p{
+            span {
+              padding:0 5px;
+              box-sizing: border-box;
+              cursor: pointer;
+            }
+            .active{
+              display: inline-block;
+              height: 33px;
+              line-height: 33px;
+              color: #006CEB;
+              border-bottom: 2px solid #006CEB;
+            }
+          }
           .el-dropdown{
             margin-right: 10px;
           }
         }
         .action-sequence-content{
-          // width: 900px;
           height: 185px;
-          // margin: 0 auto;
-          // text-align: center;
-          // display: flex;
-          // flex: 1;
-          // align-items: flex-start;
-          // flex-wrap: wrap;
           overflow-y: auto;
-          // justify-content: center;
           .row{
             display: flex;
             justify-content: center;
@@ -1095,9 +1156,7 @@ export default {
             .click-icon{
               width: 46px;
               text-align: center;
-              .icon-gesture{
-                color: red;
-              }
+              
               span{
                 font-size: 12px;
                 color: #9B9B9B;
@@ -1194,10 +1253,6 @@ export default {
             z-index: 0;
             position: absolute;
           }
-          img{
-            // width: 100%;
-            // height: 500px;
-          }
         }
         .screenBottomBtn{
           margin-top: 10px;
@@ -1211,11 +1266,6 @@ export default {
           }
         }
       }
-    }
-    
-    
-    .gutter {
-      // background: #ccc;
     }
   // }
   

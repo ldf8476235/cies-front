@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2020-12-01 16:58:19
+ * @LastEditTime: 2020-12-09 17:33:21
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -30,9 +30,8 @@
             </el-input>
           </div>
           <div class="newBtn">
-            <el-button @click="goNewTask" type="primary" icon="el-icon-plus"
-              >新建任务</el-button
-            >
+            <el-button @click="goNewTask" type="primary" icon="el-icon-plus">新建任务</el-button>
+            
           </div>
         </div>
         <div class="tableContent">
@@ -51,7 +50,23 @@
             </el-table-column>
             <el-table-column prop="name" label="状态" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="操作" width="180">
+            <el-table-column prop="name" label="操作" width="80">
+              <template slot-scope="scope">
+                <el-popover
+                  placement="bottom"
+                  width="100"
+                  trigger="click">
+                  <p @click="showFuncBtn(scope.row)">
+                    <svg-icon data_iconName="icon-edit" className="icon-gesture"/>
+                    <span>编辑</span>
+                  </p>
+                  <p><svg-icon data_iconName="icon-copy" className="icon-gesture"/><span>复制</span></p>
+                  <p><svg-icon data_iconName="icon-log" className="icon-gesture"/><span>日志</span></p>
+                  <p><svg-icon data_iconName="icon-report" className="icon-gesture"/><span>报告</span></p>
+                  <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
+                  <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
+                </el-popover>
+              </template>
             </el-table-column>
           </el-table>
         </div>
@@ -116,6 +131,7 @@ export default {
 .task {
   .content {
     padding: 20px;
+    box-sizing: border-box;
   }
   .funcTop {
     display: flex;

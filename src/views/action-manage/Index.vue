@@ -1,21 +1,13 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2020-12-02 18:16:17
+ * @LastEditTime: 2020-12-09 17:56:03
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
 -->
 <template>
   <div class="action">
-    <!-- <div class="crumbs">
-      <div class="tab">
-        <div @click="tabCut(1)" class="actionTab" :class="tabIndex === 1 ? 'pitch' : ''">动作列表</div>
-        <div @click="tabCut(2)" class="verifyTab" :class="tabIndex === 2 ? 'pitch' : ''">校验点列表</div>
-      </div>
-      <span>动作列表</span>
-      
-    </div> -->
     <Crumbs :crumbs='crumbs'></Crumbs>
     <div class="container">
       <div class="content">
@@ -36,16 +28,30 @@
             </el-input>
           </div>
           <div class="newBtn">
-            <el-button @click="goNewTask" type="primary" icon="el-icon-plus"
-              >新建动作</el-button
-            >
+            <!-- <el-button  type="primary" icon="el-icon-plus">新建动作</el-button> -->
+            <el-dropdown @command="goNewTask">
+              <el-button type="primary">
+                <i class="el-icon-plus"></i>
+                <span>新建动作</span>
+                <!-- <svg-icon data_iconName='icon-arrow-down'></svg-icon> -->
+                <i class="el-icon-caret-bottom"></i>
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item :command="0">屏幕操作</el-dropdown-item>
+                <el-dropdown-item :command="1">语音输入</el-dropdown-item>
+                <el-dropdown-item :command="2">命令脚本</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </div>
         </div>
         <div class="tableContent">
           <el-table :data="actionList" border style="width: 100%">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="name" label="类型" width="80">
+            <el-table-column prop="name" label="类型" width="50">
+              <template>
+                <svg-icon data_iconName="icon-gesture" className="icon"/>
+              </template>
             </el-table-column>
             <el-table-column prop="date" label="动作名称" width="180">
             </el-table-column>
@@ -65,9 +71,9 @@
                 placement="bottom"
                 width="100"
                 trigger="click">
-                <p><i class="el-icon-plus"></i><span>编辑</span></p>
-                <p><i class="el-icon-plus"></i><span>复制</span></p>
-                <p><i class="el-icon-plus"></i><span>删除</span></p>
+                <p><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
+                <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
+                <p><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
                 <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
               </el-popover>
             </el-table-column>
@@ -132,8 +138,22 @@ export default {
   },
   methods: {
     // 新建任务
-    goNewTask() {
-      this.$router.push("/action/newaction");
+    goNewTask(i) {
+      console.log(i)
+      switch (i) {
+        case 0:
+          this.$router.push("/action/newscreen");
+          break;
+        case 1:
+          this.$router.push("/action/newvoice");
+          break;
+        case 2:
+          this.$router.push("/action/newscript");
+          break;
+        default:
+          break;
+      }
+      
     },
     // tab切换
     tabCut(index){
@@ -145,7 +165,7 @@ export default {
 </script>
 
 <style lang='less' scoped>
-@import "../../assets/css/pub.less";
+// @import "../../assets/css/pub.less";
 .action {
   .crumbs {
     // .tab{
@@ -175,6 +195,7 @@ export default {
   }
   .content {
     padding: 20px;
+    box-sizing: border-box;
   }
   .funcTop {
     display: flex;
@@ -199,10 +220,13 @@ export default {
     }
     .newBtn {
       .el-button {
-        // width: 100px;
-        // height: 30px;
-        // padding: 0;
-        // font-size: 12px;
+        padding: 7px 8px;
+        span{
+          padding:0 3px;
+        }
+        i {
+          font-weight: 600;
+        }
       }
     }
   }

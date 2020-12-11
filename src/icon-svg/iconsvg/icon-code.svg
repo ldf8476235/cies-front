@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>icon-code</title>
-    <g id="icon-code" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <polygon id="路径-8" fill="#4A4A4A" fill-rule="nonzero" transform="translate(16.823223, 12.000000) scale(-1, 1) translate(-16.823223, -12.000000) " points="18.6464466 7.64644661 19.3535534 8.35355339 15.707 12 19.3535534 15.6464466 18.6464466 16.3535534 14.2928932 12"></polygon>
-        <polygon id="路径-8" fill="#4A4A4A" fill-rule="nonzero" points="8.64644661 7.64644661 9.35355339 8.35355339 5.707 12 9.35355339 15.6464466 8.64644661 16.3535534 4.29289322 12"></polygon>
-        <polygon id="路径-9" fill="#4A4A4A" fill-rule="nonzero" points="12.5149287 7.87873219 13.4850713 8.12126781 11.4850713 16.1212678 10.5149287 15.8787322"></polygon>
+    <g id="icon-code" stroke="none" stroke-width="1"  fill-rule="evenodd">
+        <polygon id="路径-8"  fill-rule="nonzero" transform="translate(16.823223, 12.000000) scale(-1, 1) translate(-16.823223, -12.000000) " points="18.6464466 7.64644661 19.3535534 8.35355339 15.707 12 19.3535534 15.6464466 18.6464466 16.3535534 14.2928932 12"></polygon>
+        <polygon id="路径-8"  fill-rule="nonzero" points="8.64644661 7.64644661 9.35355339 8.35355339 5.707 12 9.35355339 15.6464466 8.64644661 16.3535534 4.29289322 12"></polygon>
+        <polygon id="路径-9"  fill-rule="nonzero" points="12.5149287 7.87873219 13.4850713 8.12126781 11.4850713 16.1212678 10.5149287 15.8787322"></polygon>
     </g>
 </svg>

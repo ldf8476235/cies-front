@@ -1,14 +1,14 @@
 <!--
  * @Autor: wh
  * @Version: 1.0
- * @Date: 2020-12-02 13:19:20
+ * @Date: 2020-12-09 10:30:22
  * @LastEditors: wh
  * @Description: 
- * @LastEditTime: 2020-12-11 16:45:08
+ * @LastEditTime: 2020-12-09 14:03:58
 -->
 <template>
-  <div class="new-case">
-    <Crumbs :crumbs='crumbs' @save='save'></Crumbs>
+  <div class="case-details">
+    <Crumbs :crumbs='crumbs' @edit='edit' @copy='copy'></Crumbs>
     <div class="container">
       <div class="content">
         <div class="title">用例信息</div>
@@ -20,26 +20,30 @@
             label-width="100px"
           >
             <div class="caseInfo">
-              <el-row>
+              <el-row class="">
                 <el-col :span="12">
-                  <el-form-item label="用例名称：" prop="device_name">
+                  <el-form-item v-if="editFlag"  label="用例名称：" prop="device_name">
                     <el-input
+                      disabled
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
                       v-model.trim="caseInfo.device_name"
                       placeholder="请输入"
                     ></el-input>
                   </el-form-item>
+                  <p v-else><span>用例名称：</span><span>case_name_1</span></p>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：">
+                  <el-form-item v-if="editFlag" label="软件版本：">
                     <el-input
                       v-model="caseInfo.device_sn"
                       placeholder=""
                     ></el-input>
                   </el-form-item>
+                  <p v-else><span>软件版本：</span><span>case_name_1</span></p>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="device_space">
+                  
+                  <el-form-item v-if="editFlag" label="所属项目：" prop="device_space">
                     <el-select v-model="selectVal" placeholder="请选择">
                       <el-option
                         v-for="item in options"
@@ -50,25 +54,37 @@
                       </el-option>
                     </el-select>
                   </el-form-item>
+                  <p v-else ><span>所属项目：</span><span>case_name_1</span></p>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="用例描述：">
+                  <p><span>创建人：</span><span>case_name_1</span></p>
+                </el-col>
+                <el-col :span="12">
+                  <p><span>创建时间：</span><span>case_name_1</span></p>
+                </el-col>
+                <el-col :span="12">
+                  <p><span>更新时间：</span><span>case_name_1</span></p>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item v-if="editFlag" label="用例描述：">
                     <el-input
                       type="textarea"
                       v-model="caseInfo.device_desc"
                       placeholder="请输入"
                     ></el-input>
                   </el-form-item>
+                  <p  v-else ><span>用例描述：</span><span>case_name_1</span></p>
                 </el-col>
               </el-row>
             </div>
             <div class="taskCase">
-              <el-row class="text-title">
+              <el-row v-if="editFlag" class="text-title">
                 <p>
                   已选择 <span> 1 </span>个节点<span> 2 </span>用例
                   <span class="del-color">删除</span>
                 </p>
               </el-row>
+              <div v-else class="action-list-title">动作列表</div>
               <el-table
                 width="100%"
                 border
@@ -97,7 +113,7 @@
                       :rules="rulesCaseInfo.caseInfoTable.name"
                       label-width="0px"
                     >
-                      <span v-if="scope.row.editNode">
+                      <span v-if="editFlag">
                         <el-input
                           ref="inputBlur"
                           v-model="scope.row.nodeName"
@@ -116,7 +132,7 @@
                       :rules="rulesCaseInfo.caseInfoTable.hope_status_name"
                       label-width="0px"
                     >
-                      <span v-if="scope.row.editLoop">
+                      <span v-if="editFlag">
                         <el-input
                           ref="inputBlur"
                           v-model="scope.row.loopTimes"
@@ -135,8 +151,8 @@
                       :rules="rulesCaseInfo.caseInfoTable.device_function"
                       label-width="0px"
                     >
-                      <span v-if="true">
-                        <el-select v-model="selectVal" placeholder="请选择">
+                      <!-- <span> -->
+                        <el-select  v-if="editFlag" v-model="selectVal" placeholder="请选择">
                           <el-option
                             v-for="item in options"
                             :key="item.value"
@@ -145,8 +161,8 @@
                           >
                           </el-option>
                         </el-select>
-                      </span>
-                      <!-- <span v-else> {{scope.row.error}} </span> -->
+                      <!-- </span> -->
+                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}} </span>
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -154,11 +170,12 @@
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
+                      
                       :prop="'caseInfoTable.' + scope.$index + '.executeWait'"
                       :rules="rulesCaseInfo.caseInfoTable.device_function"
                       label-width="0px"
                     >
-                      <el-select v-model="selectVal" placeholder="请选择">
+                      <el-select v-if="editFlag" v-model="selectVal" placeholder="请选择">
                         <el-option
                           v-for="item in options"
                           :key="item.value"
@@ -167,11 +184,11 @@
                         >
                         </el-option>
                       </el-select>
-                      <!-- <span> {{scope.row.executeWait}} </span> -->
+                      <span v-else>{{scope.row.loopTimes}}</span>
                     </el-form-item>
                   </template>
                 </el-table-column>
-                <el-table-column label="操作" align="center" width="80">
+                <el-table-column v-if="editFlag" label="操作" align="center" width="80">
                   <template slot-scope="scope">
                     <el-popover
                       placement="bottom"
@@ -190,15 +207,14 @@
                   </template>
                 </el-table-column>
               </el-table>
-              <el-row class="add-node">
+              <!-- <el-row class="add-node">
                 <el-col>
                   <el-button type="" @click="addCaseRow">
                     <i class="el-icon-plus"></i> 添加动作</el-button>
                 </el-col>
-              </el-row>
+              </el-row> -->
             </div>
           </el-form>
-          
         </div>
       </div>
     </div>
@@ -207,14 +223,16 @@
 
 <script>
 export default {
-  name: 'NewCase',
+  name: 'CaseDetails',
   data() {
     return {
       crumbs:{
         action:true,
-        name:'新建用例'
+        details:true,
+        name:'case_name_1'
       },
-      loading: true, //任务名称动态验证动画
+      editFlag:false,
+      loading: false, //任务名称动态验证动画
       options: [
         {
           value: "选项1",
@@ -271,19 +289,21 @@ export default {
   watch:{
   },
   methods: {
-    addCaseRow() {},
-    save(){
-      console.log('保存')
+    // 复制
+    copy(){
+      console.log('复制')
+    },
+    // 编辑
+    edit(){
+      this.editFlag = true
+      console.log('编辑')
     }
   },
 };
 </script>
 
 <style lang='less' scoped>
-.new-case {
-  .caseInfo {
-    
-  }
+.case-details{
   .title {
     height: 41px;
     line-height: 41px;
@@ -294,6 +314,18 @@ export default {
   .formData {
     padding: 20px 0px;
     .caseInfo{
+      padding:10px 20px;
+      
+      p{
+        font-size: 12px;
+        line-height: 18px;
+         margin-bottom: 18px;
+        span{
+          display: inline-block;
+          width: 60px;
+          text-align: right;
+        }
+      }
       .el-input {
         width: 50%;
       }
@@ -312,11 +344,19 @@ export default {
           color: #006CEB;
         }
       }
+      .action-list-title{
+        height: 41px;
+        line-height: 41px;
+        font-size: 12px;
+        // padding: 0 20px;
+        // border-bottom: 1px solid #ddd;
+      }
     }
-    .add-node{
-      margin-top: 20px;
-    }
+  }
+  .info{
+    // padding:10px 20px;
   }
   
 }
 </style>
+

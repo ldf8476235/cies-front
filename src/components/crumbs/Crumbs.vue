@@ -4,13 +4,20 @@
  * @Date: 2020-12-02 17:25:31
  * @LastEditors: wh
  * @Description: 
- * @LastEditTime: 2020-12-02 18:18:17
+ * @LastEditTime: 2020-12-09 10:47:19
 -->
 <template>
   <div>
     <div class="crumbs" v-if="crumbs.action">
       <p><i @click="goBack" class="el-icon-back"></i> <span>{{crumbs.name}}</span></p>
-      <el-button @click="save" type="primary">保存</el-button>
+      <div v-if="crumbs.details">
+        <el-button @click="copy" icon="el-icon-document-copy">
+          复制
+          <!-- <svg-icon data_iconName="icon-replace" className="icon-gesture"/>   -->
+        </el-button>
+        <el-button @click="edit" icon="el-icon-edit-outline">编辑</el-button>
+      </div>
+      <el-button v-else @click="save" type="primary">保存</el-button>
     </div>
     <div class="crumbs" v-else>
       <span>{{crumbs.name}}</span>
@@ -39,6 +46,14 @@ export default {
     // 返回上一页
     goBack(){
       this.$router.back()
+    },
+    // 复制
+    copy(){
+      this.$emit('copy')
+    },
+    // 编辑
+    edit(){
+      this.$emit('edit')
     },
     // 保存
     save(){

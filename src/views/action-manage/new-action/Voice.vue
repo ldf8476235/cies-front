@@ -1,17 +1,17 @@
 <!--
  * @Autor: wh
  * @Version: 1.0
- * @Date: 2020-12-02 13:19:20
+ * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description: 
- * @LastEditTime: 2020-12-11 16:45:08
+ * @LastEditTime: 2020-12-10 10:00:49
 -->
 <template>
-  <div class="new-case">
+  <div class="new-voice">
     <Crumbs :crumbs='crumbs' @save='save'></Crumbs>
     <div class="container">
       <div class="content">
-        <div class="title">用例信息</div>
+        <div class="title">动作信息</div>
         <div class="formData">
           <el-form
             ref="caseInfo"
@@ -22,19 +22,11 @@
             <div class="caseInfo">
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="用例名称：" prop="device_name">
+                  <el-form-item label="动作名称：" prop="device_name">
                     <el-input
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
                       v-model.trim="caseInfo.device_name"
                       placeholder="请输入"
-                    ></el-input>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                  <el-form-item label="软件版本：">
-                    <el-input
-                      v-model="caseInfo.device_sn"
-                      placeholder=""
                     ></el-input>
                   </el-form-item>
                 </el-col>
@@ -51,6 +43,28 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
+                <el-col :span="12">
+                  <el-form-item label="语料库：" prop="device_space">
+                    <el-select v-model="selectVal" placeholder="请选择">
+                      <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
+                      >
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="软件版本：">
+                    <el-input
+                      v-model="caseInfo.device_sn"
+                      placeholder=""
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+                
                 <el-col :span="12">
                   <el-form-item label="用例描述：">
                     <el-input
@@ -76,21 +90,16 @@
                 >
                 <el-table-column
                   type="selection"
+                  align="center"
                   width="55">
                 </el-table-column>
                 <el-table-column
                   type="index"
-                  label="序号"
-                  width="55">
+                  label="#"
+                  align="center"
+                  width="40">
                 </el-table-column>
-                <el-table-column
-                  label="动作类型"
-                  width="100">
-                  <template>
-                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
-                  </template>
-                </el-table-column>
-                <el-table-column label="动作名称">
+                <el-table-column label="语音名称">
                   <template slot-scope="scope">
                     <el-form-item
                       :prop="'caseInfoTable.' + scope.$index + '.nodeName'"
@@ -109,48 +118,6 @@
                     </el-form-item>
                   </template>
                 </el-table-column>
-                <el-table-column label="循环次数">
-                  <template slot-scope="scope">
-                    <el-form-item
-                      :prop="'caseInfoTable.' + scope.$index + '.loopTimes'"
-                      :rules="rulesCaseInfo.caseInfoTable.hope_status_name"
-                      label-width="0px"
-                    >
-                      <span v-if="scope.row.editLoop">
-                        <el-input
-                          ref="inputBlur"
-                          v-model="scope.row.loopTimes"
-                          placeholder=""
-                          @blur="inputBlur(scope.row,scope.column)"
-                        ></el-input>
-                      </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}} </span>
-                    </el-form-item>
-                  </template>
-                </el-table-column>
-                <el-table-column label="出错处理">
-                  <template slot-scope="scope">
-                    <el-form-item
-                      :prop="'caseInfoTable.' + scope.$index + '.error'"
-                      :rules="rulesCaseInfo.caseInfoTable.device_function"
-                      label-width="0px"
-                    >
-                      <span v-if="true">
-                        <el-select v-model="selectVal" placeholder="请选择">
-                          <el-option
-                            v-for="item in options"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                          >
-                          </el-option>
-                        </el-select>
-                      </span>
-                      <!-- <span v-else> {{scope.row.error}} </span> -->
-                    </el-form-item>
-                  </template>
-                </el-table-column>
-                
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
@@ -167,7 +134,6 @@
                         >
                         </el-option>
                       </el-select>
-                      <!-- <span> {{scope.row.executeWait}} </span> -->
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -179,11 +145,8 @@
                       trigger="click">
                       <p @click="showFuncBtn(scope.row)">
                         <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
-                        <span>插入用例</span>
+                        <span>插入语音</span>
                       </p>
-                      <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>替换动作</span></p>
-                      <p><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
-                      <p><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
                       <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
                       <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
                     </el-popover>
@@ -193,7 +156,7 @@
               <el-row class="add-node">
                 <el-col>
                   <el-button type="" @click="addCaseRow">
-                    <i class="el-icon-plus"></i> 添加动作</el-button>
+                    <i class="el-icon-plus"></i> 添加语音</el-button>
                 </el-col>
               </el-row>
             </div>
@@ -207,12 +170,12 @@
 
 <script>
 export default {
-  name: 'NewCase',
+  name: 'NewVoice',
   data() {
     return {
       crumbs:{
         action:true,
-        name:'新建用例'
+        name:'新建动作'
       },
       loading: true, //任务名称动态验证动画
       options: [
@@ -280,7 +243,7 @@ export default {
 </script>
 
 <style lang='less' scoped>
-.new-case {
+.new-voice {
   .caseInfo {
     
   }
@@ -308,6 +271,7 @@ export default {
       padding: 0 20px;
       .text-title{
         font-size: 12px;
+        margin-bottom: 5px;
         .del-color{
           color: #006CEB;
         }

@@ -4,7 +4,7 @@
  * @Date: 2020-12-08 17:59:01
  * @LastEditors: wh
  * @Description: 
- * @LastEditTime: 2020-12-08 18:53:20
+ * @LastEditTime: 2020-12-09 15:37:11
 -->
 <template>
   <svg :class="svgClass" aria-hidden="true">
@@ -20,7 +20,7 @@ export default {
         type:String,
         required:true
     },
-    className:{
+    className:{ // 自定义，不需要可删除
         type:String,
         default:''
     }
@@ -44,11 +44,12 @@ export default {
 .svg-icon{
     width:24px;
     height: 24px;
-    vertical-align: -0.15em;
-    fill: red;
     overflow: hidden;
+    fill: currentColor;
+    /* vertical-align: -0.15em;*/
+    
 }
-/* .icon-gesture{
-  color: red;
-} */
+.svg-class{
+  margin-right: 10px;
+}
 </style>

@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2020-12-02 18:15:57
+ * @LastEditTime: 2020-12-09 14:47:41
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\App.vue
@@ -26,7 +26,9 @@
   p{
     width: 120px;
     height: 36px;
-    line-height: 36px;
+    // line-height: 36px;
+    display: flex;
+    align-items: center;
     cursor: pointer;
     i{
       width: 20px;
@@ -41,7 +43,11 @@
       padding: 0 7px;
       font-family: SourceHanSansCN-Normal, SourceHanSansCN;
     }
+    &:hover{
+      background: #F6F6F6;
+    }
   }
+  
   .el-button {
     border: none;
   }
