@@ -3,11 +3,11 @@
  * @Version: 1.0
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
- * @Description: 
- * @LastEditTime: 2020-12-08 19:00:22
+ * @Description:
+ * @LastEditTime: 2020-12-15 17:52:35
 -->
 <template>
-  <div class="new-action">
+  <div class="new-screen">
     <Crumbs :crumbs='crumbs' @save='save'></Crumbs>
     <div class="container">
       <div class="content">
@@ -52,7 +52,7 @@
                               placeholder=""
                             ></el-input>
                           </el-form-item>
-                          
+
                           <el-form-item label="指派人：">
                             <el-input
                               v-model="actionInfo.device_sn"
@@ -78,7 +78,7 @@
                         <span>脚本</span>
                       </div>
                       <div class="editor">
-                        <CodeMirror 
+                        <CodeMirror
                           ref="cmEditor"
                           :cmTheme="cmTheme"
                           :cmMode="cmMode"
@@ -94,7 +94,11 @@
                   <div class="gutter">
                     <el-card class="box-card-bottom">
                       <div slot="header" class="action-bottom">
-                        <span>动作序列</span>
+                        <p>
+                          <span @click="tab(0)" :class="tabFlag === 0 ?'active' : ''">动作序列</span>
+                          <span @click="tab(1)" :class="tabFlag === 1 ?'active' : ''">元素结构</span>
+                        </p>
+
                         <div class="action-btn">
                           <el-dropdown split-button type="">
                             链接设备
@@ -110,52 +114,65 @@
                         </div>
                       </div>
                       <div class="action-sequence-content">
-
-                        <div class="row" v-for=" item1 in 3" :key="item1">
-                          <div class="action-item" v-if="item1 % 2 === 1" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
-                            <div class="click-icon">
-                              <span>Home</span>
-                              <p>
-                                <img src="../../../assets/iconpng/icon-gesture.png" alt="">
-                              </p>
-                              <span class="iconfont icon-cuo1 red"></span>
-                            </div>
-                            <div class="point-to">
-                              <span class="iconfont" :class="item === 10 ? 'icon-jiang' : 'icon-arrow-up-copy' "></span>
-                            </div>
-                          </div>
-                          <div class="action-item" v-if="item1 % 2 === 0" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
-                            <div class="point-to" v-if="item !== 10">
-                              <span class="iconfont" :class="item === 10 ? 'icon-jiang' : 'icon-jiantou-you' "></span>
-                            </div>
-                            <div class="click-icon">
-                              <span>Home</span>
-                              <p>
-                                <!-- <img src="../../../assets/iconpng/icon-gesture.png" alt=""> -->
+                        <div v-if="tabFlag === 0">
+                          <div class="row" v-for=" item1 in 3" :key="item1">
+                            <div class="action-item" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
+                              <!-- 奇数行 -->
+                              <div class="click-icon" v-if="item1 % 2 === 1">
+                                <span>Home</span>
+                                <p>
+                                  <img src="../../../assets/iconpng/icon-gesture.png" alt="">
+                                </p>
+                                <span class=" el-icon-circle-close red"></span>
+                              </div>
+                              <div class="point-to" v-if="item1 % 2 === 1">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-right' "></span>
+                              </div>
+                              <!-- 偶数行 -->
+                              <div class="point-to" v-if="item !== 10 && item1 % 2 === 0">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-back' "></span>
+                              </div>
+                              <div class="click-icon" v-if="item1 % 2 === 0">
+                                <span>Home</span>
+                                <p>
                                     <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
-                              </p>
-                              <span class="iconfont icon-cuo1 red"></span>
+                                </p>
+                                <span class="el-icon-circle-close red"></span>
+                              </div>
+                              <div class="point-to" v-if="item === 10 && item1 % 2 === 0">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
+                              </div>
                             </div>
-                            <div class="point-to" v-if="item === 10">
-                              <span class="iconfont" :class="item === 10 ? 'icon-jiang' : 'icon-jiantou-you' "></span>
-                            </div>
+                            <!-- <div class="action-item" v-if="item1 % 2 === 0" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
+                              <div class="point-to" v-if="item !== 10">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-back' "></span>
+                              </div>
+                              <div class="click-icon">
+                                <span>Home</span>
+                                <p>
+                                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
+                                </p>
+                                <span class="el-icon-circle-close red"></span>
+                              </div>
+                              <div class="point-to" v-if="item === 10">
+                                <span :class="item === 10 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
+                              </div>
+                            </div> -->
                           </div>
                         </div>
-                        <!-- <div class="row" v-for=" item1 in 1" :key="item1">
-                          <div class="action-item" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
-                            <div class="point-to">
-                              <span class="iconfont" :class="item === 10 ? 'icon-jiang' : 'icon-jiantou-you' "></span>
-                            </div>
-                            <div class="click-icon">
-                              <span>Home</span>
-                              <p>
-                                <img src="../../../assets/iconpng/icon-gesture.png" alt="">
-                              </p>
-                              <span class="iconfont icon-cuo1 red"></span>
-                            </div>
-                          </div>
-                        </div> -->
-                        
+                        <div v-else>
+                          <v-jstree :data="jsTreeData">
+                              <template slot-scope="scope">
+                                <div
+style=""
+                                  @click.exact="itemClick(scope.model)"
+                                  >
+                                  <i :class="scope.model.icon" role="presentation"></i>
+                                  {{scope.model.text}}
+                                </div>
+                              </template>
+                          </v-jstree>
+                        </div>
                       </div>
                     </el-card>
                   </div>
@@ -169,7 +186,7 @@
                 <div slot="header" class="clearfix">
                   <span>实时界面</span>
                 </div>
-                <div class="screen" id="screen">
+                <div class="screen" id="screen" ref="screen">
                   <!-- <img src="../../../assets/images/test.png" alt=""> -->
                   <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
                   <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
@@ -193,138 +210,139 @@
 </template>
 
 <script>
-import Crumbs from '../../../components/crumbs/Crumbs.vue';
 import CodeMirror from '../../../components/codemirror/Codemirror.vue'
-import { b64toBlob, ImagePool} from "@/utils/common.js";
+import VJstree from 'vue-jstree'
+import { b64toBlob, ImagePool, copyToClipboard } from '@/utils/common.js';
 export default {
-  components: { Crumbs ,CodeMirror},
-  name: 'NewAction',
+
+  name: 'NewScreen',
+  components: { CodeMirror, VJstree },
   data() {
     return {
-      crumbs:{
-        action:true,
-        name:'新建动作'
+      crumbs: {
+        action: true,
+        name: '新建动作'
       },
-      cmTheme: "base16-light", // codeMirror主题
+      cmTheme: 'base16-light', // codeMirror主题
       // codeMirror主题选项
       cmThemeOptions: [
-          "default",
-          "3024-day",
-          "3024-night",
-          "abcdef",
-          "ambiance",
-          "ayu-dark",
-          "ayu-mirage",
-          "base16-dark",
-          "base16-light",
-          "bespin",
-          "blackboard",
-          "cobalt",
-          "colorforth",
-          "darcula",
-          "dracula",
-          "duotone-dark",
-          "duotone-light",
-          "eclipse",
-          "elegant",
-          "erlang-dark",
-          "gruvbox-dark",
-          "hopscotch",
-          "icecoder",
-          "idea",
-          "isotope",
-          "lesser-dark",
-          "liquibyte",
-          "lucario",
-          "material",
-          "material-darker",
-          "material-palenight",
-          "material-ocean",
-          "mbo",
-          "mdn-like",
-          "midnight",
-          "monokai",
-          "moxer",
-          "neat",
-          "neo",
-          "night",
-          "nord",
-          "oceanic-next",
-          "panda-syntax",
-          "paraiso-dark",
-          "paraiso-light",
-          "pastel-on-dark",
-          "railscasts",
-          "rubyblue",
-          "seti",
-          "shadowfox",
-          "solarized dark",
-          "solarized light",
-          "the-matrix",
-          "tomorrow-night-bright",
-          "tomorrow-night-eighties",
-          "ttcn",
-          "twilight",
-          "vibrant-ink",
-          "xq-dark",
-          "xq-light",
-          "yeti",
-          "yonce",
-          "zenburn"
+        'default',
+        '3024-day',
+        '3024-night',
+        'abcdef',
+        'ambiance',
+        'ayu-dark',
+        'ayu-mirage',
+        'base16-dark',
+        'base16-light',
+        'bespin',
+        'blackboard',
+        'cobalt',
+        'colorforth',
+        'darcula',
+        'dracula',
+        'duotone-dark',
+        'duotone-light',
+        'eclipse',
+        'elegant',
+        'erlang-dark',
+        'gruvbox-dark',
+        'hopscotch',
+        'icecoder',
+        'idea',
+        'isotope',
+        'lesser-dark',
+        'liquibyte',
+        'lucario',
+        'material',
+        'material-darker',
+        'material-palenight',
+        'material-ocean',
+        'mbo',
+        'mdn-like',
+        'midnight',
+        'monokai',
+        'moxer',
+        'neat',
+        'neo',
+        'night',
+        'nord',
+        'oceanic-next',
+        'panda-syntax',
+        'paraiso-dark',
+        'paraiso-light',
+        'pastel-on-dark',
+        'railscasts',
+        'rubyblue',
+        'seti',
+        'shadowfox',
+        'solarized dark',
+        'solarized light',
+        'the-matrix',
+        'tomorrow-night-bright',
+        'tomorrow-night-eighties',
+        'ttcn',
+        'twilight',
+        'vibrant-ink',
+        'xq-dark',
+        'xq-light',
+        'yeti',
+        'yonce',
+        'zenburn'
       ],
-      cmEditorMode: "default", // 编辑模式
+      cmEditorMode: 'default', // 编辑模式
       // 编辑模式选项
       cmEditorModeOptions: [
-          "default",
-          "json",
-          "sql",
-          "javascript",
-          "css",
-          "xml",
-          "html",
-          "yaml",
-          "markdown",
-          "python"
+        'default',
+        'json',
+        'sql',
+        'javascript',
+        'css',
+        'xml',
+        'html',
+        'yaml',
+        'markdown',
+        'python'
       ],
-      cmMode: "python", //codeMirror模式
+      cmMode: 'python', // codeMirror模式
       jsonIndentation: 2, // json编辑模式下，json格式化缩进 支持字符或数字，最大不超过10，默认缩进2个空格
       autoFormatJson: true, // json编辑模式下，输入框失去焦点时是否自动格式化，true 开启， false 关闭
-      generatedCode:'',
-      loading: false, //任务名称动态验证动画
+      generatedCode: '',
+      loading: false, // 任务名称动态验证动画
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: '选项1',
+          label: '黄金糕'
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: '选项2',
+          label: '双皮奶'
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: '选项3',
+          label: '蚵仔煎'
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: '选项4',
+          label: '龙须面'
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
+          value: '选项5',
+          label: '北京烤鸭'
+        }
       ],
-      selectVal: "", // 选中项
-      tabClickIndex: "",
-      actionInfo:{},
-      rulesActionInfo:{},
-      canvasStyle: { //画布内联style
+      selectVal: '', // 选中项
+      tabClickIndex: '',
+      actionInfo: {},
+      rulesActionInfo: {},
+      canvasStyle: { // 画布内联style
         opacity: 1,
         width: 'inherit',
         height: 'inherit'
       },
-      canvas: {   // 画布
+      canvas: { // 画布
         bg: null,
-        fg: null,
+        fg: null
       },
       lastScreenSize: {
         screen: {},
@@ -333,100 +351,111 @@ export default {
           height: 1
         }
       },
-      cursor: {}
+      cursor: {},
+      tabFlag: 0,
+      jsTreeData: [] // 树形节点对象
     };
   },
-  created(){
+  created() {
     this.imagePool = new ImagePool(100);
   },
-  mounted(){
+  mounted() {
     this.canvas.bg = document.querySelector('#bgCanvas')
     this.canvas.fg = document.querySelector('#fgCanvas')
-    
+
     this.deviceId = 'android:'
     this.checkVersion()
     this.getCurrentScreen()
     this.doConnect()
-    
+
     window.onresize = () => {
       this.resizeScreen()
     }
-    
-    
   },
-  computed:{
-    nodes:{
+  destroyed() {
+    this.screenWebSocket.close()
+  },
+  computed: {
+    nodes: {
       // cache:false,//控制计算属性缓存
-      get:function (){
+      get: function() {
         console.log('计算属性')
         return this.originNodes
       }
-      
-    },
+
+    }
   },
-  watch:{
+  watch: {
   },
   methods: {
+    // 元素节点点击事件
+    itemClick(a, b) {
+      console.log('元素节点', a, b)
+    },
+    // 动作/元素结构切换
+    tab(i) {
+      console.log(i)
+      this.tabFlag = i
+    },
     // wh-检查版本
-    checkVersion: function () {
+    checkVersion: function() {
       this.$axios.get('/api/v1/version').then(res => {
         console.log(res)
         this.version = res.version;
-          console.log('版本：',this.version)
-          // var lastScreenshotBase64 = localStorage.screenshotBase64;
-          // if (lastScreenshotBase64) {
-          //   var blob = b64toBlob(lastScreenshotBase64, 'image/jpeg');
-          //   this.drawBlobImageToScreen(blob);
-          //   this.canvasStyle.opacity = 1.0;
-          // }
-          // if (localStorage.jsonHierarchy) {
-          //   let source = JSON.parse(localStorage.jsonHierarchy);
-          //   this.drawAllNodeFromSource(source);
-          //   this.loading = false;
-          //   this.canvasStyle.opacity = 1.0;
-          // }
+        console.log('版本：', this.version)
+        // var lastScreenshotBase64 = localStorage.screenshotBase64;
+        // if (lastScreenshotBase64) {
+        //   var blob = b64toBlob(lastScreenshotBase64, 'image/jpeg');
+        //   this.drawBlobImageToScreen(blob);
+        //   this.canvasStyle.opacity = 1.0;
+        // }
+        // if (localStorage.jsonHierarchy) {
+        //   let source = JSON.parse(localStorage.jsonHierarchy);
+        //   this.drawAllNodeFromSource(source);
+        //   this.loading = false;
+        //   this.canvasStyle.opacity = 1.0;
+        // }
       })
     },
     // 获取当前屏幕截图
-    getCurrentScreen(){
+    getCurrentScreen() {
       this.$axios.get('/api/v1/devices/' + encodeURIComponent(this.deviceId || '-') + '/screenshot').then(res => {
         console.log(res)
-        console.log('screenRefresh----:',res)
+        console.log('screenRefresh----:', res)
         var blob = b64toBlob(res.data, 'image/' + res.type);
         this.drawBlobImageToScreen(blob);
         this.dumpHierarchy().then(this.loadLiveScreen)
         localStorage.setItem('screenshotBase64', res.data);
       }).catch(err => {
-        console.log('err:',err)
+        console.log('err:', err)
       })
     },
     // wh-连接手机
     doConnect() {
-      
       const params = `platform=${'Android'}&deviceUrl=${''}`
-      this.$axios.post('/api/v1/connect',params,{headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).then(res => {
-        console.log("deviceId", res.deviceId)
-          this.deviceId = res.deviceId
-          this.screenWebSocketUrl = res.screenWebSocketUrl
+      this.$axios.post('/api/v1/connect', params, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}).then(res => {
+        console.log('deviceId', res.deviceId)
+        this.deviceId = res.deviceId
+        this.screenWebSocketUrl = res.screenWebSocketUrl
       }).catch(err => {
-        console.log('err',err)
+        console.log('err', err)
       })
     },
     // 绘制当前屏幕
-    drawBlobImageToScreen (blob) {
-      console.log('drawBlobImageToScreen----',blob)
+    drawBlobImageToScreen(blob) {
+      console.log('drawBlobImageToScreen----', blob)
       // Support jQuery Promise
       // var dtd = $.Deferred();
       // console.log(this.canvas.bg)
-      var bgcanvas = this.canvas.bg,
-        fgcanvas = this.canvas.fg,
-        ctx = bgcanvas.getContext('2d'),
-        self = this,
-        URL = window.URL || window.webkitURL,
-        BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-        img = this.imagePool.next();
-        console.log(img.width,img.height)
-      img.onload = function () {
+      var bgcanvas = this.canvas.bg;
+      var fgcanvas = this.canvas.fg;
+      var ctx = bgcanvas.getContext('2d');
+      var self = this;
+      var URL = window.URL || window.webkitURL;
+      var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+      var img = this.imagePool.next();
+      console.log(img.width, img.height)
+      img.onload = function() {
         fgcanvas.width = bgcanvas.width = img.width
         fgcanvas.height = bgcanvas.height = img.height
         // var screenDiv = document.getElementById('screen');
@@ -442,13 +471,13 @@ export default {
         // img.src = BLANK_IMG
         // img = null
         // blob = null
-        console.log('------',img)
+        // console.log('------',img)
         // URL.revokeObjectURL(url)
         // url = null
         // dtd.resolve();
       }
 
-      img.onerror = function () {
+      img.onerror = function() {
         // Happily ignore. I suppose this shouldn't happen, but sometimes it does, presumably when we're loading images too quickly.
         // Do the same cleanup here as in onload.
         img.onload = img.onerror = null
@@ -466,14 +495,14 @@ export default {
       // return dtd;
     },
     // wh-获取安卓屏幕结构
-    dumpHierarchy () { // v2
+    dumpHierarchy() { // v2
       return this.$axios.get('/api/v2/devices/' + encodeURIComponent(this.deviceId || '-') + '/hierarchy').then(res => {
         // console.log('res----:',res)
-        localStorage.setItem("xmlHierarchy", res.xmlHierarchy);
+        localStorage.setItem('xmlHierarchy', res.xmlHierarchy);
         localStorage.setItem('jsonHierarchy', JSON.stringify(res.jsonHierarchy));
-        localStorage.setItem("activity", res.activity);
-        localStorage.setItem("packageName", res.packageName);
-        localStorage.setItem("windowSize", res.windowSize);
+        localStorage.setItem('activity', res.activity);
+        localStorage.setItem('packageName', res.packageName);
+        localStorage.setItem('windowSize', res.windowSize);
         this.activity = res.activity; // only for android
         this.packageName = res.packageName;
         this.drawAllNodeFromSource(res.jsonHierarchy);
@@ -481,22 +510,25 @@ export default {
       })
     },
     // wh-绘制所有安卓屏幕所有节点
-    drawAllNodeFromSource (source) {
-      let nodeMaps = this.originNodeMaps = {}
+    drawAllNodeFromSource(source) {
+      const nodeMaps = this.originNodeMaps = {}
       function sourceToNodes(source) {
-        let node = Object.assign({}, source); //, { children: undefined });
+        const node = Object.assign({}, source); //, { children: undefined });
         nodeMaps[node._id] = node;
         let nodes = [node];
         if (source.children) {
-          source.children.forEach(function (s) {
+          source.children.forEach(function(s) {
             s._parentId = node._id;
             nodes = nodes.concat(sourceToNodes(s))
           })
         }
         return nodes;
       }
-      this.originNodes = sourceToNodes(source) //res.nodes;
-      console.log('this.originNodes:',this.originNodes)
+      this.originNodes = sourceToNodes(source) // res.nodes;
+      // console.log('this.originNodes:',source)
+      const jsTreeData = this.sourceToJstree(source)
+      this.jsTreeData = [jsTreeData]
+      console.log('js====', this.jsTreeData)
       this.activeMouseControl()
       this.drawAllNode();
       this.canvasStyle.opacity = 1.0;
@@ -506,7 +538,7 @@ export default {
       var canvas = self.canvas.fg;
       var ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      self.originNodes.forEach(function (node) {
+      self.originNodes.forEach(function(node) {
         // ignore some types
         if (['Layout'].includes(node.type)) {
           return;
@@ -520,17 +552,17 @@ export default {
         return;
       }
       // console.log(node.rect.x)
-      var x = node.rect.x,
-        y = node.rect.y,
-        w = node.rect.width,
-        h = node.rect.height;
+      var x = node.rect.x;
+      var y = node.rect.y;
+      var w = node.rect.width;
+      var h = node.rect.height;
       color = color || 'black';
       var ctx = this.canvas.fg.getContext('2d');
       var rectangle = new Path2D();
       rectangle.rect(x, y, w, h);
       // if (dashed) {
-        ctx.lineWidth = 5;
-        ctx.setLineDash([8, 10]); // 设置虚线 实现部分与虚线部分 8-10-8-10 循环
+      ctx.lineWidth = 5;
+      ctx.setLineDash([8, 10]); // 设置虚线 实现部分与虚线部分 8-10-8-10 循环
       // } else {
       //   ctx.lineWidth = 5;
       //   ctx.setLineDash([]);
@@ -540,7 +572,6 @@ export default {
     },
     // wh-可视区域尺寸变化
     resizeScreen(img) {
-      
       // check if need update
       if (img) {
         if (this.lastScreenSize.canvas.width == img.width &&
@@ -553,7 +584,8 @@ export default {
           return;
         }
       }
-      var screenDiv = document.getElementById('screen');
+      var screenDiv = this.$refs.screen // document.getElementById('screen');
+      console.log(screenDiv.clientWidth)
       this.lastScreenSize = {
         canvas: {
           width: img.width,
@@ -561,16 +593,17 @@ export default {
         },
         screen: {
           width: screenDiv.clientWidth,
-          height: screenDiv.clientHeight,
+          height: screenDiv.clientHeight
         }
       }
       var canvasRatio = img.width / img.height;
-      var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
-      console.log('sssssssssssssssss',screenDiv.clientWidth,screenDiv.clientHeight)
-       Object.assign(this.canvasStyle, {
-          width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', //'inherit',
-          height: Math.floor(screenDiv.clientHeight) + 'px', //'100%',
-        })
+      // var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
+      console.log('sssssssssssssssss', screenDiv.clientWidth, screenDiv.clientHeight)
+      Object.assign(this.canvasStyle, {
+        width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', // 'inherit',
+        height: Math.floor(screenDiv.clientHeight) + 'px' // '100%',
+      })
+
       // if (canvasRatio > screenRatio) {
       //   Object.assign(this.canvasStyle, {
       //     width: Math.floor(screenDiv.clientWidth) + 'px', //'100%',
@@ -586,10 +619,10 @@ export default {
     drawRefresh() {
       this.drawAllNode()
       if (this.nodeHovered) {
-        this.drawNode(this.nodeHovered, "blue")
+        this.drawNode(this.nodeHovered, 'blue')
       }
       if (this.nodeSelected) {
-        this.drawNode(this.nodeSelected, "red")
+        this.drawNode(this.nodeSelected, 'red')
       }
     },
     findNodesByPosition(pos) {
@@ -597,10 +630,10 @@ export default {
         if (!node.rect) {
           return false;
         }
-        var lx = node.rect.x,
-          ly = node.rect.y,
-          rx = node.rect.width + lx,
-          ry = node.rect.height + ly;
+        var lx = node.rect.x;
+        var ly = node.rect.y;
+        var rx = node.rect.width + lx;
+        var ry = node.rect.height + ly;
         return lx < x && x < rx && ly < y && y < ry;
       }
 
@@ -608,7 +641,7 @@ export default {
         return node.rect.width * node.rect.height;
       }
 
-      let activeNodes = this.nodes.filter(function (node) {
+      const activeNodes = this.nodes.filter(function(node) {
         if (!isInside(node, pos.x, pos.y)) {
           return false;
         }
@@ -625,16 +658,16 @@ export default {
       return activeNodes;
     },
     drawHoverNode(pos) {
-      let hoveredNodes = this.findNodesByPosition(pos);
-      let node = hoveredNodes[0];
+      const hoveredNodes = this.findNodesByPosition(pos);
+      const node = hoveredNodes[0];
       this.nodeHovered = node;
 
       hoveredNodes.forEach((node) => {
-        this.drawNode(node, "green")
+        this.drawNode(node, 'green')
       })
-      this.drawNode(this.nodeHovered, "blue");
+      this.drawNode(this.nodeHovered, 'blue');
     },
-    findNodes (kwargs) {
+    findNodes(kwargs) {
       return this.nodes.filter((node) => {
         for (const [k, v] of Object.entries(kwargs)) {
           if (node[k] !== v) {
@@ -644,10 +677,10 @@ export default {
         return true
       })
     },
-    generateNodeSelectorKwargs (node) {
+    generateNodeSelectorKwargs(node) {
       // iOS: name, label, className
       // Android: text, description, resourceId, className
-      let kwargs = {};
+      const kwargs = {};
       ['label', 'resourceId', 'name', 'text', 'type', 'tag', 'description', 'className'].some((key) => {
         if (!node[key]) {
           return false;
@@ -663,34 +696,34 @@ export default {
           return n._id == node._id
         })
       }
-      kwargs["_count"] = nodeCount
+      kwargs['_count'] = nodeCount
       return kwargs;
     },
     _combineKeyValue(key, value) {
-      if (typeof value === "string") {
+      if (typeof value === 'string') {
         value = `"${value}"`
       }
       return key + '=' + value;
     },
     generateNodeSelectorCode(node) {
-      console.log('node:',node)
+      console.log('node:', node)
       if (this.useXPathOnly) {
         return `d.xpath('${this.elemXPathLite}')`
       }
-      let kwargs = this.generateNodeSelectorKwargs(node)
+      const kwargs = this.generateNodeSelectorKwargs(node)
       if (kwargs._count === 1) {
         const array = [];
         for (const [key, value] of Object.entries(kwargs)) {
-          if (key.startsWith("_")) {
+          if (key.startsWith('_')) {
             continue;
           }
           array.push(this._combineKeyValue(key, value))
         }
-        return `d(${array.join(", ")})`
+        return `d(${array.join(', ')})`
       }
       return `d.xpath('${this.elemXPathLite}')`
     },
-    loadLiveHierarchy () {
+    loadLiveHierarchy() {
       if (this.nodeHovered || this.nodeSelected) {
         setTimeout(this.loadLiveHierarchy, 500)
         return
@@ -705,30 +738,30 @@ export default {
       var self = this;
       var BLANK_IMG =
         'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-      var protocol = location.protocol == "http:" ? "ws://" : "wss://"
+      // var protocol = location.protocol == 'http:' ? 'ws://' : 'wss://'
       var ws = new WebSocket(this.screenWebSocketUrl);
       var canvas = document.getElementById('bgCanvas')
       var ctx = canvas.getContext('2d');
-      var lastScreenSize = {
-        screen: {},
-        canvas: {}
-      };
+      // var lastScreenSize = {
+      //   screen: {},
+      //   canvas: {}
+      // };
 
       this.screenWebSocket = ws;
 
       // this.loadLiveHierarchy() // 计算红色框
-      
-      ws.onopen = function (ev) {
+
+      ws.onopen = function(ev) {
         console.log('screen websocket connected')
       };
-      ws.onmessage = function (message) {
-        
-        console.log("New message");
+      ws.onmessage = function(message) {
+
+        console.log('New message');
         var blob = new Blob([message.data], {
           type: 'image/jpeg'
         })
         var img = self.imagePool.next();
-        img.onload = function () {
+        img.onload = function() {
           canvas.width = img.width
           canvas.height = img.height
           ctx.drawImage(img, 0, 0, img.width, img.height);
@@ -748,7 +781,7 @@ export default {
           url = null
         }
 
-        img.onerror = function () {
+        img.onerror = function() {
           // Happily ignore. I suppose this shouldn't happen, but
           // sometimes it does, presumably when we're loading images
           // too quickly.
@@ -768,7 +801,51 @@ export default {
 
       ws.onclose = (ev) => {
         this.liveScreen = false;
-        console.log("screen websocket closed")
+        console.log('screen websocket closed')
+      }
+    },
+    // 源节点转换成树形节点对象
+    sourceToJstree(source) {
+      // console.log(source)
+      var n = {}
+      n.id = source._id;
+      n.text = source._type
+      if (source.name) {
+        n.text += ' - ' + source.name;
+      }
+      if (source.resourceId) {
+        n.text += ' - ' + source.resourceId;
+      }
+      n.icon = this.sourceTypeIcon(source.type);
+      if (source.children) {
+        n.children = []
+        source.children.forEach((s) => {
+          n.children.push(this.sourceToJstree(s))
+        })
+      }
+
+      return n
+    },
+    sourceTypeIcon(widgetType) {
+      switch (widgetType) {
+        case 'Scene':
+          return 'glyphicon glyphicon-tree-conifer'
+        case 'Layer':
+          return 'glyphicon glyphicon-equalizer'
+        case 'Camera':
+          return 'glyphicon glyphicon-facetime-video'
+        case 'Node':
+          return 'glyphicon glyphicon-leaf'
+        case 'ImageView':
+          return 'glyphicon glyphicon-picture'
+        case 'Button':
+          return 'glyphicon glyphicon-inbox'
+        case 'Layout':
+          return 'glyphicon glyphicon-tasks'
+        case 'Text':
+          return 'glyphicon glyphicon-text-size'
+        default:
+          return 'el-icon-s-promotion'
       }
     },
     // wh-鼠标移动，点击事件
@@ -795,7 +872,7 @@ export default {
       }
 
       function activeFinger(index, x, y, pressure) {
-        var scale = 0.5 + pressure
+        // var scale = 0.5 + pressure
         // $(".finger-" + index)
         //   .addClass("active")
         //   .css("transform", 'translate3d(' + x + 'px,' + y + 'px,0)')
@@ -873,7 +950,7 @@ export default {
           px: px,
           py: py,
           x: Math.floor(px * element.width),
-          y: Math.floor(py * element.height),
+          y: Math.floor(py * element.height)
         }
       }
 
@@ -933,7 +1010,7 @@ export default {
           self.nodeSelected = self.nodeHovered;
           self.drawAllNode();
           // self.drawHoverNode(pos);
-          self.drawNode(self.nodeSelected, "red");
+          self.drawNode(self.nodeSelected, 'red');
           var generatedCode = self.generateNodeSelectorCode(self.nodeSelected);
           if (self.autoCopy) {
             copyToClipboard(generatedCode);
@@ -957,14 +1034,14 @@ export default {
       }
 
       function markPosition(pos) {
-        var ctx = self.canvas.fg.getContext("2d");
+        var ctx = self.canvas.fg.getContext('2d');
         ctx.fillStyle = '#ff8901' // '#ff0000'; // red
         ctx.beginPath()
         ctx.arc(pos.x, pos.y, 12, 0, 2 * Math.PI)
         ctx.closePath()
         ctx.fill()
 
-        ctx.fillStyle = "#fff"; // white
+        ctx.fillStyle = '#fff'; // white
         ctx.beginPath()
         ctx.arc(pos.x, pos.y, 8, 0, 2 * Math.PI)
         ctx.closePath()
@@ -972,28 +1049,31 @@ export default {
       }
 
       /* bind listeners */
-      element.addEventListener("contextmenu", contextMenuListener);
+      element.addEventListener('contextmenu', contextMenuListener);
       element.addEventListener('mousedown', mouseDownListener);
       element.addEventListener('mousemove', mouseHoverListener);
       element.addEventListener('mouseleave', mouseHoverLeaveListener);
     },
-    save(){
+    save() {
       console.log('保存')
     }
-  },
+  }
 };
 </script>
 
 <style lang='less' scoped>
-.new-action {
+.new-screen {
   // height: 100%;
   // overflow: hidden;
   // .action-content{
     /deep/ .el-card__header{
-      padding: 5px 10px;
+      padding: 5px 10px 0px 10px;
     }
     /deep/ .el-card__body {
       padding: 5px;
+    }
+    span {
+      font-size: 12px;
     }
     .left{
       .el-card {
@@ -1007,10 +1087,10 @@ export default {
           clear: both
         }
         .action-btn{
-          
-          
+
+
         }
-        
+
       }
       .box-card-top {
         height: 300px;
@@ -1020,63 +1100,45 @@ export default {
             // width: 100px;
             /deep/ .CodeMirror-scroll {
               padding-bottom: 0px;
+              width: 100%;
+              height: 80%;
+              overflow-x: hidden !important;
             }
           }
-          /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar{
-            width:5px;
-            height:5px;
-            // color: red;
+          /deep/ .CodeMirror-vscrollbar {
+            overflow: hidden;
           }
-          /*正常情况下滑块的样式*/
-         /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar-thumb{
-            background-color:rgb(83,98,111);
-            border-radius:10px;
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*鼠标悬浮在该类指向的控件上时滑块的样式*/
-         /deep/ .CodeMirror-vscrollbar:hover::-webkit-scrollbar-thumb{
-            background-color:rgba(0,0,0,.2);
-            border-radius:10px;
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*鼠标悬浮在滑块上时滑块的样式*/
-         /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar-thumb:hover{
-            background-color:rgba(0,0,0,.4);
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*正常时候的主干部分*/
-         /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar-track{
-            border-radius:10px;
-            -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0);
-            background-color: #fff;//rgb(38, 56, 73);
-          }
-          /*鼠标悬浮在滚动条上的主干部分*/
-          /deep/ .CodeMirror-vscrollbar::-webkit-scrollbar-track:hover{
-            -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.4);
-            background-color:rgba(0,0,0,.01);
+          /deep/ .CodeMirror-sizer{
+            // border: none;
           }
         }
       }
       .box-card-bottom {
-        
+
         .action-bottom{
           display: flex;
           justify-content: space-between;
+          p{
+            span {
+              padding:0 5px;
+              box-sizing: border-box;
+              cursor: pointer;
+            }
+            .active{
+              display: inline-block;
+              height: 33px;
+              line-height: 33px;
+              color: #006CEB;
+              border-bottom: 2px solid #006CEB;
+            }
+          }
           .el-dropdown{
             margin-right: 10px;
           }
         }
         .action-sequence-content{
-          // width: 900px;
           height: 185px;
-          // margin: 0 auto;
-          // text-align: center;
-          // display: flex;
-          // flex: 1;
-          // align-items: flex-start;
-          // flex-wrap: wrap;
           overflow-y: auto;
-          // justify-content: center;
           .row{
             display: flex;
             justify-content: center;
@@ -1095,9 +1157,7 @@ export default {
             .click-icon{
               width: 46px;
               text-align: center;
-              .icon-gesture{
-                color: red;
-              }
+
               span{
                 font-size: 12px;
                 color: #9B9B9B;
@@ -1194,10 +1254,6 @@ export default {
             z-index: 0;
             position: absolute;
           }
-          img{
-            // width: 100%;
-            // height: 500px;
-          }
         }
         .screenBottomBtn{
           margin-top: 10px;
@@ -1212,12 +1268,7 @@ export default {
         }
       }
     }
-    
-    
-    .gutter {
-      // background: #ccc;
-    }
   // }
-  
+
 }
 </style>

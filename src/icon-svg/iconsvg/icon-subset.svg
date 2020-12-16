@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>icon-subset</title>
-    <g id="icon-subset" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <polygon id="路径-5" fill="#979797" fill-rule="nonzero" points="12.5 4 12.5 11.5 20 11.5 20 12.5 11.5 12.5 11.5 4"></polygon>
+    <g id="icon-subset" stroke="none" stroke-width="1"  fill-rule="evenodd">
+        <polygon id="路径-5"  fill-rule="nonzero" points="12.5 4 12.5 11.5 20 11.5 20 12.5 11.5 12.5 11.5 4"></polygon>
     </g>
 </svg>

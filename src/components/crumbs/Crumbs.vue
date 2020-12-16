@@ -3,14 +3,25 @@
  * @Version: 1.0
  * @Date: 2020-12-02 17:25:31
  * @LastEditors: wh
- * @Description: 
- * @LastEditTime: 2020-12-02 18:18:17
+ * @Description:
+ * @LastEditTime: 2020-12-15 09:33:24
 -->
 <template>
   <div>
     <div class="crumbs" v-if="crumbs.action">
       <p><i @click="goBack" class="el-icon-back"></i> <span>{{crumbs.name}}</span></p>
-      <el-button @click="save" type="primary">保存</el-button>
+      <div v-if="crumbs.details">
+        <el-button @click="copy" icon="el-icon-document-copy">
+          复制
+          <!-- <svg-icon data_iconName="icon-replace" className="icon-gesture"/>   -->
+        </el-button>
+        <el-button @click="edit" icon="el-icon-edit-outline">编辑</el-button>
+      </div>
+      <div v-else>
+        <el-button type="text">取消</el-button>
+        <el-button  @click="save" type="primary">保存</el-button>
+      </div>
+
     </div>
     <div class="crumbs" v-else>
       <span>{{crumbs.name}}</span>
@@ -21,30 +32,42 @@
 <script>
 export default {
   name: 'Crumbs',
-  props:{
-    crumbs:{
-      type:Object,
-      
+  props: {
+    crumbs: {
+      type: Object
+
     }
   },
   data() {
     return {
     };
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
   methods: {
     // 返回上一页
-    goBack(){
+    goBack() {
       this.$router.back()
     },
+    // 复制
+    copy() {
+      this.$emit('copy')
+    },
+    // 编辑
+    edit() {
+      this.$emit('edit')
+    },
+    // 取消
+    cancel() {
+      this.$emit('cancel')
+    },
     // 保存
-    save(){
+    save() {
       this.$emit('save')
     }
-  },
+  }
 };
 </script>
 

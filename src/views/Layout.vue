@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2020-12-03 13:35:38
+ * @LastEditTime: 2020-12-11 17:42:55
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\views\Layout.vue
@@ -9,10 +9,10 @@
 <template>
   <div class="layout">
     <el-container>
-      <el-aside width="188px">
+      <el-aside :width="collapse ? '66px' : '188px'">
         <div @click="goHome" class="logo">
           <img :src="logo" alt="" />
-          <span>SYSTEM</span>
+          <span v-if="!collapse">SYSTEM</span>
         </div>
         <el-menu
           background-color="#FFFFFF"
@@ -34,10 +34,19 @@
       <el-container>
         <el-header>
           <div class="header">
-            <div><i class="iconfont icon-changjing"></i></div>
+            <div class="fold" @click="foldBtn"><svg-icon data_iconName='icon-list' /></div>
             <div class="userInfo">
               <img :src="logo" alt="" />
-              <span>Vincent</span>
+              <el-dropdown @command="logout">
+              <div>
+                <span>Vincent</span>
+                <i class="el-icon-caret-bottom"></i>
+              </div>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item :command="0">个人信息</el-dropdown-item>
+                <el-dropdown-item :command="1">推出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
             </div>
           </div>
         </el-header>
@@ -52,94 +61,102 @@
 </template>
 
 <script>
-import NavMenu from "@/components/menu/NavMenu.vue";
-import logoImg from "@/assets/images/logo.png";
+import NavMenu from '@/components/menu/NavMenu.vue';
+import logoImg from '@/assets/images/logo.png';
 export default {
-  name: "Layout",
+  name: 'Layout',
   components: {
-    NavMenu,
+    NavMenu
   },
   data() {
     return {
-      transitionName: "slide-right",
+      transitionName: 'slide-right',
       collapse: false,
-      activePath: "/",
-      tabName: "设备管理",
+      activePath: '/',
+      tabName: '设备管理',
       logo: logoImg,
       // 左侧导航栏菜单
       navData: [
         {
-          id: "001",
-          name: "任务管理",
-          path: "/task",
-          icon: "icon-changjing",
-          children: [],
+          id: '001',
+          name: '任务管理',
+          path: '/task',
+          icon: 'icon-task-off'
+          // children: [],
         },
         {
-          id: "002",
-          name: "用例管理",
-          path: "/case",
-          icon: "icon-changjing",
-          children: [],
+          id: '002',
+          name: '用例管理',
+          path: '/case',
+          icon: 'icon-cese-off'
+          // children: [],
         },
         {
-          id: "003",
-          name: "动作管理",
-          path: "/action",
-          icon: "icon-changjing",
-          children: [],
+          id: '003',
+          name: '动作管理',
+          path: '/action',
+          icon: 'icon-action-off'
+          // children: [],
         },
         {
-          id: "009",
-          name: "校验点管理",
-          path: "/verify",
-          icon: "icon-changjing",
-          children: [],
+          id: '009',
+          name: '校验点管理',
+          path: '/verify',
+          icon: 'icon-checkoff'
+          // children: [],
         },
         {
-          id: "004",
-          name: "设备管理",
-          path: "/device",
-          icon: "icon-changjing",
-          children: [],
+          id: '004',
+          name: '设备管理',
+          path: '/device',
+          icon: 'icon-device-off'
+          // children: [],
         },
         {
-          id: "005",
-          name: "脚本管理",
-          path: "/script",
-          icon: "icon-changjing",
-          children: [],
+          id: '005',
+          name: '脚本管理',
+          path: '/script',
+          icon: 'icon-script-on'
+          // children: [],
         },
         {
-          id: "006",
-          name: "角色管理",
-          path: "/role",
-          icon: "icon-changjing",
-          children: [],
+          id: '006',
+          name: '角色管理',
+          path: '/role',
+          icon: 'icon-role-off'
+          // children: [],
         },
         {
-          id: "007",
-          name: "用户管理",
-          path: "/user",
-          icon: "icon-changjing",
-          children: [],
+          id: '007',
+          name: '用户管理',
+          path: '/user',
+          icon: 'icon-user-off'
+          // children: [],
         },
         {
-          id: "008",
-          name: "接口调试",
-          icon: "icon-changjing",
-          path: "/api",
-          url: "http://192.168.220.139/cies/swagger-ui.html",
-          children: [],
-        },
-      ],
+          id: '008',
+          name: '接口调试',
+          icon: 'icon-changjing',
+          path: '/api',
+          url: 'http://192.168.220.139/cies/swagger-ui.html'
+          // children: [],
+        }
+      ]
     };
   },
   mounted() {
-    const path = window.location.href.split("/").pop().split("?")[0];
-    this.activePath = "/" + path;
+    const path = window.location.href.split('/').pop().split('?')[0];
+    this.activePath = '/' + path;
   },
   methods: {
+    // 登出/个人信息
+    logout() {
+
+    },
+    // 折叠菜单
+    foldBtn() {
+      this.collapse = !this.collapse
+    },
     // 回到首页
     goHome() {},
     handleOpen(key, keyPath) {
@@ -147,7 +164,7 @@ export default {
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
-    },
+    }
   },
   watch: {
     // $route(to, from) {
@@ -157,11 +174,11 @@ export default {
     //   console.log(fromDepth)
     //   this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
     // }
-  },
+  }
 };
 </script>
 
-<style lang='less'>
+<style lang='less' scoped>
 .layout {
   height: 100%;
   .el-header {
@@ -183,16 +200,12 @@ export default {
           padding: 0 10px;
         }
       }
+      .fold{
+        cursor: pointer;
+      }
     }
   }
-  .el-menu-item {
-    &:hover {
-      background: rgba(0, 108, 235, 0.05) !important;
-    }
-    &:focus {
-      background: rgba(0, 108, 235, 0.05) !important;
-    }
-  }
+
 
   .el-aside {
     height: 100%;

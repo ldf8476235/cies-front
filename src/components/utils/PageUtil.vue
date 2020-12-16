@@ -1,5 +1,5 @@
 <!--
- * @Description: 
+ * @Description:
  * @Version: 1.0
  * @Autor: wh
  * @Date: 2020-11-30 17:12:31
@@ -8,7 +8,7 @@
 -->
 <template>
   <div class="page">
-    <el-select v-model="pageSize2" slot="prepend" placeholder="" style="width: 80px;" @change="handleSizeChange()">
+    <el-select v-model="pageSize2" slot="prepend" placeholder="" style="width: 80px;" @change="handleSizeChange">
       <el-option label=10 value=10></el-option>
       <el-option label=20 value=20></el-option>
       <el-option label=30 value=30></el-option>
@@ -28,16 +28,16 @@
 <script >
 export default {
   name: 'PageUtil',
-  data () {
+  data() {
     return {
-      pageSize2:this.pageSize,
-      currPage2:this.currPage,
-      total2:this.total
+      pageSize2: this.pageSize,
+      currPage2: this.currPage,
+      total2: this.total
     }
   },
   //
-  props:['total','currPage','pageSize'],
-  methods:{
+  props: ['total', 'currPage', 'pageSize'],
+  methods: {
     handleSizeChange() {
       this.$parent.pageSize = parseInt(this.pageSize2);
       this.$parent.currPage = 1;
@@ -48,10 +48,10 @@ export default {
       this.$parent.getList();
     }
   },
-  watch:{
-    total(value){
+  watch: {
+    total(value) {
       this.total2 = value
-    },
+    }
   }
 }
 </script>
