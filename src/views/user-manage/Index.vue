@@ -258,7 +258,9 @@ export default {
   },
   mounted: function () {
     this.getList();
-    this.getRoleList();
+    setTimeout(() => {
+      this.getRoleList();
+    }, 500);
   },
 };
 </script>
