@@ -3,8 +3,8 @@
  * @Version: 1.0
  * @Date: 2020-12-02 17:25:31
  * @LastEditors: wh
- * @Description: 
- * @LastEditTime: 2020-12-09 10:47:19
+ * @Description:
+ * @LastEditTime: 2020-12-15 09:33:24
 -->
 <template>
   <div>
@@ -17,7 +17,11 @@
         </el-button>
         <el-button @click="edit" icon="el-icon-edit-outline">编辑</el-button>
       </div>
-      <el-button v-else @click="save" type="primary">保存</el-button>
+      <div v-else>
+        <el-button type="text">取消</el-button>
+        <el-button  @click="save" type="primary">保存</el-button>
+      </div>
+
     </div>
     <div class="crumbs" v-else>
       <span>{{crumbs.name}}</span>
@@ -28,38 +32,42 @@
 <script>
 export default {
   name: 'Crumbs',
-  props:{
-    crumbs:{
-      type:Object,
-      
+  props: {
+    crumbs: {
+      type: Object
+
     }
   },
   data() {
     return {
     };
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
   methods: {
     // 返回上一页
-    goBack(){
+    goBack() {
       this.$router.back()
     },
     // 复制
-    copy(){
+    copy() {
       this.$emit('copy')
     },
     // 编辑
-    edit(){
+    edit() {
       this.$emit('edit')
     },
+    // 取消
+    cancel() {
+      this.$emit('cancel')
+    },
     // 保存
-    save(){
+    save() {
       this.$emit('save')
     }
-  },
+  }
 };
 </script>
 

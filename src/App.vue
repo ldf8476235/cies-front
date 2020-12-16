@@ -36,7 +36,7 @@
       font-size: 14px;
       text-align: center;
       line-height: 20px;
-      
+
     }
     span {
       font-size: 12px;
@@ -47,7 +47,7 @@
       background: #F6F6F6;
     }
   }
-  
+
   .el-button {
     border: none;
   }

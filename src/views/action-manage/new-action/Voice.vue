@@ -3,7 +3,7 @@
  * @Version: 1.0
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
- * @Description: 
+ * @Description:
  * @LastEditTime: 2020-12-10 10:00:49
 -->
 <template>
@@ -64,7 +64,7 @@
                     ></el-input>
                   </el-form-item>
                 </el-col>
-                
+
                 <el-col :span="12">
                   <el-form-item label="用例描述：">
                     <el-input
@@ -161,7 +161,7 @@
               </el-row>
             </div>
           </el-form>
-          
+
         </div>
       </div>
     </div>
@@ -173,79 +173,79 @@ export default {
   name: 'NewVoice',
   data() {
     return {
-      crumbs:{
-        action:true,
-        name:'新建动作'
+      crumbs: {
+        action: true,
+        name: '新建动作'
       },
-      loading: true, //任务名称动态验证动画
+      loading: true, // 任务名称动态验证动画
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: '选项1',
+          label: '黄金糕'
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: '选项2',
+          label: '双皮奶'
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: '选项3',
+          label: '蚵仔煎'
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: '选项4',
+          label: '龙须面'
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
+          value: '选项5',
+          label: '北京烤鸭'
+        }
       ],
-      selectVal: "", // 选中项
-      tabClickIndex: "",
+      selectVal: '', // 选中项
+      tabClickIndex: '',
       caseInfo: {
         caseInfoTable: [
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称1",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称1',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
           },
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称2",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称2',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
-          },
-        ],
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
+          }
+        ]
       },
       rulesCaseInfo: {
-        caseInfoTable: {},
+        caseInfoTable: {}
       }
     };
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
   methods: {
     addCaseRow() {},
-    save(){
+    save() {
       console.log('保存')
     }
-  },
+  }
 };
 </script>
 
 <style lang='less' scoped>
 .new-voice {
   .caseInfo {
-    
+
   }
   .title {
     height: 41px;
@@ -281,6 +281,6 @@ export default {
       margin-top: 20px;
     }
   }
-  
+
 }
 </style>

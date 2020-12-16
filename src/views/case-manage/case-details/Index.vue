@@ -3,7 +3,7 @@
  * @Version: 1.0
  * @Date: 2020-12-09 10:30:22
  * @LastEditors: wh
- * @Description: 
+ * @Description:
  * @LastEditTime: 2020-12-09 14:03:58
 -->
 <template>
@@ -42,7 +42,7 @@
                   <p v-else><span>软件版本：</span><span>case_name_1</span></p>
                 </el-col>
                 <el-col :span="12">
-                  
+
                   <el-form-item v-if="editFlag" label="所属项目：" prop="device_space">
                     <el-select v-model="selectVal" placeholder="请选择">
                       <el-option
@@ -166,11 +166,11 @@
                     </el-form-item>
                   </template>
                 </el-table-column>
-                
+
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
-                      
+
                       :prop="'caseInfoTable.' + scope.$index + '.executeWait'"
                       :rules="rulesCaseInfo.caseInfoTable.device_function"
                       label-width="0px"
@@ -226,79 +226,79 @@ export default {
   name: 'CaseDetails',
   data() {
     return {
-      crumbs:{
-        action:true,
-        details:true,
-        name:'case_name_1'
+      crumbs: {
+        action: true,
+        details: true,
+        name: 'case_name_1'
       },
-      editFlag:false,
-      loading: false, //任务名称动态验证动画
+      editFlag: false,
+      loading: false, // 任务名称动态验证动画
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: '选项1',
+          label: '黄金糕'
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: '选项2',
+          label: '双皮奶'
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: '选项3',
+          label: '蚵仔煎'
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: '选项4',
+          label: '龙须面'
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
+          value: '选项5',
+          label: '北京烤鸭'
+        }
       ],
-      selectVal: "", // 选中项
-      tabClickIndex: "",
+      selectVal: '', // 选中项
+      tabClickIndex: '',
       caseInfo: {
         caseInfoTable: [
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称1",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称1',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
           },
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称2",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称2',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
-          },
-        ],
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
+          }
+        ]
       },
       rulesCaseInfo: {
-        caseInfoTable: {},
+        caseInfoTable: {}
       }
     };
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
   methods: {
     // 复制
-    copy(){
+    copy() {
       console.log('复制')
     },
     // 编辑
-    edit(){
+    edit() {
       this.editFlag = true
       console.log('编辑')
     }
-  },
+  }
 };
 </script>
 
@@ -315,7 +315,7 @@ export default {
     padding: 20px 0px;
     .caseInfo{
       padding:10px 20px;
-      
+
       p{
         font-size: 12px;
         line-height: 18px;
@@ -356,7 +356,7 @@ export default {
   .info{
     // padding:10px 20px;
   }
-  
+
 }
 </style>
 

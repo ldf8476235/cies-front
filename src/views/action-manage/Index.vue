@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2020-12-09 17:56:03
+ * @LastEditTime: 2020-12-15 15:51:47
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -26,6 +26,9 @@
             <el-input v-model="inputKey" placeholder="请输入内容">
               <i slot="suffix" class="el-input__icon el-icon-search"></i>
             </el-input>
+            <el-button class="btnFilter">
+              <svg-icon data_iconName='icon-filter'></svg-icon>
+            </el-button>
           </div>
           <div class="newBtn">
             <!-- <el-button  type="primary" icon="el-icon-plus">新建动作</el-button> -->
@@ -65,8 +68,8 @@
             </el-table-column>
             <el-table-column prop="name" label="创建时间" width="140">
             </el-table-column>
-            
-            <el-table-column prop="name" label="操作" width="80">
+
+            <el-table-column prop="name" label="操作" width="60">
               <el-popover
                 placement="bottom"
                 width="100"
@@ -74,11 +77,14 @@
                 <p><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
                 <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
                 <p><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
-                <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
+                <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
+                <div slot="reference">
+                    <svg-icon data_iconName='icon-more'></svg-icon>
+                  </div>
               </el-popover>
             </el-table-column>
           </el-table>
-          
+
           <!-- <action-list></action-list> -->
         </div>
         <PageUtil
@@ -94,14 +100,14 @@
 
 <script>
 export default {
-  name: "Action",
-  components:{
+  name: 'Action',
+  components: {
   },
   data() {
     return {
-      crumbs:{ //面包屑内容
-        action:false,
-        name:'动作管理'
+      crumbs: { // 面包屑内容
+        action: false,
+        name: '动作管理'
       },
       total: 0,
       pageSize: 10,
@@ -109,31 +115,31 @@ export default {
       // 选择项内容
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: '选项1',
+          label: '黄金糕'
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: '选项2',
+          label: '双皮奶'
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: '选项3',
+          label: '蚵仔煎'
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: '选项4',
+          label: '龙须面'
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
+          value: '选项5',
+          label: '北京烤鸭'
+        }
       ],
-      selectVal: "", // 选中项
-      inputKey: "", // 搜索输入项
-      tabIndex:1,
-      actionList:[{}] // 动作列表
-      
+      selectVal: '', // 选中项
+      inputKey: '', // 搜索输入项
+      tabIndex: 1,
+      actionList: [{}] // 动作列表
+
     };
   },
   methods: {
@@ -142,25 +148,25 @@ export default {
       console.log(i)
       switch (i) {
         case 0:
-          this.$router.push("/action/newscreen");
+          this.$router.push('/action/newscreen');
           break;
         case 1:
-          this.$router.push("/action/newvoice");
+          this.$router.push('/action/newvoice');
           break;
         case 2:
-          this.$router.push("/action/newscript");
+          this.$router.push('/action/newscript');
           break;
         default:
           break;
       }
-      
+
     },
     // tab切换
-    tabCut(index){
+    tabCut(index) {
       console.log(index)
       this.tabIndex = index
     }
-  },
+  }
 };
 </script>
 
@@ -191,7 +197,7 @@ export default {
     //     border-bottom: 4px solid #006CEB;
     //   }
     // }
-    
+
   }
   .content {
     padding: 20px;
@@ -201,6 +207,8 @@ export default {
     display: flex;
     justify-content: space-between;
     .search {
+      display: flex;
+      align-items: center;
       .el-select {
         width: 90px;
         height: 30px;
@@ -216,6 +224,10 @@ export default {
         i {
           cursor: pointer;
         }
+      }
+      .btnFilter{
+        padding: 0;
+        margin-left: 5px;
       }
     }
     .newBtn {

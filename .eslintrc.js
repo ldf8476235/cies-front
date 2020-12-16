@@ -176,7 +176,7 @@ module.exports = {
     'semi': [0],
     'semi-spacing': [2, {
       'before': false,
-      'after': false
+      'after': true
     }], // 强制分号之前和之后使用一致的空格
     'space-before-blocks': [2, 'always'], // 强制在块之前使用一致的空格
     'space-before-function-paren': [2, 'never'], // 强制在 function的左括号之前使用一致的空格

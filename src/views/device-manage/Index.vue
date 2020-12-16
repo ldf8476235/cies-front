@@ -18,7 +18,7 @@
             size="small"
             placeholder="请输入关键字"
             v-model="value">
-            <i slot="suffix" class="el-input__icon el-icon-search" style="cursor: pointer;" @click="getList()"></i>
+            <i slot="suffix" class="el-input__icon el-icon-search" style="cursor: pointer;" @click="getList"></i>
           </el-input>
         </div>
         <el-button
@@ -30,9 +30,9 @@
           <i class="el-icon-plus" style="margin: 0 4px 0 -10px"></i>添加设备
         </el-button>
         <div class="batchDelete">
-          <el-button 
-            size="small" 
-            @click="batchDel()" 
+          <el-button
+            size="small"
+            @click="batchDel"
             style="float:right;margin-top:20px;margin-right:10px"
             v-if="this.deviceIds.length > 0"
           >
@@ -149,40 +149,40 @@
 
 <script>
 export default {
-  name:'Device',
-  data(){
-    return{
-      condition:'',
-      value:'',
-      total:0,
-      loading:true,
-      pageSize:10,
-      currPage:1,
-      deviceList : [],
-      deviceIds:[],
+  name: 'Device',
+  data() {
+    return {
+      condition: '',
+      value: '',
+      total: 0,
+      loading: true,
+      pageSize: 10,
+      currPage: 1,
+      deviceList: [],
+      deviceIds: [],
       options: [{
-          value: 'device_name',
-          label: '设备名称'
-        }, {
-          value: 'device_admin',
-          label: '负责人'
-        }, {
-          value: 'device_type',
-          label: '设备类型'
-        }, {
-          value: 'device_ip',
-          label: 'IP地址'
-        }, {
-          value: 'device_status',
-          label: '状态'
-        }],
+        value: 'device_name',
+        label: '设备名称'
+      }, {
+        value: 'device_admin',
+        label: '负责人'
+      }, {
+        value: 'device_type',
+        label: '设备类型'
+      }, {
+        value: 'device_ip',
+        label: 'IP地址'
+      }, {
+        value: 'device_status',
+        label: '状态'
+      }]
     }
   },
   methods: {
     goAdd() {
-      this.$router.push("/device/add");
+      this.$router.push('/device/add');
     },
-    selectHandler(val){
+    selectHandler(val) {
       this.deviceIds = [];
       val.forEach(element => {
         this.deviceIds.push(element.deviceId)
@@ -192,17 +192,17 @@ export default {
     getList() {
       this.loading = true;
       var params = {
-        page:this.currPage,
-        limit:this.pageSize
+        page: this.currPage,
+        limit: this.pageSize
       }
-      if(this.condition!=''){
+      if (this.condition != '') {
         params[this.condition] = this.value
       }
       this.$http({
         url: 'device/list',
         method: 'get',
-        params:params
-      }).then((res) =>{
+        params: params
+      }).then((res) => {
         this.deviceList = res.data.data.list
         this.total = res.data.data.totalCount
         this.loading = false;
@@ -211,47 +211,47 @@ export default {
     getRowKeys(row) {
       return row.deviceId;
     },
-    //格式化设备类型数据
+    // 格式化设备类型数据
     formatterType(row) {
       var typelist = row.deviceType;
       if (typelist.length == 1) {
         return typelist[0];
       } else {
-        var type = "";
+        var type = '';
         typelist.forEach((element) => {
-          type = type + " | " + element;
+          type = type + ' | ' + element;
         });
         return type.substring(2);
       }
     },
-    edit(row){
+    edit(row) {
       row['update'] = true
-      this.$router.push({path:'/device/update',query: row})
+      this.$router.push({ path: '/device/update', query: row })
     },
-    copy(row){
-      this.$router.push({path:'/device/update',query: row})
+    copy(row) {
+      this.$router.push({ path: '/device/update', query: row })
     },
     del(id) {
       this.$http({
-        url: "device/delete/" + id,
-        method: "delete",
+        url: 'device/delete/' + id,
+        method: 'delete'
       }).then((res) => {
-        if(res.data.code == 1){
-          this.$message.success("删除成功");
+        if (res.data.code == 1) {
+          this.$message.success('删除成功');
           this.getList();
         } else {
           this.$message.error(res.data.msg);
         }
       });
     },
-    batchDel(){
+    batchDel() {
       this.$http({
         url: 'device/batchDelete',
         method: 'post',
-        data:this.deviceIds
-      }).then((res) =>{
-        if(res.data.code == 1){
-          this.$message.success("删除成功");
+        data: this.deviceIds
+      }).then((res) => {
+        if (res.data.code == 1) {
+          this.$message.success('删除成功');
           this.deviceIds = []
           this.getList()
         } else {
@@ -260,9 +260,9 @@ export default {
       });
     }
   },
-  mounted: function () {
+  mounted: function() {
     this.getList();
-  },
+  }
 };
 </script>
 

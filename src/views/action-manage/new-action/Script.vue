@@ -3,7 +3,7 @@
  * @Version: 1.0
  * @Date: 2020-12-09 17:53:48
  * @LastEditors: wh
- * @Description: 
+ * @Description:
  * @LastEditTime: 2020-12-10 10:28:03
 -->
 <template>
@@ -51,7 +51,7 @@
                     ></el-input>
                   </el-form-item>
                 </el-col>
-                
+
                 <el-col :span="12">
                   <el-form-item label="用例描述：">
                     <el-input
@@ -74,7 +74,7 @@
                 </div>
               </el-row>
               <div class="editor">
-                <CodeMirror 
+                <CodeMirror
                 ref="cmEditor"
                 :cmTheme="cmTheme"
                 :cmMode="cmMode"
@@ -83,10 +83,10 @@
                 :codeVal='generatedCode'
                 ></CodeMirror>
               </div>
-              
+
             </div>
           </el-form>
-          
+
         </div>
       </div>
     </div>
@@ -97,167 +97,167 @@
 import CodeMirror from '../../../components/codemirror/Codemirror.vue'
 export default {
   name: 'NewScript',
-  components: {CodeMirror},
+  components: { CodeMirror },
   data() {
     return {
-      crumbs:{
-        action:true,
-        name:'新建动作'
+      crumbs: {
+        action: true,
+        name: '新建动作'
       },
-      loading: false, //任务名称动态验证动画
+      loading: false, // 任务名称动态验证动画
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: '选项1',
+          label: '黄金糕'
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: '选项2',
+          label: '双皮奶'
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: '选项3',
+          label: '蚵仔煎'
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: '选项4',
+          label: '龙须面'
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
+          value: '选项5',
+          label: '北京烤鸭'
+        }
       ],
-      cmTheme: "base16-light", // codeMirror主题
+      cmTheme: 'base16-light', // codeMirror主题
       // codeMirror主题选项
       cmThemeOptions: [
-          "default",
-          "3024-day",
-          "3024-night",
-          "abcdef",
-          "ambiance",
-          "ayu-dark",
-          "ayu-mirage",
-          "base16-dark",
-          "base16-light",
-          "bespin",
-          "blackboard",
-          "cobalt",
-          "colorforth",
-          "darcula",
-          "dracula",
-          "duotone-dark",
-          "duotone-light",
-          "eclipse",
-          "elegant",
-          "erlang-dark",
-          "gruvbox-dark",
-          "hopscotch",
-          "icecoder",
-          "idea",
-          "isotope",
-          "lesser-dark",
-          "liquibyte",
-          "lucario",
-          "material",
-          "material-darker",
-          "material-palenight",
-          "material-ocean",
-          "mbo",
-          "mdn-like",
-          "midnight",
-          "monokai",
-          "moxer",
-          "neat",
-          "neo",
-          "night",
-          "nord",
-          "oceanic-next",
-          "panda-syntax",
-          "paraiso-dark",
-          "paraiso-light",
-          "pastel-on-dark",
-          "railscasts",
-          "rubyblue",
-          "seti",
-          "shadowfox",
-          "solarized dark",
-          "solarized light",
-          "the-matrix",
-          "tomorrow-night-bright",
-          "tomorrow-night-eighties",
-          "ttcn",
-          "twilight",
-          "vibrant-ink",
-          "xq-dark",
-          "xq-light",
-          "yeti",
-          "yonce",
-          "zenburn"
+        'default',
+        '3024-day',
+        '3024-night',
+        'abcdef',
+        'ambiance',
+        'ayu-dark',
+        'ayu-mirage',
+        'base16-dark',
+        'base16-light',
+        'bespin',
+        'blackboard',
+        'cobalt',
+        'colorforth',
+        'darcula',
+        'dracula',
+        'duotone-dark',
+        'duotone-light',
+        'eclipse',
+        'elegant',
+        'erlang-dark',
+        'gruvbox-dark',
+        'hopscotch',
+        'icecoder',
+        'idea',
+        'isotope',
+        'lesser-dark',
+        'liquibyte',
+        'lucario',
+        'material',
+        'material-darker',
+        'material-palenight',
+        'material-ocean',
+        'mbo',
+        'mdn-like',
+        'midnight',
+        'monokai',
+        'moxer',
+        'neat',
+        'neo',
+        'night',
+        'nord',
+        'oceanic-next',
+        'panda-syntax',
+        'paraiso-dark',
+        'paraiso-light',
+        'pastel-on-dark',
+        'railscasts',
+        'rubyblue',
+        'seti',
+        'shadowfox',
+        'solarized dark',
+        'solarized light',
+        'the-matrix',
+        'tomorrow-night-bright',
+        'tomorrow-night-eighties',
+        'ttcn',
+        'twilight',
+        'vibrant-ink',
+        'xq-dark',
+        'xq-light',
+        'yeti',
+        'yonce',
+        'zenburn'
       ],
-      cmEditorMode: "default", // 编辑模式
+      cmEditorMode: 'default', // 编辑模式
       // 编辑模式选项
       cmEditorModeOptions: [
-          "default",
-          "json",
-          "sql",
-          "javascript",
-          "css",
-          "xml",
-          "html",
-          "yaml",
-          "markdown",
-          "python"
+        'default',
+        'json',
+        'sql',
+        'javascript',
+        'css',
+        'xml',
+        'html',
+        'yaml',
+        'markdown',
+        'python'
       ],
-      cmMode: "python", //codeMirror模式
+      cmMode: 'python', // codeMirror模式
       jsonIndentation: 2, // json编辑模式下，json格式化缩进 支持字符或数字，最大不超过10，默认缩进2个空格
       autoFormatJson: true, // json编辑模式下，输入框失去焦点时是否自动格式化，true 开启， false 关闭
-      generatedCode:'',
-      selectVal: "", // 选中项
-      tabClickIndex: "",
+      generatedCode: '',
+      selectVal: '', // 选中项
+      tabClickIndex: '',
       scriptInfo: {
         scriptInfoTable: [
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称1",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称1',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
           },
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称2",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称2',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
-          },
-        ],
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
+          }
+        ]
       },
       rulesScriptInfo: {
-        scriptInfoTable: {},
+        scriptInfoTable: {}
       }
     };
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
   methods: {
     addCaseRow() {},
-    save(){
+    save() {
       console.log('保存')
     }
-  },
+  }
 };
 </script>
 
 <style lang='less' scoped>
 .new-voice {
   .scriptInfo {
-    
+
   }
   .title {
     height: 41px;
@@ -347,6 +347,6 @@ export default {
       margin-top: 20px;
     }
   }
-  
+
 }
 </style>

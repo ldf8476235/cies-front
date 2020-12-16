@@ -3,8 +3,8 @@
  * @Version: 1.0
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
- * @Description: 
- * @LastEditTime: 2020-12-11 16:45:08
+ * @Description:
+ * @LastEditTime: 2020-12-15 14:05:54
 -->
 <template>
   <div class="new-case">
@@ -18,6 +18,7 @@
             :model="caseInfo"
             :rules="rulesCaseInfo"
             label-width="100px"
+
           >
             <div class="caseInfo">
               <el-row>
@@ -73,10 +74,21 @@
                 width="100%"
                 border
                 :data="caseInfo.caseInfoTable"
+                ref="tableCase"
                 >
                 <el-table-column
-                  type="selection"
-                  width="55">
+                  width="60">
+                  <template slot="header" slot-scope='scope'>
+                     <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange"></el-checkbox>
+                  </template>
+                  <template slot-scope="scope">
+                    <div class="func">
+                      <el-checkbox v-model="scope.row.selectFlag" @change="selectRow(scope.row)"></el-checkbox>
+                      <div id="drag" class="drag">
+                        <svg-icon data_iconName = 'icon-grab'></svg-icon>
+                      </div>
+                    </div>
+                  </template>
                 </el-table-column>
                 <el-table-column
                   type="index"
@@ -150,7 +162,7 @@
                     </el-form-item>
                   </template>
                 </el-table-column>
-                
+
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
@@ -198,7 +210,7 @@
               </el-row>
             </div>
           </el-form>
-          
+
         </div>
       </div>
     </div>
@@ -206,84 +218,195 @@
 </template>
 
 <script>
+import Sortable from 'sortablejs';
 export default {
   name: 'NewCase',
   data() {
     return {
-      crumbs:{
-        action:true,
-        name:'新建用例'
+      crumbs: {
+        action: true,
+        name: '新建用例'
       },
-      loading: true, //任务名称动态验证动画
+      loading: false, // 任务名称动态验证动画
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: '选项1',
+          label: '黄金糕'
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: '选项2',
+          label: '双皮奶'
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: '选项3',
+          label: '蚵仔煎'
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: '选项4',
+          label: '龙须面'
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
+          value: '选项5',
+          label: '北京烤鸭'
+        }
       ],
-      selectVal: "", // 选中项
-      tabClickIndex: "",
+      selectVal: '', // 选中项
+      tabClickIndex: '',
       caseInfo: {
         caseInfoTable: [
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称1",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称1',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134',
+            selectFlag: false
           },
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称2",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称2',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
-          },
-        ],
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134',
+            selectFlag: false
+          }
+        ]
       },
       rulesCaseInfo: {
-        caseInfoTable: {},
-      }
+        caseInfoTable: {}
+      },
+
+      isIndeterminate: false, // 半选
+      checkAll: false // 全选
     };
   },
-  computed:{
-  },
-  watch:{
+  mounted() {
+    this.drag()
   },
   methods: {
+    // 每项选择
+    selectRow(row) {
+      this.$nextTick(() => {
+        const isAll = this.caseInfo.caseInfoTable.every(item => {
+          return item.selectFlag === true
+        })
+        const noAll = this.caseInfo.caseInfoTable.every(item => {
+          return item.selectFlag === false
+        })
+        if (isAll) {
+          this.isIndeterminate = false;
+          this.checkAll = true;
+        } else if (noAll) {
+          this.isIndeterminate = false;
+          this.checkAll = false;
+        } else {
+          this.checkAll = false;
+          this.isIndeterminate = true;
+        }
+      })
+
+    },
+    // 全选/全不选
+    handleCheckAllChange(flag) {
+      if (flag) {
+        this.caseInfo.caseInfoTable.forEach(item => {
+          item.selectFlag = true
+        })
+        this.isIndeterminate = false
+      } else {
+        this.caseInfo.caseInfoTable.forEach(item => {
+          item.selectFlag = false
+        })
+        this.isIndeterminate = false
+      }
+    },
+    // 拖动
+    drag() {
+      this.$nextTick(() => {
+        // 表格拖拽事件的添加
+        const el = document.querySelectorAll('.el-table__body-wrapper > table > tbody')[0]
+        const self = this;
+        Sortable.create(el, {
+          handle: '.drag',
+          // 拖拽结束后的操作
+          onEnd({ newIndex, oldIndex }) {
+            // 修改data中的数组，
+            const targetRow = self.caseInfo.caseInfoTable.splice(oldIndex, 1)[0]
+            self.caseInfo.caseInfoTable.splice(newIndex, 0, targetRow)
+          }
+        })
+      })
+    },
+    // 单击
+    tabClick(row, column) {
+      switch (column.label) {
+        case '节点名称':
+          console.log('单击节点')
+          row.editNode = false;
+          break
+        case '循环次数':
+          console.log('单击循环')
+          row.editLoop = false;
+          break
+        default:
+          return
+      }
+    },
+
+    /**
+     * 双击文字变成输入框
+     */
+    tabDblClick(row, column) {
+      console.log(row, column)
+      switch (column.label) {
+        case '节点名称':
+          row.editNode = true;
+          this.$nextTick(() => {
+            this.$refs.inputBlur.focus()
+          })
+
+          break
+        case '循环次数':
+          row.editLoop = true;
+          this.$nextTick(() => {
+            this.$refs.inputBlur.focus()
+          })
+          break
+        default:
+          return
+      }
+
+    },
+    /**
+     * 失去焦点初始化
+     */
+    inputBlur(row, column) {
+      console.log('失去焦点')
+      switch (column.label) {
+        case '节点名称':
+          row.editNode = false;
+          break
+        case '循环次数':
+          row.editLoop = false;
+          break
+        default:
+          return
+      }
+    },
     addCaseRow() {},
-    save(){
+    save() {
       console.log('保存')
     }
-  },
+  }
 };
 </script>
 
 <style lang='less' scoped>
 .new-case {
-  .caseInfo {
-    
-  }
   .title {
     height: 41px;
     line-height: 41px;
@@ -312,11 +435,17 @@ export default {
           color: #006CEB;
         }
       }
+      .el-table {
+        .func {
+          display: flex;
+          align-content: center;
+        }
+      }
     }
     .add-node{
       margin-top: 20px;
     }
   }
-  
+
 }
 </style>

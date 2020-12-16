@@ -3,7 +3,7 @@
  * @Version: 1.0
  * @Date: 2020-12-02 15:32:52
  * @LastEditors: wh
- * @Description: 
+ * @Description:
  * @LastEditTime: 2020-12-02 16:40:23
 -->
 <template>
@@ -25,7 +25,7 @@
       </el-table-column>
       <el-table-column prop="name" label="创建时间" width="140">
       </el-table-column>
-      
+
       <el-table-column prop="name" label="操作" width="80">
         <el-popover
           placement="bottom"
@@ -46,14 +46,14 @@ export default {
   name: 'ActionList',
   data() {
     return {
-      actionList: [{}], // 任务列表
+      actionList: [{}] // 任务列表
     };
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
-  methods: {},
+  methods: {}
 };
 </script>
 

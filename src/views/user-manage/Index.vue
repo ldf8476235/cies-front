@@ -16,20 +16,20 @@
         <div class="funcTop">
           <div class="search">
             <el-input v-model="keyword" placeholder="请输入关键字">
-              <i slot="suffix" class="el-input__icon el-icon-search" @click="getList()"></i>
+              <i slot="suffix" class="el-input__icon el-icon-search" @click="getList"></i>
             </el-input>
           </div>
           <div class="newBtn">
-            
-            <el-button v-if="this.userIds.length > 0" @click="batchDel()" icon="el-icon-delete">删除
+
+            <el-button v-if="this.userIds.length > 0" @click="batchDel" icon="el-icon-delete">删除
             </el-button>
-            <el-button @click="addUser()" type="primary" icon="el-icon-plus">添加用户
+            <el-button @click="addUser" type="primary" icon="el-icon-plus">添加用户
             </el-button>
           </div>
         </div>
         <div class="tableContent">
-          <el-table 
-            :data="userList"  
+          <el-table
+            :data="userList"
             style="width: 100%"
             :row-key="getRowKeys"
             tooltip-effect="dark"
@@ -64,8 +64,14 @@
           class="dialog-title"
           :before-close="handleClose"
           left>
-          <el-form :model="userForm" status-icon  ref="userForm" label-width="80px"
-                  class="demo-ruleForm" size="mini" label-position="top">
+          <el-form
+:model="userForm"
+status-icon
+ref="userForm"
+label-width="80px"
+                  class="demo-ruleForm"
+size="mini"
+label-position="top">
             <el-form-item label="用户名称" prop="userName">
               <el-input v-model="userForm.userName" placeholder="请输入用户名称" autocomplete="off" maxlength="30" :disabled="title=='编辑用户'"></el-input>
             </el-form-item>
@@ -78,7 +84,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="密码" prop="pwd">  
+            <el-form-item label="密码" prop="pwd">
               <!-- <el-input type="text" v-model="ruleForm2.checkPass" style="display:none" autocomplete="off" maxlength="30"></el-input>  -->
               <el-input type="password" v-model="userForm.pwd" autocomplete="off" maxlength="30"></el-input>
             </el-form-item>
@@ -88,7 +94,9 @@
           </el-form>
           <span slot="footer" class="dialog-footer">
                     <el-button @click="handleClose" class="footer-button">取 消</el-button>
-                    <el-button type="primary" @click="submit('userForm')"
+                    <el-button
+type="primary"
+@click="submit('userForm')"
                               class="footer-button footer-no">确 定</el-button>
                   </span>
         </el-dialog>
@@ -108,41 +116,41 @@ export default {
   name: 'User',
   data() {
     return {
-      dialogVisible:false,
-      keyword:'',
-      title:'新建用户',
-      pageSize:10,
-      total:0,
-      currPage:1,
-      userList:[],
-      userIds:[],
-      userForm:{
-        userName:'',
-        roleName:'',
-        pwd:'',
-        userPwd:''
+      dialogVisible: false,
+      keyword: '',
+      title: '新建用户',
+      pageSize: 10,
+      total: 0,
+      currPage: 1,
+      userList: [],
+      userIds: [],
+      userForm: {
+        userName: '',
+        roleName: '',
+        pwd: '',
+        userPwd: ''
       },
-      options2: [],
+      options2: []
     };
   },
-  methods:{
-    edit(row){
+  methods: {
+    edit(row) {
       this.title = '编辑用户'
       this.userForm = row
       this.dialogVisible = true
     },
-    addUser(){
+    addUser() {
       this.title = '新建用户'
       this.dialogVisible = true
     },
     submit(formName) {
-      if(this.title == '新建用户') {
+      if (this.title == '新建用户') {
         this.$http({
           url: 'user/add',
           method: 'post',
           data: this.userForm
-        }).then((data)=>{
-          if(data.data.code == 1) {
+        }).then((data) => {
+          if (data.data.code == 1) {
             this.$refs['userForm'].resetFields()
             this.$message.success('添加成功')
             this.dialogVisible = false
@@ -156,8 +164,8 @@ export default {
           url: 'user/update',
           method: 'post',
           data: this.userForm
-        }).then((data)=>{
-          if(data.data.code == 1) {
+        }).then((data) => {
+          if (data.data.code == 1) {
             this.$refs['userForm'].resetFields()
             this.$message.success('更新成功')
             this.dialogVisible = false
@@ -173,10 +181,10 @@ export default {
         .then(_ => {
           this.dialogVisible = false;
           this.userForm = {
-            userName:'',
-            roleName:'',
-            pwd:'',
-            userPwd:''
+            userName: '',
+            roleName: '',
+            pwd: '',
+            userPwd: ''
           },
           done();
         })
@@ -185,36 +193,36 @@ export default {
     getList() {
       this.loading = true;
       var params = {
-        page:this.currPage,
-        limit:this.pageSize
+        page: this.currPage,
+        limit: this.pageSize
       }
-      if(this.keyword!=''){
+      if (this.keyword != '') {
         params['keyword'] = this.keyword
       }
       this.$http({
         url: 'user/list',
         method: 'get',
-        params:params
-      }).then((res) =>{
+        params: params
+      }).then((res) => {
         this.userList = res.data.data.list
         this.total = res.data.data.totalCount
       });
     },
-    getRoleList(){
+    getRoleList() {
       this.$http({
         url: 'role/list',
-        method: 'get',
-      }).then((res) =>{
+        method: 'get'
+      }).then((res) => {
         var roleList = res.data.data.list
-        roleList.forEach((v,i)=>{
-          this.options2.push({value:v.roleName}) 
+        roleList.forEach((v, i) => {
+          this.options2.push({ value: v.roleName })
         })
       });
     },
     getRowKeys(row) {
       return row.deviceId;
     },
-    selectHandler(val){
+    selectHandler(val) {
       this.userIds = [];
       val.forEach(element => {
         this.userIds.push(element.userId)
@@ -222,25 +230,25 @@ export default {
     },
     del(id) {
       this.$http({
-        url: "user/delete/" + id,
-        method: "delete",
+        url: 'user/delete/' + id,
+        method: 'delete'
       }).then((res) => {
-        if(res.data.code == 1){
-          this.$message.success("删除成功");
+        if (res.data.code == 1) {
+          this.$message.success('删除成功');
           this.getList();
         } else {
           this.$message.error(res.data.msg);
         }
       });
     },
-    batchDel(){
+    batchDel() {
       this.$http({
         url: 'user/batchDelete',
         method: 'post',
-        data:this.userIds
-      }).then((res) =>{
-        if(res.data.code == 1){
-          this.$message.success("删除成功");
+        data: this.userIds
+      }).then((res) => {
+        if (res.data.code == 1) {
+          this.$message.success('删除成功');
           this.userIds = []
           this.getList()
         } else {
@@ -248,18 +256,18 @@ export default {
         }
       });
     },
-    clear(){
+    clear() {
 
     }
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
-  mounted: function () {
+  mounted: function() {
     this.getList();
     this.getRoleList();
-  },
+  }
 };
 </script>
 <style lang='less' scoped>

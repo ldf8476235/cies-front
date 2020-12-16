@@ -3,7 +3,7 @@
  * @Version: 1.0
  * @Date: 2020-12-10 14:32:41
  * @LastEditors: wh
- * @Description: 
+ * @Description:
  * @LastEditTime: 2020-12-11 17:47:46
 -->
 <template>
@@ -49,7 +49,7 @@
                         placeholder=""
                       ></el-input>
                     </el-form-item>
-                    
+
                     <el-form-item label="指派人：">
                       <el-input
                         v-model="actionInfo.device_sn"
@@ -90,7 +90,7 @@
                     <span @click="tab(0)" :class="tabFlag === 0 ?'active' : ''">动作序列</span>
                     <span @click="tab(1)" :class="tabFlag === 1 ?'active' : ''">元素结构</span>
                   </p>
-                  
+
                   <div class="action-btn">
                     <el-dropdown split-button type="">
                       链接设备
@@ -155,7 +155,8 @@
                   <div v-else>
                     <v-jstree :data="jsTreeData">
                         <template slot-scope="scope">
-                          <div style="" 
+                          <div
+style=""
                             @click.exact="itemClick(scope.model)"
                             >
                             <i :class="scope.model.icon" role="presentation"></i>
@@ -175,7 +176,7 @@
                   <span>脚本</span>
                 </div>
                 <div class="editor">
-                  <CodeMirror 
+                  <CodeMirror
                     ref="cmEditor"
                     :cmTheme="cmTheme"
                     :cmMode="cmMode"
@@ -197,122 +198,122 @@
 import CodeMirror from '../../../components/codemirror/Codemirror.vue'
 export default {
   name: 'CarScreen',
-  components: {CodeMirror},
+  components: { CodeMirror },
   data() {
     return {
-      crumbs:{
-        action:true,
-        name:'新建动作'
+      crumbs: {
+        action: true,
+        name: '新建动作'
       },
-      loading:false,
-      cmTheme: "base16-light", // codeMirror主题
+      loading: false,
+      cmTheme: 'base16-light', // codeMirror主题
       // codeMirror主题选项
       cmThemeOptions: [
-          "default",
-          "3024-day",
-          "3024-night",
-          "abcdef",
-          "ambiance",
-          "ayu-dark",
-          "ayu-mirage",
-          "base16-dark",
-          "base16-light",
-          "bespin",
-          "blackboard",
-          "cobalt",
-          "colorforth",
-          "darcula",
-          "dracula",
-          "duotone-dark",
-          "duotone-light",
-          "eclipse",
-          "elegant",
-          "erlang-dark",
-          "gruvbox-dark",
-          "hopscotch",
-          "icecoder",
-          "idea",
-          "isotope",
-          "lesser-dark",
-          "liquibyte",
-          "lucario",
-          "material",
-          "material-darker",
-          "material-palenight",
-          "material-ocean",
-          "mbo",
-          "mdn-like",
-          "midnight",
-          "monokai",
-          "moxer",
-          "neat",
-          "neo",
-          "night",
-          "nord",
-          "oceanic-next",
-          "panda-syntax",
-          "paraiso-dark",
-          "paraiso-light",
-          "pastel-on-dark",
-          "railscasts",
-          "rubyblue",
-          "seti",
-          "shadowfox",
-          "solarized dark",
-          "solarized light",
-          "the-matrix",
-          "tomorrow-night-bright",
-          "tomorrow-night-eighties",
-          "ttcn",
-          "twilight",
-          "vibrant-ink",
-          "xq-dark",
-          "xq-light",
-          "yeti",
-          "yonce",
-          "zenburn"
+        'default',
+        '3024-day',
+        '3024-night',
+        'abcdef',
+        'ambiance',
+        'ayu-dark',
+        'ayu-mirage',
+        'base16-dark',
+        'base16-light',
+        'bespin',
+        'blackboard',
+        'cobalt',
+        'colorforth',
+        'darcula',
+        'dracula',
+        'duotone-dark',
+        'duotone-light',
+        'eclipse',
+        'elegant',
+        'erlang-dark',
+        'gruvbox-dark',
+        'hopscotch',
+        'icecoder',
+        'idea',
+        'isotope',
+        'lesser-dark',
+        'liquibyte',
+        'lucario',
+        'material',
+        'material-darker',
+        'material-palenight',
+        'material-ocean',
+        'mbo',
+        'mdn-like',
+        'midnight',
+        'monokai',
+        'moxer',
+        'neat',
+        'neo',
+        'night',
+        'nord',
+        'oceanic-next',
+        'panda-syntax',
+        'paraiso-dark',
+        'paraiso-light',
+        'pastel-on-dark',
+        'railscasts',
+        'rubyblue',
+        'seti',
+        'shadowfox',
+        'solarized dark',
+        'solarized light',
+        'the-matrix',
+        'tomorrow-night-bright',
+        'tomorrow-night-eighties',
+        'ttcn',
+        'twilight',
+        'vibrant-ink',
+        'xq-dark',
+        'xq-light',
+        'yeti',
+        'yonce',
+        'zenburn'
       ],
-      cmEditorMode: "default", // 编辑模式
+      cmEditorMode: 'default', // 编辑模式
       // 编辑模式选项
       cmEditorModeOptions: [
-          "default",
-          "json",
-          "sql",
-          "javascript",
-          "css",
-          "xml",
-          "html",
-          "yaml",
-          "markdown",
-          "python"
+        'default',
+        'json',
+        'sql',
+        'javascript',
+        'css',
+        'xml',
+        'html',
+        'yaml',
+        'markdown',
+        'python'
       ],
-      cmMode: "python", //codeMirror模式
+      cmMode: 'python', // codeMirror模式
       jsonIndentation: 2, // json编辑模式下，json格式化缩进 支持字符或数字，最大不超过10，默认缩进2个空格
       autoFormatJson: true, // json编辑模式下，输入框失去焦点时是否自动格式化，true 开启， false 关闭
-      generatedCode:'',
-      actionInfo:{},
-      rulesActionInfo:{},
-      tabFlag:0,
-      options:[],
-      selectVal:''
+      generatedCode: '',
+      actionInfo: {},
+      rulesActionInfo: {},
+      tabFlag: 0,
+      options: [],
+      selectVal: ''
 
     };
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
   methods: {
     // 元素节点点击事件
-    itemClick(a,b){
-      console.log('元素节点',a,b)
+    itemClick(a, b) {
+      console.log('元素节点', a, b)
     },
     // 动作/元素结构切换
-    tab(i){
+    tab(i) {
       console.log(i)
       this.tabFlag = i
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -325,9 +326,9 @@ export default {
       padding: 5px 10px;
     }
   .top {
-    
+
     margin-bottom: 10px;
-    
+
   }
   .bottom {
     .bottom-left {
@@ -374,7 +375,7 @@ export default {
             .click-icon{
               width: 46px;
               text-align: center;
-              
+
               span{
                 font-size: 12px;
                 color: #9B9B9B;

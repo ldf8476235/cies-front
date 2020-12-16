@@ -3,8 +3,8 @@
  * @Version: 1.0
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
- * @Description: 
- * @LastEditTime: 2020-12-11 16:51:01
+ * @Description:
+ * @LastEditTime: 2020-12-15 15:41:25
 -->
 <template>
   <div class="newTask">
@@ -89,15 +89,46 @@
               <el-table
                 width="100%"
                 border
+                ref="refTable"
+                row-key="nodeName"
+                :tree-props="{children: 'children'}"
                 :data="taskInfo.taskInfoTable"
-              >
-                <el-table-column 
-                  type="selection"
+                >
+                <el-table-column
                   width="100">
                   <template slot-scope="scope">
-                    <el-checkbox @change="selectRow(scope.row)"></el-checkbox>
+                    <div class="func">
+                      <el-checkbox @change="selectRow(scope.row)"></el-checkbox>
+                      <div @click="drag(scope.row)">
+                        <svg-icon data_iconName = 'icon-grab'></svg-icon>
+                      </div>
+                      <div @click="expand(scope.row)">
+                        <svg-icon data_iconName = 'icon-start'></svg-icon>
+                      </div>
+                    </div>
                   </template>
                 </el-table-column>
+                <!-- <el-table-column type="expand" width="1">
+                  <template>
+                    <div class="demo-table-expand">
+                      <el-table
+                        :data='taskInfo.taskInfoTable[0].children'
+                        :show-header='false'
+                        border
+                      >
+                        <el-table-column prop="nodeName">
+
+                        </el-table-column>
+                        <el-table-column prop="loopTimes">
+
+                        </el-table-column>
+                        <el-table-column prop="error">
+
+                        </el-table-column>
+                      </el-table>
+                    </div>
+                  </template>
+                </el-table-column> -->
                 <el-table-column label="用例组">
                   <template slot-scope="scope">
                     <el-form-item
@@ -229,7 +260,7 @@
               </el-row>
             </div>
           </el-form>
-          
+
         </div>
       </div>
     </div>
@@ -238,124 +269,151 @@
 
 <script>
 export default {
-  name: "NewTask",
+  name: 'NewTask',
   data() {
     return {
-      crumbs:{
-        action:true,
-        name:'新建任务'
+      crumbs: {
+        action: true,
+        name: '新建任务'
       },
-      loading: true, //任务名称动态验证动画
+      loading: true, // 任务名称动态验证动画
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: '选项1',
+          label: '黄金糕'
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: '选项2',
+          label: '双皮奶'
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: '选项3',
+          label: '蚵仔煎'
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: '选项4',
+          label: '龙须面'
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
+          value: '选项5',
+          label: '北京烤鸭'
+        }
       ],
-      selectVal: "", // 选中项
-      tabClickIndex: "",
+      selectVal: '', // 选中项
+      tabClickIndex: '',
       taskInfo: {
         taskInfoTable: [
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称1",
+
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称1',
             loopTimes: 11,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134',
+            children: [{
+              editNode: false,
+              editLoop: false,
+              nodeName: '子节点名称1',
+              loopTimes: 11,
+              error: '123',
+              overtime: 'asdasd',
+              executeWait: 'aq2134'
+            }]
           },
+
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称2",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称2',
             loopTimes: 12,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
           },
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称3",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称3',
             loopTimes: 13,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
           },
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称4",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称4',
             loopTimes: 14,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
-          },
-        ],
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
+          }
+        ]
       },
       rulesTaskInfo: {
-        taskInfoTable: {},
+        taskInfoTable: {}
       }
     }
   },
   computed: {},
   watch: {},
   methods: {
-    selectRow(row){
+    // 拖动
+    drag() {
+      console.log('拖动')
+    },
+    // 显示行
+    // showTr(row, index) {
+    //   let show = (row._parent ? (row._parent._expanded && row._parent._show) : true)
+    //   row._show = show
+    //   return show ? '' : 'display:none;'
+    // },
+    // 展开
+    expand(row) {
+      console.log(row)
+      this.$refs.refTable.toggleRowExpansion(row)
+
+    },
+    selectRow(row) {
       console.log(row)
     },
     // 移动到顶部
-    upMove(index,row){
-      console.log(index,row)
+    upMove(index, row) {
+      console.log(index, row)
       if (index == 0) {
-       this.$message({
-         message: "处于最顶端，不能继续上移",
-         type: "warning"
-       });
-     } else {
-       let upDate = this.taskInfo.taskInfoTable[index];
-      this.taskInfo.taskInfoTable.unshift(upDate)
-      this.taskInfo.taskInfoTable.splice(index+1, 1);
-     }
+        this.$message({
+          message: '处于最顶端，不能继续上移',
+          type: 'warning'
+        });
+      } else {
+        const upDate = this.taskInfo.taskInfoTable[index];
+        this.taskInfo.taskInfoTable.unshift(upDate)
+        this.taskInfo.taskInfoTable.splice(index + 1, 1);
+      }
     },
     // 移动至底部
-    downMove(index){
-      
+    downMove(index) {
+
       const len = this.taskInfo.taskInfoTable.length - 1
       if (index === len) {
         this.$message({
-          message: "处于最低部，不能继续下移",
-          type: "warning"
+          message: '处于最低部，不能继续下移',
+          type: 'warning'
         });
       } else {
         console.log(index)
-        let upDate = this.taskInfo.taskInfoTable[index];
+        const upDate = this.taskInfo.taskInfoTable[index];
         this.taskInfo.taskInfoTable.splice(index, 1);
         this.taskInfo.taskInfoTable.push(upDate)
-        
+
       }
     },
     // 添加节点
     addNodeRow() {},
     // 单击
-    tabClick(row,column){
+    tabClick(row, column) {
       switch (column.label) {
         case '节点名称':
           console.log('单击节点')
@@ -374,30 +432,30 @@ export default {
      * 双击文字变成输入框
      */
     tabDblClick(row, column) {
-      console.log(row,column)
+      console.log(row, column)
       switch (column.label) {
         case '节点名称':
           row.editNode = true;
-          this.$nextTick(()=> {
+          this.$nextTick(() => {
             this.$refs.inputBlur.focus()
           })
-          
+
           break
         case '循环次数':
           row.editLoop = true;
-          this.$nextTick(()=> {
+          this.$nextTick(() => {
             this.$refs.inputBlur.focus()
           })
           break
         default:
           return
       }
-      
+
     },
     /**
      * 失去焦点初始化
      */
-    inputBlur(row,column) {
+    inputBlur(row, column) {
       console.log('失去焦点')
       switch (column.label) {
         case '节点名称':
@@ -410,7 +468,7 @@ export default {
           return
       }
     },
-    save(){
+    save() {
       console.log(this.taskInfo)
     }
   }
@@ -461,13 +519,22 @@ export default {
           color: #006CEB;
         }
       }
-      
+      .el-table {
+        .func {
+          display: flex;
+          align-content: center;
+        }
+      }
+     /deep/.el-table__expand-icon{
+        display: none;
+      }
+
     }
     .add-node{
       margin-top: 20px;
     }
   }
-  
+
 }
 
 </style>

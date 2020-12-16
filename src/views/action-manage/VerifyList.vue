@@ -3,7 +3,7 @@
  * @Version: 1.0
  * @Date: 2020-12-02 15:33:42
  * @LastEditors: wh
- * @Description: 
+ * @Description:
  * @LastEditTime: 2020-12-02 16:03:24
 -->
 <template>
@@ -34,14 +34,14 @@ export default {
   name: 'VerifyList',
   data() {
     return {
-      verifyList: [{}], // 任务列表
+      verifyList: [{}] // 任务列表
     };
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
-  methods: {},
+  methods: {}
 };
 </script>
 

@@ -3,7 +3,7 @@
  * @Version: 1.0
  * @Date: 2020-12-10 16:07:02
  * @LastEditors: wh
- * @Description: 
+ * @Description:
  * @LastEditTime: 2020-12-11 13:52:26
 -->
 <template>
@@ -51,7 +51,7 @@
                     ></el-input>
                   </el-form-item>
                 </el-col>
-                
+
                 <el-col :span="12">
                   <el-form-item label="校验点描述：">
                     <el-input
@@ -356,7 +356,7 @@
               </el-row>
             </div>
           </el-form>
-          
+
         </div>
       </div>
     </div>
@@ -364,71 +364,71 @@
 </template>
 
 <script>
-import { b64toBlob, ImagePool} from "@/utils/common.js";
+import { b64toBlob, ImagePool } from '@/utils/common.js';
 export default {
   name: 'NewVoice',
   data() {
     return {
-      crumbs:{
-        action:true,
-        name:'新建校验点'
+      crumbs: {
+        action: true,
+        name: '新建校验点'
       },
-      loading: true, //任务名称动态验证动画
+      loading: true, // 任务名称动态验证动画
       options: [
         {
-          value: "选项1",
-          label: "黄金糕",
+          value: '选项1',
+          label: '黄金糕'
         },
         {
-          value: "选项2",
-          label: "双皮奶",
+          value: '选项2',
+          label: '双皮奶'
         },
         {
-          value: "选项3",
-          label: "蚵仔煎",
+          value: '选项3',
+          label: '蚵仔煎'
         },
         {
-          value: "选项4",
-          label: "龙须面",
+          value: '选项4',
+          label: '龙须面'
         },
         {
-          value: "选项5",
-          label: "北京烤鸭",
-        },
+          value: '选项5',
+          label: '北京烤鸭'
+        }
       ],
-      selectVal: "", // 选中项
-      tabClickIndex: "",
+      selectVal: '', // 选中项
+      tabClickIndex: '',
       caseInfo: {
         caseInfoTable: [
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称1",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称1',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
           },
           {
-            editNode:false,
-            editLoop:false,
-            nodeName: "节点名称2",
+            editNode: false,
+            editLoop: false,
+            nodeName: '节点名称2',
             loopTimes: 10,
-            error: "123",
-            overtime:'asdasd',
-            executeWait:'aq2134'
-          },
-        ],
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134'
+          }
+        ]
       },
       rulesCaseInfo: {
-        caseInfoTable: {},
+        caseInfoTable: {}
       },
-      deviceId:'android:',
-      canvas: {   // 画布
+      deviceId: 'android:',
+      canvas: { // 画布
         bg: null,
-        fg: null,
+        fg: null
       },
-      canvasStyle: { //画布内联style
+      canvasStyle: { // 画布内联style
         opacity: 1,
         width: 'inherit',
         height: 'inherit'
@@ -439,50 +439,50 @@ export default {
           width: 1,
           height: 1
         }
-      },
+      }
     };
   },
-  created(){
+  created() {
     this.imagePool = new ImagePool(100);
   },
-  mounted(){
+  mounted() {
     this.getCurrentScreen()
     this.canvas.bg = document.querySelector('#bgCanvas')
     window.onresize = () => {
       this.resizeScreen()
     }
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
   methods: {
     // wh-获取当前屏幕截图
-    getCurrentScreen(){
+    getCurrentScreen() {
       this.$axios.get('/api/v1/devices/' + encodeURIComponent(this.deviceId || '-') + '/screenshot').then(res => {
         console.log(res)
-        console.log('screenRefresh----:',res)
+        console.log('screenRefresh----:', res)
         var blob = b64toBlob(res.data, 'image/' + res.type);
         this.drawBlobImageToScreen(blob);
         // this.dumpHierarchy().then(this.loadLiveScreen)
         localStorage.setItem('screenshotBase64', res.data);
       }).catch(err => {
-        console.log('err:',err)
+        console.log('err:', err)
       })
     },
     // wh-绘制当前屏幕
-    drawBlobImageToScreen (blob) {
-      var bgcanvas = this.canvas.bg,
-        ctx = bgcanvas.getContext('2d'),
-        self = this,
-        URL = window.URL || window.webkitURL,
-        BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-        
-        img = this.imagePool.next();
-      img.onload = function () {
+    drawBlobImageToScreen(blob) {
+      var bgcanvas = this.canvas.bg;
+      var ctx = bgcanvas.getContext('2d');
+      var self = this;
+      var URL = window.URL || window.webkitURL;
+      var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+
+      var img = this.imagePool.next();
+      img.onload = function() {
         bgcanvas.width = img.width
         bgcanvas.height = img.height
-        console.log(img.width,img.height)
+        console.log(img.width, img.height)
         // var screenDiv = document.getElementById('screen');
         ctx.drawImage(img, 0, 0, img.width, img.height);
         // self.resizeScreen(img);
@@ -500,7 +500,7 @@ export default {
         // url = null
       }
 
-      img.onerror = function () {
+      img.onerror = function() {
         // Happily ignore. I suppose this shouldn't happen, but sometimes it does, presumably when we're loading images too quickly.
         // Do the same cleanup here as in onload.
         img.onload = img.onerror = null
@@ -528,27 +528,27 @@ export default {
           return;
         }
       }
-        var screenDiv =this.$refs.screen //document.getElementById('screen');
-        this.lastScreenSize = {
-          canvas: {
-            width: img.width,
-            height: img.height
-          },
-          screen: {
-            width: screenDiv.clientWidth,
-            height: screenDiv.clientHeight,
-          }
+      var screenDiv = this.$refs.screen // document.getElementById('screen');
+      this.lastScreenSize = {
+        canvas: {
+          width: img.width,
+          height: img.height
+        },
+        screen: {
+          width: screenDiv.clientWidth,
+          height: screenDiv.clientHeight
         }
-        
-        var canvasRatio = img.width / img.height;
-        var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
-        console.log(img.width,img.height)
-        console.log('sssssssssssssssss',screenDiv.clientWidth,screenDiv.clientHeight)
-        // Object.assign(this.canvasStyle, {
-        //   width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', //'inherit',
-        //   height: Math.floor(screenDiv.clientHeight) + 'px', //'100%',
-        // })
-      
+      }
+
+      var canvasRatio = img.width / img.height;
+      var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
+      console.log(img.width, img.height)
+      console.log('sssssssssssssssss', screenDiv.clientWidth, screenDiv.clientHeight)
+      // Object.assign(this.canvasStyle, {
+      //   width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', //'inherit',
+      //   height: Math.floor(screenDiv.clientHeight) + 'px', //'100%',
+      // })
+
       // if (canvasRatio > screenRatio) {
       //   Object.assign(this.canvasStyle, {
       //     width: Math.floor(screenDiv.clientWidth) + 'px', //'100%',
@@ -562,10 +562,10 @@ export default {
       // }
     },
     // 保存数据
-    save(){
+    save() {
       console.log('保存')
     }
-  },
+  }
 };
 </script>
 
@@ -591,7 +591,7 @@ export default {
       }
     padding: 20px 20px;
     .caseInfo{
-      
+
     }
     .taskCase {
       // height: 100%;
@@ -624,6 +624,6 @@ export default {
       }
     }
   }
-  
+
 }
 </style>

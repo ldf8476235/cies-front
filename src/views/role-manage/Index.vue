@@ -16,20 +16,20 @@
         <div class="funcTop">
           <div class="search">
             <el-input v-model="keyword" placeholder="请输入关键字">
-              <i slot="suffix" class="el-input__icon el-icon-search" @click="getList()"></i>
+              <i slot="suffix" class="el-input__icon el-icon-search" @click="getList"></i>
             </el-input>
           </div>
           <div class="newBtn">
-            
-            <el-button v-if="this.roleIds.length > 0" @click="batchDel()" icon="el-icon-delete">删除
+
+            <el-button v-if="this.roleIds.length > 0" @click="batchDel" icon="el-icon-delete">删除
             </el-button>
-            <el-button @click="addRole()" type="primary" icon="el-icon-plus">添加角色
+            <el-button @click="addRole" type="primary" icon="el-icon-plus">添加角色
             </el-button>
           </div>
         </div>
         <div class="tableContent">
-          <el-table 
-            :data="roleList"  
+          <el-table
+            :data="roleList"
             style="width: 100%"
             :row-key="getRowKeys"
             tooltip-effect="dark"
@@ -64,8 +64,14 @@
           class="dialog-title"
           :before-close="handleClose"
           left>
-          <el-form :model="roleForm" status-icon  ref="roleForm" label-width="80px"
-                  class="demo-ruleForm" size="mini" label-position="top">
+          <el-form
+:model="roleForm"
+status-icon
+ref="roleForm"
+label-width="80px"
+                  class="demo-ruleForm"
+size="mini"
+label-position="top">
             <el-form-item label="角色名称" prop="roleName">
               <el-input v-model="roleForm.roleName" placeholder="请输入角色名称" autocomplete="off" maxlength="30" :disabled="title=='编辑角色'"></el-input>
             </el-form-item>
@@ -89,7 +95,9 @@
           </el-form>
           <span slot="footer" class="dialog-footer">
                     <el-button @click="handleClose" class="footer-button">取 消</el-button>
-                    <el-button type="primary" @click="submit('roleForm')"
+                    <el-button
+type="primary"
+@click="submit('roleForm')"
                               class="footer-button footer-no">确 定</el-button>
                   </span>
         </el-dialog>
@@ -105,46 +113,46 @@
 </template>
 
 <script>
-import {treedata} from "../../assets/js/role.js";
+import { treedata } from '../../assets/js/role.js';
 export default {
   name: 'User',
   data() {
     return {
-      title:'新建角色',
-      dialogVisible:false,
-      keyword:'',
-      pageSize:10,
-      total:0,
-      currPage:1,
-      roleList:[],
-      roleIds:[],
-      roleForm:{
-        roleName:'',
-        roleType:[],
-        roleDesc:''
+      title: '新建角色',
+      dialogVisible: false,
+      keyword: '',
+      pageSize: 10,
+      total: 0,
+      currPage: 1,
+      roleList: [],
+      roleIds: [],
+      roleForm: {
+        roleName: '',
+        roleType: [],
+        roleDesc: ''
       },
       treedata
     };
   },
-  methods:{
-    edit(row){
+  methods: {
+    edit(row) {
       this.title = '编辑角色'
       this.roleForm = row
       this.dialogVisible = true
       var that = this;
-      setTimeout(function(){
+      setTimeout(function() {
         that.$refs.tree.setCheckedKeys(row.roleType);
-      },50)
+      }, 50)
     },
     submit(formName) {
-      if(this.title == '新建角色') {
+      if (this.title == '新建角色') {
         this.roleForm.roleType = this.$refs.tree.getCheckedKeys()
         this.$http({
           url: 'role/add',
           method: 'post',
           data: this.roleForm
-        }).then((data)=>{
-          if(data.data.code == 1) {
+        }).then((data) => {
+          if (data.data.code == 1) {
             this.$refs['roleForm'].resetFields()
             this.$message.success('添加成功')
             this.dialogVisible = false
@@ -159,8 +167,8 @@ export default {
           url: 'role/update',
           method: 'post',
           data: this.roleForm
-        }).then((data)=>{
-          if(data.data.code == 1) {
+        }).then((data) => {
+          if (data.data.code == 1) {
             this.$refs['roleForm'].resetFields()
             this.$message.success('更新成功')
             this.dialogVisible = false
@@ -171,23 +179,23 @@ export default {
         })
       }
     },
-    addRole(){
+    addRole() {
       this.dialogVisible = true
     },
     getList() {
       this.loading = true;
       var params = {
-        page:this.currPage,
-        limit:this.pageSize
+        page: this.currPage,
+        limit: this.pageSize
       }
-      if(this.keyword!=''){
+      if (this.keyword != '') {
         params['keyword'] = this.keyword
       }
       this.$http({
         url: 'role/list',
         method: 'get',
-        params:params
-      }).then((res) =>{
+        params: params
+      }).then((res) => {
         this.roleList = res.data.data.list
         this.total = res.data.data.totalCount
       });
@@ -198,9 +206,9 @@ export default {
           this.$refs.tree.setCheckedKeys([]);
           this.dialogVisible = false;
           this.roleForm = {
-            roleName:'',
-            roleType:[],
-            roleDesc:''
+            roleName: '',
+            roleType: [],
+            roleDesc: ''
           },
           done();
         })
@@ -209,7 +217,7 @@ export default {
     getRowKeys(row) {
       return row.deviceId;
     },
-    selectHandler(val){
+    selectHandler(val) {
       this.roleIds = [];
       val.forEach(element => {
         this.roleIds.push(element.roleId)
@@ -217,25 +225,25 @@ export default {
     },
     del(id) {
       this.$http({
-        url: "role/delete/" + id,
-        method: "delete",
+        url: 'role/delete/' + id,
+        method: 'delete'
       }).then((res) => {
-        if(res.data.code == 1){
-          this.$message.success("删除成功");
+        if (res.data.code == 1) {
+          this.$message.success('删除成功');
           this.getList();
         } else {
           this.$message.error(res.data.msg);
         }
       });
     },
-    batchDel(){
+    batchDel() {
       this.$http({
         url: 'role/batchDelete',
         method: 'post',
-        data:this.roleIds
-      }).then((res) =>{
-        if(res.data.code == 1){
-          this.$message.success("删除成功");
+        data: this.roleIds
+      }).then((res) => {
+        if (res.data.code == 1) {
+          this.$message.success('删除成功');
           this.roleIds = []
           this.getList()
         } else {
@@ -244,22 +252,22 @@ export default {
       });
     }
   },
-  computed:{
+  computed: {
   },
-  watch:{
+  watch: {
   },
-  mounted: function () {
+  mounted: function() {
     this.getList();
-  },
+  }
 };
 </script>
 <style lang="less">
-.role .el-tree>.el-tree-node>.el-tree-node__children{     
+.role .el-tree>.el-tree-node>.el-tree-node__children{
     .el-tree-node .el-tree-node__children{
         .el-tree-node{
             float: left!important;
-        }        
-    }    
+        }
+    }
 }
 .role .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
     background-color: white;

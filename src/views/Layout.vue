@@ -61,100 +61,100 @@
 </template>
 
 <script>
-import NavMenu from "@/components/menu/NavMenu.vue";
-import logoImg from "@/assets/images/logo.png";
+import NavMenu from '@/components/menu/NavMenu.vue';
+import logoImg from '@/assets/images/logo.png';
 export default {
-  name: "Layout",
+  name: 'Layout',
   components: {
-    NavMenu,
+    NavMenu
   },
   data() {
     return {
-      transitionName: "slide-right",
+      transitionName: 'slide-right',
       collapse: false,
-      activePath: "/",
-      tabName: "设备管理",
+      activePath: '/',
+      tabName: '设备管理',
       logo: logoImg,
       // 左侧导航栏菜单
       navData: [
         {
-          id: "001",
-          name: "任务管理",
-          path: "/task",
-          icon: "icon-task-off",
+          id: '001',
+          name: '任务管理',
+          path: '/task',
+          icon: 'icon-task-off'
           // children: [],
         },
         {
-          id: "002",
-          name: "用例管理",
-          path: "/case",
-          icon: "icon-cese-off",
+          id: '002',
+          name: '用例管理',
+          path: '/case',
+          icon: 'icon-cese-off'
           // children: [],
         },
         {
-          id: "003",
-          name: "动作管理",
-          path: "/action",
-          icon: "icon-action-off",
+          id: '003',
+          name: '动作管理',
+          path: '/action',
+          icon: 'icon-action-off'
           // children: [],
         },
         {
-          id: "009",
-          name: "校验点管理",
-          path: "/verify",
-          icon: "icon-checkoff",
+          id: '009',
+          name: '校验点管理',
+          path: '/verify',
+          icon: 'icon-checkoff'
           // children: [],
         },
         {
-          id: "004",
-          name: "设备管理",
-          path: "/device",
-          icon: "icon-device-off",
+          id: '004',
+          name: '设备管理',
+          path: '/device',
+          icon: 'icon-device-off'
           // children: [],
         },
         {
-          id: "005",
-          name: "脚本管理",
-          path: "/script",
-          icon: "icon-script-on",
+          id: '005',
+          name: '脚本管理',
+          path: '/script',
+          icon: 'icon-script-on'
           // children: [],
         },
         {
-          id: "006",
-          name: "角色管理",
-          path: "/role",
-          icon: "icon-role-off",
+          id: '006',
+          name: '角色管理',
+          path: '/role',
+          icon: 'icon-role-off'
           // children: [],
         },
         {
-          id: "007",
-          name: "用户管理",
-          path: "/user",
-          icon: "icon-user-off",
+          id: '007',
+          name: '用户管理',
+          path: '/user',
+          icon: 'icon-user-off'
           // children: [],
         },
         {
-          id: "008",
-          name: "接口调试",
-          icon: "icon-changjing",
-          path: "/api",
-          url: "http://192.168.220.139/cies/swagger-ui.html",
+          id: '008',
+          name: '接口调试',
+          icon: 'icon-changjing',
+          path: '/api',
+          url: 'http://192.168.220.139/cies/swagger-ui.html'
           // children: [],
-        },
-      ],
+        }
+      ]
     };
   },
   mounted() {
-    const path = window.location.href.split("/").pop().split("?")[0];
-    this.activePath = "/" + path;
+    const path = window.location.href.split('/').pop().split('?')[0];
+    this.activePath = '/' + path;
   },
   methods: {
     // 登出/个人信息
-    logout(){
-      
+    logout() {
+
     },
     // 折叠菜单
-    foldBtn(){
+    foldBtn() {
       this.collapse = !this.collapse
     },
     // 回到首页
@@ -164,7 +164,7 @@ export default {
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
-    },
+    }
   },
   watch: {
     // $route(to, from) {
@@ -174,7 +174,7 @@ export default {
     //   console.log(fromDepth)
     //   this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
     // }
-  },
+  }
 };
 </script>
 
@@ -205,7 +205,7 @@ export default {
       }
     }
   }
-  
+
 
   .el-aside {
     height: 100%;

@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2020-12-08 18:44:50
+ * @LastEditTime: 2020-12-15 17:46:17
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\main.js
@@ -18,9 +18,8 @@ import './assets/css/global.css'
 // 引入elemrntUI
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-Vue.use(ElementUI,{ size: 'mini' });
+Vue.use(ElementUI, { size: 'mini' });
 
-import httpRequest from '@/utils/request'
 // 分页组件
 import PageUtil from './components/utils/PageUtil'
 Vue.component('PageUtil', PageUtil)
@@ -29,6 +28,7 @@ Vue.component('PageUtil', PageUtil)
 import Fragment from 'vue-fragment'
 Vue.use(Fragment.Plugin)
 // 登峰请求引入
+import httpRequest from '@/utils/request'
 Vue.prototype.$http = httpRequest
 // 引入阿里矢量图标
 // import './assets/iconfont/iconfont.css'
@@ -37,13 +37,13 @@ Vue.prototype.$http = httpRequest
 import crumbs from './components/crumbs/index'
 Vue.use(crumbs)
 
-// 引入代码编辑器 
-import { codemirror } from "vue-codemirror";
-import "codemirror/lib/codemirror.css";
+// 引入代码编辑器
+import { codemirror } from 'vue-codemirror';
+import 'codemirror/lib/codemirror.css';
 Vue.use(codemirror);
 
-// 引入jshint用于实现js自动补全提示 
-import jshint from "jshint";
+// 引入jshint用于实现js自动补全提示
+import jshint from 'jshint';
 window.JSHINT = jshint.JSHINT;
 
 // 引入流程图插件
@@ -55,7 +55,7 @@ import './icon-svg/index.js'
 // 注册一个全局自定义指令 `v-focus`
 Vue.directive('focus', {
   // 当被绑定的元素插入到 DOM 中时……
-  inserted: function (el) {
+  inserted: function(el) {
     console.log(el.children)
     // 聚焦元素
     el.children[0].focus()
