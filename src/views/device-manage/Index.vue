@@ -203,8 +203,8 @@ export default {
         method: 'get',
         params: params
       }).then((res) => {
-        this.deviceList = res.data.data.list
-        this.total = res.data.data.totalCount
+        this.deviceList = res.data.list
+        this.total = res.data.totalCount
         this.loading = false;
       });
     },
@@ -236,11 +236,11 @@ export default {
         url: 'device/delete/' + id,
         method: 'delete'
       }).then((res) => {
-        if (res.data.code == 1) {
+        if (res.code == 1) {
           this.$message.success('删除成功');
           this.getList();
         } else {
-          this.$message.error(res.data.msg);
+          this.$message.error(res.msg);
         }
       });
     },
@@ -250,12 +250,12 @@ export default {
         method: 'post',
         data: this.deviceIds
       }).then((res) => {
-        if (res.data.code == 1) {
+        if (res.code == 1) {
           this.$message.success('删除成功');
           this.deviceIds = []
           this.getList()
         } else {
-          this.$message.error(res.data.msg);
+          this.$message.error(res.msg);
         }
       });
     }

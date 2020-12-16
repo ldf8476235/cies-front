@@ -150,13 +150,13 @@ export default {
           method: 'post',
           data: this.userForm
         }).then((data) => {
-          if (data.data.code == 1) {
+          if (data.code == 1) {
             this.$refs['userForm'].resetFields()
             this.$message.success('添加成功')
             this.dialogVisible = false
             this.getList()
           } else {
-            this.$message.error(data.data.msg)
+            this.$message.error(data.msg)
           }
         })
       } else {
@@ -165,13 +165,13 @@ export default {
           method: 'post',
           data: this.userForm
         }).then((data) => {
-          if (data.data.code == 1) {
+          if (data.code == 1) {
             this.$refs['userForm'].resetFields()
             this.$message.success('更新成功')
             this.dialogVisible = false
             this.getList()
           } else {
-            this.$message.error(data.data.msg)
+            this.$message.error(data.msg)
           }
         })
       }
@@ -204,8 +204,9 @@ export default {
         method: 'get',
         params: params
       }).then((res) => {
-        this.userList = res.data.data.list
-        this.total = res.data.data.totalCount
+        console.log(res)
+        this.userList = res.data.list
+        this.total = res.data.totalCount
       });
     },
     getRoleList() {
@@ -213,7 +214,7 @@ export default {
         url: 'role/list',
         method: 'get'
       }).then((res) => {
-        var roleList = res.data.data.list
+        var roleList = res.data.list
         roleList.forEach((v, i) => {
           this.options2.push({ value: v.roleName })
         })
@@ -233,11 +234,11 @@ export default {
         url: 'user/delete/' + id,
         method: 'delete'
       }).then((res) => {
-        if (res.data.code == 1) {
+        if (res.code == 1) {
           this.$message.success('删除成功');
           this.getList();
         } else {
-          this.$message.error(res.data.msg);
+          this.$message.error(res.msg);
         }
       });
     },
@@ -247,12 +248,12 @@ export default {
         method: 'post',
         data: this.userIds
       }).then((res) => {
-        if (res.data.code == 1) {
+        if (res.code == 1) {
           this.$message.success('删除成功');
           this.userIds = []
           this.getList()
         } else {
-          this.$message.error(res.data.msg);
+          this.$message.error(res.msg);
         }
       });
     },

@@ -152,13 +152,13 @@ export default {
           method: 'post',
           data: this.roleForm
         }).then((data) => {
-          if (data.data.code == 1) {
+          if (data.code == 1) {
             this.$refs['roleForm'].resetFields()
             this.$message.success('添加成功')
             this.dialogVisible = false
             this.getList()
           } else {
-            this.$message.error(data.data.msg)
+            this.$message.error(data.msg)
           }
         })
       } else {
@@ -168,13 +168,13 @@ export default {
           method: 'post',
           data: this.roleForm
         }).then((data) => {
-          if (data.data.code == 1) {
+          if (data.code == 1) {
             this.$refs['roleForm'].resetFields()
             this.$message.success('更新成功')
             this.dialogVisible = false
             this.getList()
           } else {
-            this.$message.error(data.data.msg)
+            this.$message.error(data.msg)
           }
         })
       }
@@ -196,8 +196,8 @@ export default {
         method: 'get',
         params: params
       }).then((res) => {
-        this.roleList = res.data.data.list
-        this.total = res.data.data.totalCount
+        this.roleList = res.data.list
+        this.total = res.data.totalCount
       });
     },
     handleClose(done) {
@@ -228,11 +228,11 @@ export default {
         url: 'role/delete/' + id,
         method: 'delete'
       }).then((res) => {
-        if (res.data.code == 1) {
+        if (res.code == 1) {
           this.$message.success('删除成功');
           this.getList();
         } else {
-          this.$message.error(res.data.msg);
+          this.$message.error(res.msg);
         }
       });
     },
@@ -242,12 +242,12 @@ export default {
         method: 'post',
         data: this.roleIds
       }).then((res) => {
-        if (res.data.code == 1) {
+        if (res.code == 1) {
           this.$message.success('删除成功');
           this.roleIds = []
           this.getList()
         } else {
-          this.$message.error(res.data.msg);
+          this.$message.error(res.msg);
         }
       });
     }

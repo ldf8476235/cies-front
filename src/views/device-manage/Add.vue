@@ -71,11 +71,11 @@ export default {
         method: 'post',
         data: this.deviceMsg
       }).then((data) => {
-        if (data.data.code == 1) {
+        if (data.code == 1) {
           this.$message.success('添加成功')
           this.$router.replace('/device')
         } else {
-          this.$message.error(data.data.msg)
+          this.$message.error(data.msg)
         }
       })
     },
@@ -85,10 +85,10 @@ export default {
         method: 'post',
         data: this.deviceMsg
       }).then((data) => {
-        if (data.data.code == 1) {
+        if (data.code == 1) {
           this.$message.success('编辑成功')
         } else {
-          this.$message.error(data.data.msg)
+          this.$message.error(data.msg)
         }
       })
     },
