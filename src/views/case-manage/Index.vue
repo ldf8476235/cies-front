@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2020-12-15 18:05:15
+ * @LastEditTime: 2020-12-28 15:31:13
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -33,14 +33,21 @@
               >新建用例</el-button>
           </div>
         </div> -->
-        <Func :options='options' @goNew='goNewCase' :txt='text'></Func>
+        <Func :options='options' @goNew='goNewCase' :txt='text' @deleteBatch='deleteBatch'></Func>
         <div class="tableContent">
-          <el-table :data="caseList" border style="width: 100%">
+          <el-table
+            :data="caseList"
+            class='borderTop'
+            style="width: 100%"
+            @selection-change="handleSelectionChange">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
             <el-table-column prop="caseName" label="用例名称" width="180">
             </el-table-column>
             <el-table-column prop="caseCite" label="引用" width="60">
+              <template slot-scope='scope'>
+                <div>{{scope.row.caseCite.length}}</div>
+              </template>
             </el-table-column>
             <el-table-column prop="caseProject" label="所属项目" min-width="180">
             </el-table-column>
@@ -58,13 +65,13 @@
                   placement="bottom"
                   width="100"
                   trigger="click">
-                  <p @click="editCase(scope.$index)">
+                  <p @click="editCase(scope.row)">
                     <svg-icon data_iconName="icon-edit" className="icon-gesture"/>
                     <span>编辑</span>
                   </p>
                   <p @click="copyCase"><svg-icon data_iconName="icon-copy" className="icon-gesture"/><span>复制</span></p>
                   <p><svg-icon data_iconName="icon-report" className="icon-gesture"/><span>报告</span></p>
-                  <p @click="delCase"><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
+                  <p @click="delCase(scope.row)"><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
                   <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
                   <div slot="reference">
                     <svg-icon data_iconName='icon-more'></svg-icon>
@@ -80,6 +87,7 @@
           :pageSize="pageSize"
           :currPage="currPage"
         ></PageUtil>
+
       </div>
     </div>
   </div>
@@ -141,21 +149,53 @@ export default {
         }
       })
     },
+    // 选择框
+    handleSelectionChange(data) {
+      this.delArr = data.map(item => {
+        return item.caseId
+      })
+      console.log(this.delArr)
+    },
+    // 批量删除
+    deleteBatch() {
+      this.$http.post(`/case/batchDelete`, this.delArr).then(res => {
+        console.log(res)
+        if (res.code === 1) {
+          this.$message({
+            type: 'success',
+            message: '删除成功'
+          })
+          this.getCaseList()
+        }
+      })
+    },
     // 删除用例
-    delCase() {
-
+    delCase(row) {
+      this.$http.delete(`/case/delete/${row.caseId}`).then(res => {
+        console.log(res)
+        if (res.code === 1) {
+          this.$message({
+            type: 'success',
+            message: '删除成功'
+          })
+          this.getCaseList()
+        }
+      })
     },
     // 复制用例
     copyCase() {
 
     },
     // 编辑用例
-    editCase(id) {
-      console.log(id)
+    editCase(row) {
+      console.log(row)
       this.$router.push({
-        path: '/case/newcase',
+        name: 'NewCase',
         query: {
-          id: id
+          id: row.caseId
+        },
+        params: {
+          data: row
         }
       });
     },
@@ -206,6 +246,9 @@ export default {
   }
   .tableContent {
     margin-top: 10px;
+    .borderTop{
+      border-top: 1px solid #EBEEF5;
+    }
   }
 }
 </style>

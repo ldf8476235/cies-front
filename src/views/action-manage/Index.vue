@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2020-12-15 15:51:47
+ * @LastEditTime: 2020-12-28 15:31:57
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -48,7 +48,7 @@
           </div>
         </div>
         <div class="tableContent">
-          <el-table :data="actionList" border style="width: 100%">
+          <el-table :data="actionList" class='borderTop' style="width: 100%">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
             <el-table-column prop="name" label="类型" width="50">
@@ -244,6 +244,9 @@ export default {
   }
   .tableContent {
     margin-top: 10px;
+    .borderTop{
+      border-top: 1px solid #EBEEF5;
+    }
   }
 }
 </style>

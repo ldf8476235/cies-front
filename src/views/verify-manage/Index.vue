@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-15 15:52:16
+ * @LastEditTime: 2020-12-28 15:32:20
 -->
 <template>
   <div class="action">
@@ -34,7 +34,7 @@
         </div> -->
         <Func :options='options' @goNew='goNewVerify' :txt='text'></Func>
         <div class="tableContent">
-          <el-table :data="actionList" border style="width: 100%">
+          <el-table :data="actionList" class='borderTop' style="width: 100%">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
             <el-table-column prop="name" label="类型" width="50">
@@ -181,6 +181,9 @@ export default {
   }
   .tableContent {
     margin-top: 10px;
+    .borderTop{
+      border-top: 1px solid #EBEEF5;
+    }
   }
 }
 </style>

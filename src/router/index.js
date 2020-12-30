@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2020-12-10 16:24:17
+ * @LastEditTime: 2020-12-28 09:13:15
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\router\index.js
@@ -18,7 +18,7 @@ const routes = [
     path: '/',
     name: 'Layout',
     component: Layout,
-    redirect: '/device',
+    redirect: '/task',
     children:[
       // 任务
       {

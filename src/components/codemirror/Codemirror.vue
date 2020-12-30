@@ -4,132 +4,68 @@
  * @Date: 2020-12-03 18:23:17
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-07 15:22:16
+ * @LastEditTime: 2020-12-28 16:03:33
 -->
 <template>
-
     <codemirror
-
-        ref="myCm"
-
-        :value="editorValue"
-
-        :options="cmOptions"
-
-        @changes="onCmCodeChanges"
-
-        @blur="onCmBlur"
-
-        @keydown.native="onKeyDown"
-
-        @mousedown.native="onMouseDown"
-
-        @paste.native="OnPaste"
-
+      ref="myCm"
+      :value="editorValue"
+      :options="cmOptions"
+      @changes="onCmCodeChanges"
+      @blur="onCmBlur"
+      @keydown.native="onKeyDown"
+      @mousedown.native="onMouseDown"
+      @paste.native="OnPaste"
     ></codemirror>
 
 </template>
-
-
-
 <script>
-
 import { codemirror } from 'vue-codemirror';
-
-
-
 import 'codemirror/theme/blackboard.css';
-
 import 'codemirror/mode/javascript/javascript.js';
-
 import 'codemirror/mode/xml/xml.js';
-
 import 'codemirror/mode/htmlmixed/htmlmixed.js';
-
 import 'codemirror/mode/css/css.js';
-
 import 'codemirror/mode/yaml/yaml.js';
-
 import 'codemirror/mode/sql/sql.js';
-
 import 'codemirror/mode/python/python.js';
-
 import 'codemirror/mode/markdown/markdown.js';
-
 import 'codemirror/addon/hint/show-hint.css';
-
 import 'codemirror/addon/hint/show-hint.js';
-
 import 'codemirror/addon/hint/javascript-hint.js';
-
 import 'codemirror/addon/hint/xml-hint.js';
-
 import 'codemirror/addon/hint/css-hint.js';
-
 import 'codemirror/addon/hint/html-hint.js';
-
 import 'codemirror/addon/hint/sql-hint.js';
-
 import 'codemirror/addon/hint/anyword-hint.js';
-
 import 'codemirror/addon/lint/lint.css';
-
 import 'codemirror/addon/lint/lint.js';
-
 import 'codemirror/addon/lint/json-lint';
-
 require('script-loader!jsonlint');
-
 // import "codemirror/addon/lint/html-lint.js";
-
 // import "codemirror/addon/lint/css-lint.js";
-
 import 'codemirror/addon/lint/javascript-lint.js';
-
 import 'codemirror/addon/fold/foldcode.js';
-
 import 'codemirror/addon/fold/foldgutter.js';
-
 import 'codemirror/addon/fold/foldgutter.css';
-
 import 'codemirror/addon/fold/brace-fold.js';
-
 import 'codemirror/addon/fold/xml-fold.js';
-
 import 'codemirror/addon/fold/comment-fold.js';
-
 import 'codemirror/addon/fold/markdown-fold.js';
-
 import 'codemirror/addon/fold/indent-fold.js';
-
 import 'codemirror/addon/edit/closebrackets.js';
-
 import 'codemirror/addon/edit/closetag.js';
-
 import 'codemirror/addon/edit/matchtags.js';
-
 import 'codemirror/addon/edit/matchbrackets.js';
-
 import 'codemirror/addon/selection/active-line.js';
-
 import 'codemirror/addon/search/jump-to-line.js';
-
 import 'codemirror/addon/dialog/dialog.js';
-
 import 'codemirror/addon/dialog/dialog.css';
-
 import 'codemirror/addon/search/searchcursor.js';
-
 import 'codemirror/addon/search/search.js';
-
 import 'codemirror/addon/display/autorefresh.js';
-
 import 'codemirror/addon/selection/mark-selection.js';
-
 import 'codemirror/addon/search/match-highlighter.js';
-
-
-
 export default {
   components: {
     codemirror
@@ -139,155 +75,70 @@ export default {
     return {
       editorValue: this.codeVal,
       cmOptions: {
-
-        theme:
-
-                    !this.cmTheme || this.cmTheme == 'default'
-
-                      ? 'blackboard'
-
-                      : this.cmTheme,
-
-        mode:
-
-                    !this.cmMode || this.cmMode == 'default'
-
-                      ? 'application/json'
-
-                      : this.cmMode,
-
+        theme: !this.cmTheme || this.cmTheme == 'default' ? 'blackboard' : this.cmTheme,
+        mode: !this.cmMode || this.cmMode == 'default' ? 'application/json' : this.cmMode,
         lineWrapping: true,
-
         lineNumbers: true,
-
         autofocus: true,
-
         smartIndent: false,
-
         autocorrect: true,
-
         spellcheck: true,
-
         extraKeys: {
-
           Tab: 'autocomplete',
-
           'Ctrl-Alt-L': () => {
-
             try {
-
-              if (
-
-                this.cmOptions.mode == 'application/json' &&
-
-                                this.editorValue
-
-              ) {
-
-                this.editorValue = this.formatStrInJson(
-
-                  this.editorValue
-
-                );
-
+              if (this.cmOptions.mode == 'application/json' && this.editorValue) {
+                this.editorValue = this.formatStrInJson(this.editorValue);
               }
-
             } catch (e) {
-
-              this.$message.error(
-
-                '格式化代码出错：' + e.toString()
-
-              );
-
+              this.$message.error('格式化代码出错：' + e.toString());
             }
-
           }
-
         },
-
         lint: true,
-
         gutters: [
-
           'CodeMirror-lint-markers',
-
           'CodeMirror-linenumbers',
-
           'CodeMirror-foldgutter'
-
         ],
-
         foldGutter: true,
-
         autoCloseBrackets: true,
-
         autoCloseTags: true,
-
         matchTags: { bothTags: true },
-
         matchBrackets: true,
-
         styleActiveLine: true,
-
         autoRefresh: true,
-
         highlightSelectionMatches: {
-
           minChars: 2,
-
           style: 'matchhighlight',
-
           showToken: true
-
         },
-
         styleSelectedText: true,
-
-        enableAutoFormatJson:
-
-                    this.autoFormatJson == null ? true : this.autoFormatJson,
-
-
-
-        defaultJsonIndentation:
-
-                    !this.jsonIndentation ||
-
-                    typeof this.jsonIndentation != typeof 1
-
-                      ? 2
-
-                      : this.jsonIndentation
-
+        enableAutoFormatJson: this.autoFormatJson == null ? true : this.autoFormatJson,
+        defaultJsonIndentation: !this.jsonIndentation || typeof this.jsonIndentation != typeof 1 ? 2 : this.jsonIndentation
       },
       enableAutoFormatJson: this.autoFormatJson == null ? true : this.autoFormatJson,
       defaultJsonIndentation: !this.jsonIndentation || typeof this.jsonIndentation != typeof 1 ? 2 : this.jsonIndentation
     };
-
   },
   watch: {
     codeVal(val) {
-      this.editorValue = this.editorValue + '\n' + val
+      if (this.editorValue) {
+        this.editorValue = this.editorValue + '\n' + val
+      } else {
+        this.editorValue = val
+      }
+
     },
     cmTheme: function(newValue, oldValue) {
       try {
-        const theme =
-
-                    this.cmTheme == 'default' ? 'blackboard' : this.cmTheme;
-
+        const theme = this.cmTheme == 'default' ? 'blackboard' : this.cmTheme;
         require('codemirror/theme/' + theme + '.css');
-
         this.cmOptions.theme = theme;
-
         this.resetLint();
-
       } catch (e) {
-
         this.$message.error('切换编辑器主题出错：' + e.toString());
-
       }
-
     },
     cmMode: function(newValue, oldValue) {
       this.$set(this.cmOptions, 'mode', this.cmMode);

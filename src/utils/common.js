@@ -4,7 +4,7 @@
  * @Date: 2020-12-04 14:44:54
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-04 14:47:05
+ * @LastEditTime: 2020-12-22 11:03:44
  */
 // Copies a string to the clipboard. Must be called from within an
 // event handler such as click. May return false if it failed, but
@@ -13,7 +13,7 @@
 // IE: The clipboard feature may be disabled by an administrator. By
 // default a prompt is shown the first time the clipboard is
 // used (per session).
-function copyToClipboard(text) {
+export function copyToClipboard(text) {
   if (window.clipboardData && window.clipboardData.setData) {
     // IE specific code path to prevent textarea being shown while dialog is visible.
     return clipboardData.setData('Text', text);

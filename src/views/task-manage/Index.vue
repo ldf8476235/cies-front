@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2020-12-15 15:52:04
+ * @LastEditTime: 2020-12-28 15:30:28
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -36,35 +36,35 @@
         </div> -->
         <Func :options='options' @goNew='goNewTask' :txt='text'></Func>
         <div class="tableContent">
-          <el-table :data="taskList" border style="width: 100%">
+          <el-table :data="taskList" class='borderTop'>
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="date" label="任务名称" width="180">
+            <el-table-column prop="taskName" label="任务名称" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="所属项目" min-width="180">
+            <el-table-column prop="taskProject" label="所属项目" min-width="180">
             </el-table-column>
-            <el-table-column prop="name" label="创建人" width="180">
+            <el-table-column prop="taskAssign" label="创建人" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="软件版本" width="140">
+            <el-table-column prop="taskVersion" label="软件版本" width="100">
             </el-table-column>
-            <el-table-column prop="name" label="创建时间" width="140">
+            <el-table-column prop="createTime" label="创建时间" width="160">
             </el-table-column>
-            <el-table-column prop="name" label="状态" width="180">
+            <el-table-column prop="taskStatus" label="状态" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="操作" width="60">
+            <el-table-column label="操作" width="60">
               <template slot-scope="scope">
                 <el-popover
                   placement="bottom"
                   width="100"
                   trigger="click">
-                  <p @click="showFuncBtn(scope.row)">
+                  <p @click="edit(scope.row)">
                     <svg-icon data_iconName="icon-edit" className="icon-gesture"/>
                     <span>编辑</span>
                   </p>
                   <p><svg-icon data_iconName="icon-copy" className="icon-gesture"/><span>复制</span></p>
                   <p><svg-icon data_iconName="icon-log" className="icon-gesture"/><span>日志</span></p>
                   <p><svg-icon data_iconName="icon-report" className="icon-gesture"/><span>报告</span></p>
-                  <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
+                  <p @click='del(scope.row.taskId)'><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
                   <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
                   <div slot="reference">
                     <svg-icon data_iconName='icon-more'></svg-icon>
@@ -79,6 +79,8 @@
           :total="total"
           :pageSize="pageSize"
           :currPage="currPage"
+          @handleSizeChange='handleSizeChange'
+          @handleCurrChange='handleCurrChange'
         ></PageUtil>
       </div>
     </div>
@@ -107,29 +109,69 @@ export default {
         {
           value: '选项2',
           label: '双皮奶'
-        },
-        {
-          value: '选项3',
-          label: '蚵仔煎'
-        },
-        {
-          value: '选项4',
-          label: '龙须面'
-        },
-        {
-          value: '选项5',
-          label: '北京烤鸭'
         }
       ],
       selectVal: '', // 选中项
       inputKey: '', // 搜索输入项
-      taskList: [{}] // 任务列表
+      taskList: [] // 任务列表
     };
   },
+  mounted() {
+    this.getTaskList(this.currPage, this.pageSize)
+  },
   methods: {
+    // 获取所有任务
+    getTaskList(page, size) {
+      const url = `task/list/?page=${page}&limit=${size}`
+      this.$http.get(url).then(res => {
+        console.log(res)
+        if (res.code === 1) {
+          this.taskList = res.data.list
+          this.total = res.data.totalCount
+        }
+      })
+    },
+    // 编辑
+    edit(row) {
+      this.$router.push(
+        {
+          name: 'NewTask',
+          query: {
+            editId: row.taskId
+          },
+          params: {
+            data: row
+          }
+        }
+      )
+    },
+    // 单个删除任务
+    del(id) {
+      const url = `task/delete/${id}`
+      this.$http.delete(url).then(res => {
+        if (res.code === 1) {
+          this.getTaskList(this.currPage, this.pageSize)
+          this.$message({
+            type: 'success',
+            message: '删除成功！'
+          })
+        }
+      })
+    },
     // 新建任务
     goNewTask() {
       this.$router.push('/task/newtask');
+    },
+    // 当前页条数
+    handleSizeChange(size) {
+      this.pageSize = size
+      this.getTaskList(this.currPage, size)
+    },
+    // 当前页面
+    handleCurrChange(page) {
+      this.currPage = page
+      console.log(this.currPage)
+      this.getTaskList(page, this.pageSize)
     }
   }
 };
@@ -174,6 +216,9 @@ export default {
   }
   .tableContent {
     margin-top: 10px;
+    .borderTop{
+      border-top: 1px solid #EBEEF5;
+    }
   }
 }
 </style>

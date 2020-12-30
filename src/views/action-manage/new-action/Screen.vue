@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-15 17:52:35
+ * @LastEditTime: 2020-12-28 17:52:50
 -->
 <template>
   <div class="new-screen">
@@ -115,56 +115,40 @@
                       </div>
                       <div class="action-sequence-content">
                         <div v-if="tabFlag === 0">
-                          <div class="row" v-for=" item1 in 3" :key="item1">
+                          <div class="row" v-for=" (item1,index) in actionSequence" :key="index">
                             <div class="action-item" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
                               <!-- 奇数行 -->
-                              <div class="click-icon" v-if="item1 % 2 === 1">
+                              <div class="click-icon" v-if="actionSequence.length % 2 === 1">
                                 <span>Home</span>
                                 <p>
-                                  <img src="../../../assets/iconpng/icon-gesture.png" alt="">
+                                  <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
                                 </p>
                                 <span class=" el-icon-circle-close red"></span>
                               </div>
-                              <div class="point-to" v-if="item1 % 2 === 1">
+                              <div class="point-to" v-if="actionSequence.length % 2 === 1">
                                 <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-right' "></span>
                               </div>
                               <!-- 偶数行 -->
-                              <div class="point-to" v-if="item !== 10 && item1 % 2 === 0">
+                              <div class="point-to" v-if="item !== 10 && actionSequence.length % 2 === 0">
                                 <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-back' "></span>
                               </div>
-                              <div class="click-icon" v-if="item1 % 2 === 0">
+                              <div class="click-icon" v-if="actionSequence.length % 2 === 0">
                                 <span>Home</span>
                                 <p>
-                                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
+                                  <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
                                 </p>
                                 <span class="el-icon-circle-close red"></span>
                               </div>
-                              <div class="point-to" v-if="item === 10 && item1 % 2 === 0">
+                              <div class="point-to" v-if="item === 10 && actionSequence.length % 2 === 0">
                                 <span :class="item === 10 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
                               </div>
                             </div>
-                            <!-- <div class="action-item" v-if="item1 % 2 === 0" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
-                              <div class="point-to" v-if="item !== 10">
-                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-back' "></span>
-                              </div>
-                              <div class="click-icon">
-                                <span>Home</span>
-                                <p>
-                                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
-                                </p>
-                                <span class="el-icon-circle-close red"></span>
-                              </div>
-                              <div class="point-to" v-if="item === 10">
-                                <span :class="item === 10 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
-                              </div>
-                            </div> -->
                           </div>
                         </div>
                         <div v-else>
                           <v-jstree :data="jsTreeData">
                               <template slot-scope="scope">
                                 <div
-style=""
                                   @click.exact="itemClick(scope.model)"
                                   >
                                   <i :class="scope.model.icon" role="presentation"></i>
@@ -187,7 +171,6 @@ style=""
                   <span>实时界面</span>
                 </div>
                 <div class="screen" id="screen" ref="screen">
-                  <!-- <img src="../../../assets/images/test.png" alt=""> -->
                   <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
                   <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
                   <span class="finger finger-0" style="transform: translate3d(200px, 100px, 0px)"></span>
@@ -353,7 +336,19 @@ export default {
       },
       cursor: {},
       tabFlag: 0,
-      jsTreeData: [] // 树形节点对象
+      jsTreeData: [], // 树形节点对象
+      actionSequence: [
+        {
+          name: 'name',
+          type: 'type',
+          text: 'text',
+          picture: 'picture',
+          area: 'area',
+          action: 'action',
+          exectuteWait: '',
+          params: 'params'
+        }
+      ]
     };
   },
   created() {
@@ -373,7 +368,7 @@ export default {
     }
   },
   destroyed() {
-    this.screenWebSocket.close()
+    this.screenWebSocket && this.screenWebSocket.close()
   },
   computed: {
     nodes: {
@@ -533,6 +528,7 @@ export default {
       this.drawAllNode();
       this.canvasStyle.opacity = 1.0;
     },
+    // 绘制所有节点
     drawAllNode() {
       var self = this;
       var canvas = self.canvas.fg;
@@ -543,7 +539,7 @@ export default {
         if (['Layout'].includes(node.type)) {
           return;
         }
-        self.drawNode(node, 'red', true);
+        self.drawNode(node, 'black', true);
       })
     },
     // wh-绘制app位置边框
@@ -560,13 +556,13 @@ export default {
       var ctx = this.canvas.fg.getContext('2d');
       var rectangle = new Path2D();
       rectangle.rect(x, y, w, h);
-      // if (dashed) {
-      ctx.lineWidth = 5;
-      ctx.setLineDash([8, 10]); // 设置虚线 实现部分与虚线部分 8-10-8-10 循环
-      // } else {
-      //   ctx.lineWidth = 5;
-      //   ctx.setLineDash([]);
-      // }
+      if (dashed) {
+        ctx.lineWidth = 5;
+        ctx.setLineDash([8, 10]); // 设置虚线 实现部分与虚线部分 8-10-8-10 循环
+      } else {
+        ctx.lineWidth = 5;
+        ctx.setLineDash([]);
+      }
       ctx.strokeStyle = color;
       ctx.stroke(rectangle);
     },
@@ -640,7 +636,6 @@ export default {
       function nodeArea(node) {
         return node.rect.width * node.rect.height;
       }
-
       const activeNodes = this.nodes.filter(function(node) {
         if (!isInside(node, pos.x, pos.y)) {
           return false;
@@ -749,7 +744,7 @@ export default {
 
       this.screenWebSocket = ws;
 
-      // this.loadLiveHierarchy() // 计算红色框
+      this.loadLiveHierarchy() // 计算红色框
 
       ws.onopen = function(ev) {
         console.log('screen websocket connected')
@@ -986,6 +981,7 @@ export default {
 
       function mouseDownListener(event) {
         var e = event;
+        var pos = coord(event);
         console.log(e)
         if (e.originalEvent) {
           e = e.originalEvent
@@ -1009,16 +1005,13 @@ export default {
         if (self.nodeHovered) {
           self.nodeSelected = self.nodeHovered;
           self.drawAllNode();
-          // self.drawHoverNode(pos);
+          self.drawHoverNode(pos);
           self.drawNode(self.nodeSelected, 'red');
           var generatedCode = self.generateNodeSelectorCode(self.nodeSelected);
           if (self.autoCopy) {
             copyToClipboard(generatedCode);
           }
           self.generatedCode = generatedCode;
-
-          console.log(self.generatedCode)
-
           // self.$jstree.jstree("deselect_all");
           // self.$jstree.jstree("close_all");
           // self.$jstree.jstree("select_node", "#" + self.nodeHovered._id);
@@ -1261,6 +1254,7 @@ export default {
           flex-wrap: wrap;
           justify-content: center;
           .el-button{
+            width: 80px;
             margin-left: 0;
             margin-right: 10px;
             margin-bottom: 10px;

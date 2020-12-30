@@ -4,7 +4,7 @@
  * @Autor: wh
  * @Date: 2020-11-30 17:12:31
  * @LastEditors: wh
- * @LastEditTime: 2020-12-01 11:38:56
+ * @LastEditTime: 2020-12-28 15:23:17
 -->
 <template>
   <div class="page">
@@ -28,6 +28,7 @@
 <script >
 export default {
   name: 'PageUtil',
+  props: ['total', 'currPage', 'pageSize'],
   data() {
     return {
       pageSize2: this.pageSize,
@@ -35,17 +36,17 @@ export default {
       total2: this.total
     }
   },
-  //
-  props: ['total', 'currPage', 'pageSize'],
   methods: {
     handleSizeChange() {
       this.$parent.pageSize = parseInt(this.pageSize2);
       this.$parent.currPage = 1;
-      this.$parent.getList();
+      this.$emit('handleSizeChange', this.pageSize2)
+      // this.$parent.getList();
     },
     handleCurrChange(val) {
       this.$parent.currPage = val;
-      this.$parent.getList();
+      this.$emit('handleCurrChange', val)
+      // this.$parent.getList();
     }
   },
   watch: {

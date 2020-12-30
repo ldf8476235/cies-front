@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2020-12-11 17:42:55
+ * @LastEditTime: 2020-12-28 09:19:53
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\views\Layout.vue
@@ -51,9 +51,7 @@
           </div>
         </el-header>
         <el-main>
-          <!-- <transition :name="transitionName"> -->
-            　<router-view></router-view>
-          <!-- </transition> -->
+            <router-view></router-view>
         </el-main>
       </el-container>
     </el-container>

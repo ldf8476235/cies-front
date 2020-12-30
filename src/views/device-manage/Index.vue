@@ -141,6 +141,8 @@
           :total="total"
           :pageSize="pageSize"
           :currPage="currPage"
+          @handleSizeChange='handleSizeChange'
+          @handleCurrChange='handleCurrChange'
         ></PageUtil>
       </div>
     </div>
@@ -258,6 +260,14 @@ export default {
           this.$message.error(res.msg);
         }
       });
+    },
+    // 当前页条数
+    handleSizeChange() {
+      this.getList()
+    },
+    // 当前页面
+    handleCurrChange() {
+      this.geList()
     }
   },
   mounted: function() {

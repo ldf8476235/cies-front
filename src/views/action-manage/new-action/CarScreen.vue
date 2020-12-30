@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 14:32:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-11 17:47:46
+ * @LastEditTime: 2020-12-24 14:48:05
 -->
 <template>
   <div class="car-screen">
@@ -74,9 +74,23 @@
                 <div slot="header" class="clearfix">
                   <span>实时界面</span>
                 </div>
-                <div>
-                  阿松大
-                </div>
+                <el-row>
+                  <el-col :span='18'>
+                    <div class="screen" id="screen" ref="screen">
+                      <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
+                      <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
+                      <span class="finger finger-0" style="transform: translate3d(200px, 100px, 0px)"></span>
+                    </div>
+                  </el-col>
+                  <el-col class='phone-btn' :span='6'>
+                    <el-button>Power</el-button>
+                    <el-button>Home</el-button>
+                    <el-button>Back</el-button>
+                    <el-button>Menu</el-button>
+                    <el-button>Volume+</el-button>
+                    <el-button>Volume-</el-button>
+                  </el-col>
+                </el-row>
               </el-card>
             </div>
           </el-col>
@@ -90,7 +104,6 @@
                     <span @click="tab(0)" :class="tabFlag === 0 ?'active' : ''">动作序列</span>
                     <span @click="tab(1)" :class="tabFlag === 1 ?'active' : ''">元素结构</span>
                   </p>
-
                   <div class="action-btn">
                     <el-dropdown split-button type="">
                       链接设备
@@ -156,7 +169,6 @@
                     <v-jstree :data="jsTreeData">
                         <template slot-scope="scope">
                           <div
-style=""
                             @click.exact="itemClick(scope.model)"
                             >
                             <i :class="scope.model.icon" role="presentation"></i>
@@ -196,9 +208,11 @@ style=""
 
 <script>
 import CodeMirror from '../../../components/codemirror/Codemirror.vue'
+import { b64toBlob, ImagePool, copyToClipboard } from '@/utils/common.js';
+import VJstree from 'vue-jstree'
 export default {
   name: 'CarScreen',
-  components: { CodeMirror },
+  components: { CodeMirror, VJstree },
   data() {
     return {
       crumbs: {
@@ -295,15 +309,699 @@ export default {
       rulesActionInfo: {},
       tabFlag: 0,
       options: [],
-      selectVal: ''
+      selectVal: '',
+      canvas: { // 画布
+        bg: null,
+        fg: null
+      },
+      canvasStyle: { // 画布内联style
+        opacity: 1,
+        width: 'inherit',
+        height: 'inherit'
+      },
+      lastScreenSize: {
+        screen: {},
+        canvas: {
+          width: 1,
+          height: 1
+        }
+      },
+      cursor: {},
+      jsTreeData: [] // 树形节点对象
 
     };
   },
-  computed: {
+  created() {
+    this.imagePool = new ImagePool(100);
   },
-  watch: {
+  mounted() {
+    this.canvas.bg = document.querySelector('#bgCanvas')
+    this.canvas.fg = document.querySelector('#fgCanvas')
+    this.deviceId = 'android:'
+    this.checkVersion()
+    this.getCurrentScreen()
+    this.doConnect()
+  },
+  computed: {
+    nodes: {
+      // cache:false,//控制计算属性缓存
+      get: function() {
+        console.log('计算属性')
+        return this.originNodes
+      }
+
+    }
   },
   methods: {
+    // wh-检查版本
+    checkVersion: function() {
+      this.$axios.get('/api/v1/version').then(res => {
+        console.log(res)
+        this.version = res.version;
+        console.log('版本：', this.version)
+        // var lastScreenshotBase64 = localStorage.screenshotBase64;
+        // if (lastScreenshotBase64) {
+        //   var blob = b64toBlob(lastScreenshotBase64, 'image/jpeg');
+        //   this.drawBlobImageToScreen(blob);
+        //   this.canvasStyle.opacity = 1.0;
+        // }
+        // if (localStorage.jsonHierarchy) {
+        //   let source = JSON.parse(localStorage.jsonHierarchy);
+        //   this.drawAllNodeFromSource(source);
+        //   this.loading = false;
+        //   this.canvasStyle.opacity = 1.0;
+        // }
+      })
+    },
+    // 获取当前屏幕截图
+    getCurrentScreen() {
+      this.$axios.get('/api/v1/devices/' + encodeURIComponent(this.deviceId || '-') + '/screenshot').then(res => {
+        console.log(res)
+        console.log('screenRefresh----:', res)
+        var blob = b64toBlob(res.data, 'image/' + res.type);
+        this.drawBlobImageToScreen(blob);
+        this.dumpHierarchy().then(this.loadLiveScreen)
+        localStorage.setItem('screenshotBase64', res.data);
+      }).catch(err => {
+        console.log('err:', err)
+      })
+    },
+    // wh-连接手机
+    doConnect() {
+      const params = `platform=${'Android'}&deviceUrl=${''}`
+      this.$axios.post('/api/v1/connect', params, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}).then(res => {
+        console.log('deviceId', res.deviceId)
+        this.deviceId = res.deviceId
+        this.screenWebSocketUrl = res.screenWebSocketUrl
+      }).catch(err => {
+        console.log('err', err)
+      })
+    },
+    // 绘制当前屏幕
+    drawBlobImageToScreen(blob) {
+      console.log('drawBlobImageToScreen----', blob)
+      // Support jQuery Promise
+      // var dtd = $.Deferred();
+      // console.log(this.canvas.bg)
+      var bgcanvas = this.canvas.bg;
+      var fgcanvas = this.canvas.fg;
+      var ctx = bgcanvas.getContext('2d');
+      var self = this;
+      var URL = window.URL || window.webkitURL;
+      var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+      var img = this.imagePool.next();
+      console.log(img.width, img.height)
+      img.onload = function() {
+        fgcanvas.width = bgcanvas.width = img.width
+        fgcanvas.height = bgcanvas.height = img.height
+        // var screenDiv = document.getElementById('screen');
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        self.resizeScreen(img);
+
+        // Try to forcefully clean everything to get rid of memory
+        // leaks. Note self despite this effort, Chrome will still
+        // leak huge amounts of memory when the developer tools are
+        // open, probably to save the resources for inspection. When
+        // the developer tools are closed no memory is leaked.
+        // img.onload = img.onerror = null
+        // img.src = BLANK_IMG
+        // img = null
+        // blob = null
+        // console.log('------',img)
+        // URL.revokeObjectURL(url)
+        // url = null
+        // dtd.resolve();
+      }
+
+      img.onerror = function() {
+        // Happily ignore. I suppose this shouldn't happen, but sometimes it does, presumably when we're loading images too quickly.
+        // Do the same cleanup here as in onload.
+        img.onload = img.onerror = null
+        img.src = BLANK_IMG
+        img = null
+        blob = null
+        console.log('error')
+        URL.revokeObjectURL(url)
+        url = null
+        // dtd.reject();
+      }
+      console.log(blob)
+      var url = URL.createObjectURL(blob)
+      img.src = url;
+      // return dtd;
+    },
+    // wh-获取安卓屏幕结构
+    dumpHierarchy() { // v2
+      return this.$axios.get('/api/v2/devices/' + encodeURIComponent(this.deviceId || '-') + '/hierarchy').then(res => {
+        // console.log('res----:',res)
+        localStorage.setItem('xmlHierarchy', res.xmlHierarchy);
+        localStorage.setItem('jsonHierarchy', JSON.stringify(res.jsonHierarchy));
+        localStorage.setItem('activity', res.activity);
+        localStorage.setItem('packageName', res.packageName);
+        localStorage.setItem('windowSize', res.windowSize);
+        this.activity = res.activity; // only for android
+        this.packageName = res.packageName;
+        this.drawAllNodeFromSource(res.jsonHierarchy);
+        // this.nodeSelected = null;
+      })
+    },
+    // wh-绘制所有安卓屏幕所有节点
+    drawAllNodeFromSource(source) {
+      const nodeMaps = this.originNodeMaps = {}
+      function sourceToNodes(source) {
+        const node = Object.assign({}, source); //, { children: undefined });
+        nodeMaps[node._id] = node;
+        let nodes = [node];
+        if (source.children) {
+          source.children.forEach(function(s) {
+            s._parentId = node._id;
+            nodes = nodes.concat(sourceToNodes(s))
+          })
+        }
+        return nodes;
+      }
+      this.originNodes = sourceToNodes(source) // res.nodes;
+      // console.log('this.originNodes:',source)
+      const jsTreeData = this.sourceToJstree(source)
+      this.jsTreeData = [jsTreeData]
+      console.log('js====', this.jsTreeData)
+      this.activeMouseControl()
+      this.drawAllNode();
+      this.canvasStyle.opacity = 1.0;
+    },
+    drawAllNode() {
+      var self = this;
+      var canvas = self.canvas.fg;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      self.originNodes.forEach(function(node) {
+        // ignore some types
+        if (['Layout'].includes(node.type)) {
+          return;
+        }
+        self.drawNode(node, 'red', true);
+      })
+    },
+    // wh-绘制app位置边框
+    drawNode(node, color, dashed) {
+      if (!node || !node.rect) {
+        return;
+      }
+      // console.log(node.rect.x)
+      var x = node.rect.x;
+      var y = node.rect.y;
+      var w = node.rect.width;
+      var h = node.rect.height;
+      color = color || 'black';
+      var ctx = this.canvas.fg.getContext('2d');
+      var rectangle = new Path2D();
+      rectangle.rect(x, y, w, h);
+      // if (dashed) {
+      ctx.lineWidth = 5;
+      ctx.setLineDash([8, 10]); // 设置虚线 实现部分与虚线部分 8-10-8-10 循环
+      // } else {
+      //   ctx.lineWidth = 5;
+      //   ctx.setLineDash([]);
+      // }
+      ctx.strokeStyle = color;
+      ctx.stroke(rectangle);
+    },
+    // wh-可视区域尺寸变化
+    resizeScreen(img) {
+      // check if need update
+      if (img) {
+        if (this.lastScreenSize.canvas.width == img.width &&
+          this.lastScreenSize.canvas.height == img.height) {
+          return;
+        }
+      } else {
+        img = this.lastScreenSize.canvas;
+        if (!img) {
+          return;
+        }
+      }
+      var screenDiv = this.$refs.screen // document.getElementById('screen');
+      console.log(screenDiv.clientWidth)
+      this.lastScreenSize = {
+        canvas: {
+          width: img.width,
+          height: img.height
+        },
+        screen: {
+          width: screenDiv.clientWidth,
+          height: screenDiv.clientHeight
+        }
+      }
+      var canvasRatio = img.width / img.height;
+      // var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
+      console.log('sssssssssssssssss', screenDiv.clientWidth, screenDiv.clientHeight)
+      Object.assign(this.canvasStyle, {
+        width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', // 'inherit',
+        height: Math.floor(screenDiv.clientHeight) + 'px' // '100%',
+      })
+
+      // if (canvasRatio > screenRatio) {
+      //   Object.assign(this.canvasStyle, {
+      //     width: Math.floor(screenDiv.clientWidth) + 'px', //'100%',
+      //     height: Math.floor(screenDiv.clientWidth / canvasRatio) + 'px', // 'inherit',
+      //   })
+      // } else {
+      //   // Object.assign(this.canvasStyle, {
+      //   //   width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', //'inherit',
+      //   //   height: Math.floor(screenDiv.clientHeight) + 'px', //'100%',
+      //   // })
+      // }
+    },
+    drawRefresh() {
+      this.drawAllNode()
+      if (this.nodeHovered) {
+        this.drawNode(this.nodeHovered, 'blue')
+      }
+      if (this.nodeSelected) {
+        this.drawNode(this.nodeSelected, 'red')
+      }
+    },
+    findNodesByPosition(pos) {
+      function isInside(node, x, y) {
+        if (!node.rect) {
+          return false;
+        }
+        var lx = node.rect.x;
+        var ly = node.rect.y;
+        var rx = node.rect.width + lx;
+        var ry = node.rect.height + ly;
+        return lx < x && x < rx && ly < y && y < ry;
+      }
+
+      function nodeArea(node) {
+        return node.rect.width * node.rect.height;
+      }
+
+      const activeNodes = this.nodes.filter(function(node) {
+        if (!isInside(node, pos.x, pos.y)) {
+          return false;
+        }
+        // skip some types
+        if (['Layout', 'Sprite'].includes(node.type)) {
+          return false;
+        }
+        return true;
+      })
+
+      activeNodes.sort((node1, node2) => {
+        return nodeArea(node1) - nodeArea(node2)
+      })
+      return activeNodes;
+    },
+    drawHoverNode(pos) {
+      const hoveredNodes = this.findNodesByPosition(pos);
+      const node = hoveredNodes[0];
+      this.nodeHovered = node;
+
+      hoveredNodes.forEach((node) => {
+        this.drawNode(node, 'green')
+      })
+      this.drawNode(this.nodeHovered, 'blue');
+    },
+    findNodes(kwargs) {
+      return this.nodes.filter((node) => {
+        for (const [k, v] of Object.entries(kwargs)) {
+          if (node[k] !== v) {
+            return false;
+          }
+        }
+        return true
+      })
+    },
+    generateNodeSelectorKwargs(node) {
+      // iOS: name, label, className
+      // Android: text, description, resourceId, className
+      const kwargs = {};
+      ['label', 'resourceId', 'name', 'text', 'type', 'tag', 'description', 'className'].some((key) => {
+        if (!node[key]) {
+          return false;
+        }
+        kwargs[key] = node[key];
+        return this.findNodes(kwargs).length === 1
+      });
+
+      const matchedNodes = this.findNodes(kwargs);
+      const nodeCount = matchedNodes.length
+      if (nodeCount > 1) {
+        kwargs['instance'] = matchedNodes.findIndex((n) => {
+          return n._id == node._id
+        })
+      }
+      kwargs['_count'] = nodeCount
+      return kwargs;
+    },
+    _combineKeyValue(key, value) {
+      if (typeof value === 'string') {
+        value = `"${value}"`
+      }
+      return key + '=' + value;
+    },
+    generateNodeSelectorCode(node) {
+      console.log('node:', node)
+      if (this.useXPathOnly) {
+        return `d.xpath('${this.elemXPathLite}')`
+      }
+      const kwargs = this.generateNodeSelectorKwargs(node)
+      if (kwargs._count === 1) {
+        const array = [];
+        for (const [key, value] of Object.entries(kwargs)) {
+          if (key.startsWith('_')) {
+            continue;
+          }
+          array.push(this._combineKeyValue(key, value))
+        }
+        return `d(${array.join(', ')})`
+      }
+      return `d.xpath('${this.elemXPathLite}')`
+    },
+    loadLiveHierarchy() {
+      if (this.nodeHovered || this.nodeSelected) {
+        setTimeout(this.loadLiveHierarchy, 500)
+        return
+      }
+      this.dumpHierarchy()
+        .then(() => {
+          this.loadLiveHierarchy()
+        })
+    },
+    loadLiveScreen() {
+      console.log('aaaaa')
+      var self = this;
+      var BLANK_IMG =
+        'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      // var protocol = location.protocol == 'http:' ? 'ws://' : 'wss://'
+      var ws = new WebSocket(this.screenWebSocketUrl);
+      var canvas = document.getElementById('bgCanvas')
+      var ctx = canvas.getContext('2d');
+      // var lastScreenSize = {
+      //   screen: {},
+      //   canvas: {}
+      // };
+
+      this.screenWebSocket = ws;
+
+      // this.loadLiveHierarchy() // 计算红色框
+
+      ws.onopen = function(ev) {
+        console.log('screen websocket connected')
+      };
+      ws.onmessage = function(message) {
+
+        console.log('New message');
+        var blob = new Blob([message.data], {
+          type: 'image/jpeg'
+        })
+        var img = self.imagePool.next();
+        img.onload = function() {
+          canvas.width = img.width
+          canvas.height = img.height
+          ctx.drawImage(img, 0, 0, img.width, img.height);
+          self.resizeScreen(img);
+
+          // Try to forcefully clean everything to get rid of memory
+          // leaks. Note self despite this effort, Chrome will still
+          // leak huge amounts of memory when the developer tools are
+          // open, probably to save the resources for inspection. When
+          // the developer tools are closed no memory is leaked.
+          img.onload = img.onerror = null
+          img.src = BLANK_IMG
+          img = null
+          blob = null
+
+          URL.revokeObjectURL(url)
+          url = null
+        }
+
+        img.onerror = function() {
+          // Happily ignore. I suppose this shouldn't happen, but
+          // sometimes it does, presumably when we're loading images
+          // too quickly.
+
+          // Do the same cleanup here as in onload.
+          img.onload = img.onerror = null
+          img.src = BLANK_IMG
+          img = null
+          blob = null
+
+          URL.revokeObjectURL(url)
+          url = null
+        }
+        var url = URL.createObjectURL(blob)
+        img.src = url;
+      }
+
+      ws.onclose = (ev) => {
+        this.liveScreen = false;
+        console.log('screen websocket closed')
+      }
+    },
+    // 源节点转换成树形节点对象
+    sourceToJstree(source) {
+      // console.log(source)
+      var n = {}
+      n.id = source._id;
+      n.text = source._type
+      if (source.name) {
+        n.text += ' - ' + source.name;
+      }
+      if (source.resourceId) {
+        n.text += ' - ' + source.resourceId;
+      }
+      n.icon = this.sourceTypeIcon(source.type);
+      if (source.children) {
+        n.children = []
+        source.children.forEach((s) => {
+          n.children.push(this.sourceToJstree(s))
+        })
+      }
+
+      return n
+    },
+    sourceTypeIcon(widgetType) {
+      switch (widgetType) {
+        case 'Scene':
+          return 'glyphicon glyphicon-tree-conifer'
+        case 'Layer':
+          return 'glyphicon glyphicon-equalizer'
+        case 'Camera':
+          return 'glyphicon glyphicon-facetime-video'
+        case 'Node':
+          return 'glyphicon glyphicon-leaf'
+        case 'ImageView':
+          return 'glyphicon glyphicon-picture'
+        case 'Button':
+          return 'glyphicon glyphicon-inbox'
+        case 'Layout':
+          return 'glyphicon glyphicon-tasks'
+        case 'Text':
+          return 'glyphicon glyphicon-text-size'
+        default:
+          return 'el-icon-s-promotion'
+      }
+    },
+    // wh-鼠标移动，点击事件
+    activeMouseControl() {
+      var self = this;
+      var element = this.canvas.fg;
+
+      var screen = {
+        bounds: {}
+      }
+      // wh-计算界限
+      function calculateBounds() {
+        var el = element;
+        screen.bounds.w = el.offsetWidth
+        screen.bounds.h = el.offsetHeight
+        screen.bounds.x = 0
+        screen.bounds.y = 0
+
+        while (el.offsetParent) {
+          screen.bounds.x += el.offsetLeft
+          screen.bounds.y += el.offsetTop
+          el = el.offsetParent
+        }
+      }
+
+      function activeFinger(index, x, y, pressure) {
+        // var scale = 0.5 + pressure
+        // $(".finger-" + index)
+        //   .addClass("active")
+        //   .css("transform", 'translate3d(' + x + 'px,' + y + 'px,0)')
+      }
+
+      function deactiveFinger(index) {
+        // $(".finger-" + index).removeClass("active")
+      }
+
+      function mouseMoveListener(event) {
+        var e = event
+        if (e.originalEvent) {
+          e = e.originalEvent
+        }
+        // Skip secondary click
+        if (e.which === 3) {
+          return
+        }
+        e.preventDefault()
+
+        var pressure = 0.5
+        activeFinger(0, e.pageX, e.pageY, pressure);
+        // that.touchMove(0, x / screen.bounds.w, y / screen.bounds.h, pressure);
+      }
+
+      function mouseHoverLeaveListener(event) {
+        self.nodeHovered = null;
+        self.drawRefresh()
+      }
+
+      function mouseUpListener(event) {
+        var e = event
+        if (e.originalEvent) {
+          e = e.originalEvent
+        }
+        // Skip secondary click
+        if (e.which === 3) {
+          return
+        }
+        e.preventDefault()
+
+        var pos = coord(e);
+        // change precision
+        pos.px = Math.floor(pos.px * 1000) / 1000;
+        pos.py = Math.floor(pos.py * 1000) / 1000;
+        pos.x = Math.floor(pos.px * element.width);
+        pos.y = Math.floor(pos.py * element.height);
+        self.cursor = pos;
+
+        self.nodeHovered = null;
+        markPosition(self.cursor)
+
+        stopMousing()
+      }
+
+      function stopMousing() {
+        element.removeEventListener('mousemove', mouseMoveListener);
+        element.addEventListener('mousemove', mouseHoverListener);
+        element.addEventListener('mouseleave', mouseHoverLeaveListener);
+        document.removeEventListener('mouseup', mouseUpListener);
+        deactiveFinger(0);
+      }
+
+      function coord(event) {
+        var e = event;
+        if (e.originalEvent) {
+          e = e.originalEvent
+        }
+        calculateBounds()
+        var x = e.pageX - screen.bounds.x
+        var y = e.pageY - screen.bounds.y
+        var px = x / screen.bounds.w;
+        var py = y / screen.bounds.h;
+        return {
+          px: px,
+          py: py,
+          x: Math.floor(px * element.width),
+          y: Math.floor(py * element.height)
+        }
+      }
+
+      function mouseHoverListener(event) {
+        var e = event;
+        if (e.originalEvent) {
+          e = e.originalEvent
+        }
+        // Skip secondary click
+        if (e.which === 3) {
+          return
+        }
+        e.preventDefault()
+        // startMousing()
+
+        var x = e.pageX - screen.bounds.x
+        var y = e.pageY - screen.bounds.y
+        var pos = coord(event);
+
+        self.nodeHoveredList = self.findNodesByPosition(pos);
+        self.nodeHovered = self.nodeHoveredList[0];
+        self.drawRefresh()
+
+        if (self.cursor.px) {
+          markPosition(self.cursor)
+        }
+      }
+
+      function contextMenuListener(event) {
+        event.preventDefault()
+        self.getCurrentScreen()
+      }
+
+      function mouseDownListener(event) {
+        var e = event;
+        console.log(e)
+        if (e.originalEvent) {
+          e = e.originalEvent
+        }
+        // Skip secondary click
+        if (e.which === 3) {
+
+          return
+        }
+        e.preventDefault()
+
+        // fakePinch = e.altKey
+        calculateBounds()
+        // startMousing()
+
+        var x = e.pageX - screen.bounds.x
+        var y = e.pageY - screen.bounds.y
+        var pressure = 0.5
+        activeFinger(0, e.pageX, e.pageY, pressure);
+
+        if (self.nodeHovered) {
+          self.nodeSelected = self.nodeHovered;
+          self.drawAllNode();
+          // self.drawHoverNode(pos);
+          self.drawNode(self.nodeSelected, 'red');
+          var generatedCode = self.generateNodeSelectorCode(self.nodeSelected);
+          if (self.autoCopy) {
+            copyToClipboard(generatedCode);
+          }
+          self.generatedCode = generatedCode;
+          console.log(self.generatedCode)
+        }
+
+        element.removeEventListener('mouseleave', mouseHoverLeaveListener);
+        element.removeEventListener('mousemove', mouseHoverListener);
+        element.addEventListener('mousemove', mouseMoveListener);
+        document.addEventListener('mouseup', mouseUpListener);
+      }
+
+      function markPosition(pos) {
+        var ctx = self.canvas.fg.getContext('2d');
+        ctx.fillStyle = '#ff8901' // '#ff0000'; // red
+        ctx.beginPath()
+        ctx.arc(pos.x, pos.y, 12, 0, 2 * Math.PI)
+        ctx.closePath()
+        ctx.fill()
+
+        ctx.fillStyle = '#fff'; // white
+        ctx.beginPath()
+        ctx.arc(pos.x, pos.y, 8, 0, 2 * Math.PI)
+        ctx.closePath()
+        ctx.fill();
+      }
+
+      /* bind listeners */
+      element.addEventListener('contextmenu', contextMenuListener);
+      element.addEventListener('mousedown', mouseDownListener);
+      element.addEventListener('mousemove', mouseHoverListener);
+      element.addEventListener('mouseleave', mouseHoverLeaveListener);
+    },
     // 元素节点点击事件
     itemClick(a, b) {
       console.log('元素节点', a, b)
@@ -326,9 +1024,46 @@ export default {
       padding: 5px 10px;
     }
   .top {
-
     margin-bottom: 10px;
+    .top-right{
+      .screen{
+          // width: 100%;
+          height: 250px;
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          flex: 1;
+          background-color: gray;
+          .canvas-fg {
+            z-index: 1;
+            position: absolute;
+          }
 
+          .canvas-bg {
+            z-index: 0;
+            position: absolute;
+          }
+        }
+      .phone-btn{
+        height: 250px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-content: center;
+        .el-button{
+          width: 80px;
+          margin-left: 0;
+          margin-bottom: 10px;
+          &:nth-child(even){
+          margin-left: 10px;
+        }
+        }
+
+      }
+    }
   }
   .bottom {
     .bottom-left {

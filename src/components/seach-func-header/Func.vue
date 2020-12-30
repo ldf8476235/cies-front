@@ -4,7 +4,7 @@
  * @Date: 2020-12-15 09:38:07
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-15 10:39:48
+ * @LastEditTime: 2020-12-18 14:08:10
 -->
 <template>
   <div>
@@ -29,9 +29,13 @@
       </div>
       <div class="newBtn">
         <el-button
-@click="goNew"
-type="primary"
-icon="el-icon-plus"
+          @click="deleteBatch"
+          icon="el-icon-delete"
+          >删除</el-button>
+        <el-button
+          @click="goNew"
+          type="primary"
+          icon="el-icon-plus"
           >{{txt}}</el-button>
       </div>
     </div>
@@ -64,8 +68,13 @@ export default {
         inputKey: ''
       }
       this.$emit('goNew', obj)
+    },
+    // 批量删除按钮
+    deleteBatch() {
+      this.$emit('deleteBatch')
     }
   }
+
 };
 </script>
 
