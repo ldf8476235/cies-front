@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-28 17:52:50
+ * @LastEditTime: 2021-01-06 13:41:37
 -->
 <template>
   <div class="new-screen">
@@ -28,15 +28,22 @@
                           :rules="rulesActionInfo"
                           label-width="100px"
                         >
-                          <el-form-item label="任务名称：" prop="device_name">
+                          <el-form-item label="任务名称：" prop="actionName">
                             <el-input
                               :suffix-icon="loading ? 'el-icon-loading' : ''"
-                              v-model.trim="actionInfo.device_name"
+                              v-model.trim="actionInfo.actionName"
                               placeholder="请输入"
                             ></el-input>
                           </el-form-item>
-                          <el-form-item label="所属项目：" prop="device_space">
-                            <el-select style="width:100%;" v-model="selectVal" placeholder="请选择">
+                          <el-form-item label="动作类型：">
+                            <!-- <el-input
+                              v-model="actionInfo.actionType"
+                              placeholder=""
+                            ></el-input> -->
+                            <span>屏幕操作</span>
+                          </el-form-item>
+                          <el-form-item label="所属项目：" prop="actionProject ">
+                            <el-select style="width:100%;" v-model="actionInfo.actionProject " placeholder="请选择">
                               <el-option
                                 v-for="item in options"
                                 :key="item.value"
@@ -48,21 +55,22 @@
                           </el-form-item>
                           <el-form-item label="软件版本：">
                             <el-input
-                              v-model="actionInfo.device_sn"
+                              v-model="actionInfo.actionVersion"
                               placeholder=""
                             ></el-input>
                           </el-form-item>
 
-                          <el-form-item label="指派人：">
+
+                          <el-form-item label="超时时长：">
                             <el-input
-                              v-model="actionInfo.device_sn"
+                              v-model="actionInfo.actionTimeout"
                               placeholder=""
                             ></el-input>
                           </el-form-item>
                           <el-form-item label="任务描述：">
                             <el-input
                               type="textarea"
-                              v-model="actionInfo.device_desc"
+                              v-model="actionInfo.actionDesc"
                               placeholder="请输入"
                             ></el-input>
                           </el-form-item>
@@ -115,32 +123,189 @@
                       </div>
                       <div class="action-sequence-content">
                         <div v-if="tabFlag === 0">
-                          <div class="row" v-for=" (item1,index) in actionSequence" :key="index">
-                            <div class="action-item" v-for=" item in 10" :key="item" :class="item === 10 ? 'row-wrap' : ''">
-                              <!-- 奇数行 -->
-                              <div class="click-icon" v-if="actionSequence.length % 2 === 1">
-                                <span>Home</span>
-                                <p>
-                                  <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
-                                </p>
-                                <span class=" el-icon-circle-close red"></span>
-                              </div>
-                              <div class="point-to" v-if="actionSequence.length % 2 === 1">
-                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-right' "></span>
-                              </div>
-                              <!-- 偶数行 -->
-                              <div class="point-to" v-if="item !== 10 && actionSequence.length % 2 === 0">
-                                <span :class="item === 10 ? 'el-icon-bottom' : 'el-icon-back' "></span>
-                              </div>
-                              <div class="click-icon" v-if="actionSequence.length % 2 === 0">
-                                <span>Home</span>
-                                <p>
-                                  <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
-                                </p>
+                          <div class="row" v-for=" (item,index) in actionSequence" :key="index">
+                            <!-- 奇数行 -->
+                            <div
+                              v-if="index % 2 === 0"
+                              :class="cindex === 9 ? 'row-wrap' : 'action-item'"
+                              v-for="(citem,cindex) in item"
+                              :key='cindex'>
+                              <div class="click-icon">
+                                <span>{{citem.name}}</span>
+                                <el-popover
+                                  placement="top-start"
+                                  title="属性"
+                                  width="220"
+                                  trigger="click"
+                                 >
+                                 <el-row style='padding-bottom:10px;'>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>名称：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>类型：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>文本：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>图片：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>区域：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>动作：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>执行后等待：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>参数：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                 </el-row>
+                                  <el-button slot="reference" type=''>
+                                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
+                                  </el-button>
+                                </el-popover>
                                 <span class="el-icon-circle-close red"></span>
                               </div>
-                              <div class="point-to" v-if="item === 10 && actionSequence.length % 2 === 0">
-                                <span :class="item === 10 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
+                              <div class="point-to">
+                                <span :class="cindex === 9 ? 'el-icon-bottom' : 'el-icon-right'"></span>
+                              </div>
+                            </div>
+                            <!-- 偶数行 -->
+                            <div
+                              v-if="index % 2 === 1"
+                              :class="cindex === 9 ? 'row-wrap' : 'action-item'"
+                              v-for="(citem,cindex) in item"
+                              :key='cindex'>
+                              <div class="point-to" v-if="cindex !== 9">
+                                <span class="el-icon-back"></span>
+                              </div>
+                              <div class="click-icon">
+                                <span>{{citem.name}}</span>
+                                <el-popover
+                                  placement="top-start"
+                                  title="属性"
+                                  width="220"
+                                  trigger="click"
+                                 >
+                                 <el-row style='padding-bottom:10px;'>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>名称：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>类型：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>文本：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>图片：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>区域：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>动作：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>执行后等待：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                  <el-col>
+                                    <el-row>
+                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>参数：</span></el-col>
+                                      <el-col :span='14'>
+                                        <span>{{citem.name}}</span>
+                                      </el-col>
+                                    </el-row>
+                                  </el-col>
+                                 </el-row>
+                                  <el-button slot="reference" type=''>
+                                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
+                                  </el-button>
+                                </el-popover>
+                                <span class="el-icon-circle-close red"></span>
+                              </div>
+                              <div class="point-to" v-if="cindex === 9">
+                                <span :class="cindex === 9 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
                               </div>
                             </div>
                           </div>
@@ -166,7 +331,7 @@
           </el-col>
           <el-col class="right" :span="6">
             <div class="gutter">
-              <el-card class="box-card-right">
+              <el-card v-click-outside="onClickOutside" class="box-card-right">
                 <div slot="header" class="clearfix">
                   <span>实时界面</span>
                 </div>
@@ -184,6 +349,15 @@
                   <el-button>Volume-</el-button>
                 </div>
               </el-card>
+              <div class='mobile-btn'  v-show='mobileBtn'>
+                <el-button>Tap Widget</el-button>
+                <el-button>Tap</el-button>
+                <el-button>Send Keys</el-button>
+                <el-button>LongPress</el-button>
+                <el-button>ScrollWidget</el-button>
+                <el-button>Swipe</el-button>
+                <el-button>Sleep</el-button>
+              </div>
             </div>
           </el-col>
         </el-row>
@@ -316,7 +490,9 @@ export default {
       ],
       selectVal: '', // 选中项
       tabClickIndex: '',
-      actionInfo: {},
+      actionInfo: {
+        actionType: 'screen'
+      },
       rulesActionInfo: {},
       canvasStyle: { // 画布内联style
         opacity: 1,
@@ -338,17 +514,31 @@ export default {
       tabFlag: 0,
       jsTreeData: [], // 树形节点对象
       actionSequence: [
-        {
-          name: 'name',
-          type: 'type',
-          text: 'text',
-          picture: 'picture',
-          area: 'area',
-          action: 'action',
-          exectuteWait: '',
-          params: 'params'
-        }
-      ]
+        [
+          {
+            name: 'name',
+            type: 'type',
+            text: 'text',
+            picture: 'picture',
+            area: 'area',
+            action: 'action',
+            exectuteWait: '',
+            params: 'params'
+          },
+          {
+            name: 'name2',
+            type: 'type2',
+            text: 'text2',
+            picture: 'picture2',
+            area: 'area2',
+            action: 'action2',
+            exectuteWait: '',
+            params: 'params2'
+          }
+        ]
+      ],
+      autoCopy: true,
+      mobileBtn: false
     };
   },
   created() {
@@ -362,10 +552,11 @@ export default {
     this.checkVersion()
     this.getCurrentScreen()
     this.doConnect()
+    this.activeMouseControl()
 
-    window.onresize = () => {
-      this.resizeScreen()
-    }
+    // window.onresize = () => {
+    //   this.resizeScreen()
+    // }
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
@@ -374,30 +565,33 @@ export default {
     nodes: {
       // cache:false,//控制计算属性缓存
       get: function() {
-        console.log('计算属性')
         return this.originNodes
       }
 
     }
   },
-  watch: {
-  },
   methods: {
+    // 点击按钮外部区域，隐藏元素
+    onClickOutside() {
+      this.mobileBtn = false;
+    },
+    // 处理动作序列数据
+    disposeActionSequence() {
+      const arr = []
+
+    },
     // 元素节点点击事件
     itemClick(a, b) {
       console.log('元素节点', a, b)
     },
     // 动作/元素结构切换
     tab(i) {
-      console.log(i)
       this.tabFlag = i
     },
     // wh-检查版本
     checkVersion: function() {
       this.$axios.get('/api/v1/version').then(res => {
-        console.log(res)
         this.version = res.version;
-        console.log('版本：', this.version)
         // var lastScreenshotBase64 = localStorage.screenshotBase64;
         // if (lastScreenshotBase64) {
         //   var blob = b64toBlob(lastScreenshotBase64, 'image/jpeg');
@@ -415,8 +609,6 @@ export default {
     // 获取当前屏幕截图
     getCurrentScreen() {
       this.$axios.get('/api/v1/devices/' + encodeURIComponent(this.deviceId || '-') + '/screenshot').then(res => {
-        console.log(res)
-        console.log('screenRefresh----:', res)
         var blob = b64toBlob(res.data, 'image/' + res.type);
         this.drawBlobImageToScreen(blob);
         this.dumpHierarchy().then(this.loadLiveScreen)
@@ -429,27 +621,25 @@ export default {
     doConnect() {
       const params = `platform=${'Android'}&deviceUrl=${''}`
       this.$axios.post('/api/v1/connect', params, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}).then(res => {
-        console.log('deviceId', res.deviceId)
+
         this.deviceId = res.deviceId
         this.screenWebSocketUrl = res.screenWebSocketUrl
+        console.log(this.screenWebSocketUrl)
       }).catch(err => {
         console.log('err', err)
       })
     },
     // 绘制当前屏幕
     drawBlobImageToScreen(blob) {
-      console.log('drawBlobImageToScreen----', blob)
       // Support jQuery Promise
       // var dtd = $.Deferred();
-      // console.log(this.canvas.bg)
       var bgcanvas = this.canvas.bg;
       var fgcanvas = this.canvas.fg;
       var ctx = bgcanvas.getContext('2d');
       var self = this;
       var URL = window.URL || window.webkitURL;
       var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-      var img = this.imagePool.next();
-      console.log(img.width, img.height)
+      var img = this.imagePool.next()
       img.onload = function() {
         fgcanvas.width = bgcanvas.width = img.width
         fgcanvas.height = bgcanvas.height = img.height
@@ -466,7 +656,6 @@ export default {
         // img.src = BLANK_IMG
         // img = null
         // blob = null
-        // console.log('------',img)
         // URL.revokeObjectURL(url)
         // url = null
         // dtd.resolve();
@@ -479,12 +668,10 @@ export default {
         img.src = BLANK_IMG
         img = null
         blob = null
-        console.log('error')
         URL.revokeObjectURL(url)
         url = null
         // dtd.reject();
       }
-      console.log(blob)
       var url = URL.createObjectURL(blob)
       img.src = url;
       // return dtd;
@@ -492,7 +679,6 @@ export default {
     // wh-获取安卓屏幕结构
     dumpHierarchy() { // v2
       return this.$axios.get('/api/v2/devices/' + encodeURIComponent(this.deviceId || '-') + '/hierarchy').then(res => {
-        // console.log('res----:',res)
         localStorage.setItem('xmlHierarchy', res.xmlHierarchy);
         localStorage.setItem('jsonHierarchy', JSON.stringify(res.jsonHierarchy));
         localStorage.setItem('activity', res.activity);
@@ -501,7 +687,7 @@ export default {
         this.activity = res.activity; // only for android
         this.packageName = res.packageName;
         this.drawAllNodeFromSource(res.jsonHierarchy);
-        // this.nodeSelected = null;
+        this.nodeSelected = null;
       })
     },
     // wh-绘制所有安卓屏幕所有节点
@@ -520,15 +706,12 @@ export default {
         return nodes;
       }
       this.originNodes = sourceToNodes(source) // res.nodes;
-      // console.log('this.originNodes:',source)
       const jsTreeData = this.sourceToJstree(source)
       this.jsTreeData = [jsTreeData]
-      console.log('js====', this.jsTreeData)
-      this.activeMouseControl()
       this.drawAllNode();
       this.canvasStyle.opacity = 1.0;
     },
-    // 绘制所有节点
+    // 绘制所有节点-黑色虚线框
     drawAllNode() {
       var self = this;
       var canvas = self.canvas.fg;
@@ -547,7 +730,6 @@ export default {
       if (!node || !node.rect) {
         return;
       }
-      // console.log(node.rect.x)
       var x = node.rect.x;
       var y = node.rect.y;
       var w = node.rect.width;
@@ -580,8 +762,8 @@ export default {
           return;
         }
       }
+      // this.$nextTick(() => {
       var screenDiv = this.$refs.screen // document.getElementById('screen');
-      console.log(screenDiv.clientWidth)
       this.lastScreenSize = {
         canvas: {
           width: img.width,
@@ -594,11 +776,12 @@ export default {
       }
       var canvasRatio = img.width / img.height;
       // var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
-      console.log('sssssssssssssssss', screenDiv.clientWidth, screenDiv.clientHeight)
       Object.assign(this.canvasStyle, {
         width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', // 'inherit',
         height: Math.floor(screenDiv.clientHeight) + 'px' // '100%',
       })
+      // })
+
 
       // if (canvasRatio > screenRatio) {
       //   Object.assign(this.canvasStyle, {
@@ -615,7 +798,7 @@ export default {
     drawRefresh() {
       this.drawAllNode()
       if (this.nodeHovered) {
-        this.drawNode(this.nodeHovered, 'blue')
+        this.drawNode(this.nodeHovered, '#ff8901')
       }
       if (this.nodeSelected) {
         this.drawNode(this.nodeSelected, 'red')
@@ -636,7 +819,8 @@ export default {
       function nodeArea(node) {
         return node.rect.width * node.rect.height;
       }
-      const activeNodes = this.nodes.filter(function(node) {
+      // if (this.originNodes) {
+      const activeNodes = this.originNodes.filter(function(node) {
         if (!isInside(node, pos.x, pos.y)) {
           return false;
         }
@@ -651,6 +835,8 @@ export default {
         return nodeArea(node1) - nodeArea(node2)
       })
       return activeNodes;
+      // }
+
     },
     drawHoverNode(pos) {
       const hoveredNodes = this.findNodesByPosition(pos);
@@ -663,7 +849,7 @@ export default {
       this.drawNode(this.nodeHovered, 'blue');
     },
     findNodes(kwargs) {
-      return this.nodes.filter((node) => {
+      return this.originNodes.filter((node) => {
         for (const [k, v] of Object.entries(kwargs)) {
           if (node[k] !== v) {
             return false;
@@ -700,8 +886,8 @@ export default {
       }
       return key + '=' + value;
     },
+    // 生成节点选择器
     generateNodeSelectorCode(node) {
-      console.log('node:', node)
       if (this.useXPathOnly) {
         return `d.xpath('${this.elemXPathLite}')`
       }
@@ -719,7 +905,9 @@ export default {
       return `d.xpath('${this.elemXPathLite}')`
     },
     loadLiveHierarchy() {
+      // 选中后不在实时计算元素(app)边框
       if (this.nodeHovered || this.nodeSelected) {
+        console.log('进入判断')
         setTimeout(this.loadLiveHierarchy, 500)
         return
       }
@@ -729,7 +917,6 @@ export default {
         })
     },
     loadLiveScreen() {
-      console.log('aaaaa')
       var self = this;
       var BLANK_IMG =
         'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
@@ -737,21 +924,13 @@ export default {
       var ws = new WebSocket(this.screenWebSocketUrl);
       var canvas = document.getElementById('bgCanvas')
       var ctx = canvas.getContext('2d');
-      // var lastScreenSize = {
-      //   screen: {},
-      //   canvas: {}
-      // };
 
+      self.loadLiveHierarchy() // 计算手机app所有元素的黑色框
       this.screenWebSocket = ws;
-
-      this.loadLiveHierarchy() // 计算红色框
-
       ws.onopen = function(ev) {
         console.log('screen websocket connected')
       };
       ws.onmessage = function(message) {
-
-        console.log('New message');
         var blob = new Blob([message.data], {
           type: 'image/jpeg'
         })
@@ -796,12 +975,10 @@ export default {
 
       ws.onclose = (ev) => {
         this.liveScreen = false;
-        console.log('screen websocket closed')
       }
     },
     // 源节点转换成树形节点对象
     sourceToJstree(source) {
-      // console.log(source)
       var n = {}
       n.id = source._id;
       n.text = source._type
@@ -845,6 +1022,7 @@ export default {
     },
     // wh-鼠标移动，点击事件
     activeMouseControl() {
+      console.log('鼠标事件监控')
       var self = this;
       var element = this.canvas.fg;
 
@@ -865,7 +1043,7 @@ export default {
           el = el.offsetParent
         }
       }
-
+      // 模拟手机点击图像
       function activeFinger(index, x, y, pressure) {
         // var scale = 0.5 + pressure
         // $(".finger-" + index)
@@ -899,6 +1077,7 @@ export default {
       }
 
       function mouseUpListener(event) {
+        console.log('鼠标抬起')
         var e = event
         if (e.originalEvent) {
           e = e.originalEvent
@@ -948,7 +1127,7 @@ export default {
           y: Math.floor(py * element.height)
         }
       }
-
+      // 鼠标hover事件
       function mouseHoverListener(event) {
         var e = event;
         if (e.originalEvent) {
@@ -959,16 +1138,12 @@ export default {
           return
         }
         e.preventDefault()
-        // startMousing()
-
-        var x = e.pageX - screen.bounds.x
-        var y = e.pageY - screen.bounds.y
+        // var x = e.pageX - screen.bounds.x
+        // var y = e.pageY - screen.bounds.y
         var pos = coord(event);
-
         self.nodeHoveredList = self.findNodesByPosition(pos);
         self.nodeHovered = self.nodeHoveredList[0];
         self.drawRefresh()
-
         if (self.cursor.px) {
           markPosition(self.cursor)
         }
@@ -978,54 +1153,49 @@ export default {
         event.preventDefault()
         self.getCurrentScreen()
       }
-
+      // 鼠标按下
       function mouseDownListener(event) {
+        console.log('鼠标按下')
         var e = event;
-        var pos = coord(event);
-        console.log(e)
+        // var pos = coord(event);
         if (e.originalEvent) {
           e = e.originalEvent
         }
         // Skip secondary click
         if (e.which === 3) {
-
           return
         }
+        self.mobileBtn = true
         e.preventDefault()
 
         // fakePinch = e.altKey
         calculateBounds()
-        // startMousing()
 
-        var x = e.pageX - screen.bounds.x
-        var y = e.pageY - screen.bounds.y
+        // var x = e.pageX - screen.bounds.x
+        // var y = e.pageY - screen.bounds.y
         var pressure = 0.5
         activeFinger(0, e.pageX, e.pageY, pressure);
 
         if (self.nodeHovered) {
           self.nodeSelected = self.nodeHovered;
+
           self.drawAllNode();
-          self.drawHoverNode(pos);
+          // self.drawHoverNode(pos);
           self.drawNode(self.nodeSelected, 'red');
           var generatedCode = self.generateNodeSelectorCode(self.nodeSelected);
           if (self.autoCopy) {
             copyToClipboard(generatedCode);
           }
           self.generatedCode = generatedCode;
-          // self.$jstree.jstree("deselect_all");
-          // self.$jstree.jstree("close_all");
-          // self.$jstree.jstree("select_node", "#" + self.nodeHovered._id);
-          // self.$jstree.jstree(true)._open_to("#" + self.nodeHovered._id);
           // document.getElementById(self.nodeHovered._id).scrollIntoView(false);
         }
         // self.touchDown(0, x / screen.bounds.w, y / screen.bounds.h, pressure);
-
         element.removeEventListener('mouseleave', mouseHoverLeaveListener);
         element.removeEventListener('mousemove', mouseHoverListener);
         element.addEventListener('mousemove', mouseMoveListener);
         document.addEventListener('mouseup', mouseUpListener);
       }
-
+      // 标志点击的元素的圆点
       function markPosition(pos) {
         var ctx = self.canvas.fg.getContext('2d');
         ctx.fillStyle = '#ff8901' // '#ff0000'; // red
@@ -1048,7 +1218,7 @@ export default {
       element.addEventListener('mouseleave', mouseHoverLeaveListener);
     },
     save() {
-      console.log('保存')
+      console.log('保存', this.actionInfo)
     }
   }
 };
@@ -1086,7 +1256,7 @@ export default {
 
       }
       .box-card-top {
-        height: 300px;
+        height: 330px;
         overflow: hidden;
         .editor{
           .vue-codemirror{
@@ -1094,7 +1264,7 @@ export default {
             /deep/ .CodeMirror-scroll {
               padding-bottom: 0px;
               width: 100%;
-              height: 80%;
+              height: 93%;
               overflow-x: hidden !important;
             }
           }
@@ -1107,7 +1277,6 @@ export default {
         }
       }
       .box-card-bottom {
-
         .action-bottom{
           display: flex;
           justify-content: space-between;
@@ -1130,27 +1299,38 @@ export default {
           }
         }
         .action-sequence-content{
-          height: 185px;
+          height: 165px;
           overflow-y: auto;
           .row{
+            width: 830px;
             display: flex;
-            justify-content: center;
+            margin: 0 auto;
+            // justify-content: center;
+            // align-items: flex-start;
             .row-wrap {
               display: flex;
               flex-direction: column;
               align-items: center;
+              margin-top:12px;
             }
           }
           .row:nth-child(even){
             flex-direction: row-reverse;
           }
+          .row-content{
+            display: flex;
+          }
           .action-item{
             display: flex;
             align-items: center;
-            .click-icon{
-              width: 46px;
-              text-align: center;
-
+          }
+          .click-icon{
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              .property{
+                width: 150px;
+              }
               span{
                 font-size: 12px;
                 color: #9B9B9B;
@@ -1158,30 +1338,30 @@ export default {
               .red{
                 color: #D0021B;
               }
-              p {
-                width: 46px;
-                height: 46px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border: 1px solid #DBDBDB;
-                text-align: center;
-                line-height: 46px;
-                border-radius: 5px;
-                span{
-                  font-size: 24px;
-                  color: #9B9B9B;
-                }
-              }
+              // p {
+              //   width: 46px;
+              //   height: 46px;
+              //   display: flex;
+              //   justify-content: center;
+              //   align-items: center;
+              //   border: 1px solid #DBDBDB;
+              //   text-align: center;
+              //   line-height: 46px;
+              //   border-radius: 5px;
+              //   span{
+              //     font-size: 24px;
+              //     color: #9B9B9B;
+              //   }
+              // }
             }
             .point-to{
-              width: 40px;
+              width: 30px;
               display: flex;
               justify-content: center;
+              // flex-wrap: wrap;
               // text-align: center;
               // width: 30px;
             }
-          }
         }
         /deep/ .action-sequence-content::-webkit-scrollbar{
             width:5px;
@@ -1222,6 +1402,7 @@ export default {
       }
     }
     .right{
+      position: relative;
       .box-card-right {
         // height: 605px;
        /deep/ .el-card__body{
@@ -1259,6 +1440,23 @@ export default {
             margin-right: 10px;
             margin-bottom: 10px;
           }
+        }
+      }
+      .mobile-btn{
+        position: absolute;
+        width: 200px;
+        background: rgba(170, 235, 252, 0.51);;
+        padding: 10px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        top:20px;
+        left: -150px;
+        z-index: 11;
+        border-radius: 5px;
+        .el-button {
+          width: 90px;
+          margin-left: 0;
+          margin-bottom: 5px;
         }
       }
     }

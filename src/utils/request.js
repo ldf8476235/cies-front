@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-18 10:22:01
- * @LastEditTime: 2020-12-15 18:00:58
+ * @LastEditTime: 2021-01-05 09:56:34
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\utils\request.js
@@ -13,7 +13,7 @@ import axios from 'axios';
 
 const http = axios.create({
   timeout: 10000,
-  baseURL: 'http://192.168.220.201/cies'
+  baseURL: 'http://192.168.220.120/cies'
 });
 // request拦截器
 http.interceptors.request.use(config => {

@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2020-12-28 09:19:53
+ * @LastEditTime: 2021-01-05 09:56:42
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\views\Layout.vue
@@ -136,7 +136,7 @@ export default {
           name: '接口调试',
           icon: 'icon-changjing',
           path: '/api',
-          url: 'http://192.168.220.139/cies/swagger-ui.html'
+          url: 'http://192.168.220.120/cies/swagger-ui.html'
           // children: [],
         }
       ]

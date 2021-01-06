@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2020-12-15 17:46:17
+ * @LastEditTime: 2021-01-06 13:27:37
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\main.js
@@ -33,6 +33,8 @@ Vue.prototype.$http = httpRequest
 // 引入阿里矢量图标
 // import './assets/iconfont/iconfont.css'
 
+import vClickOutside from 'v-click-outside'
+Vue.use(vClickOutside)
 // 引入自定义面包屑组件
 import crumbs from './components/crumbs/index'
 Vue.use(crumbs)

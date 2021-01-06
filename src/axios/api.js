@@ -4,13 +4,13 @@
  * @Date: 2020-12-04 13:30:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-15 17:51:29
+ * @LastEditTime: 2021-01-05 10:59:34
  */
 import axios from 'axios'
 // import NProgress from 'nprogress'
 // import 'nprogress/nprogress.css'
 // 创建axios实例
-console.log('地址查询：', process.env)
+// console.log('地址查询：', process.env)
 let BASE_URL
 if (process.env.NODE_ENV == 'development') {
   BASE_URL = ''

@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:07:02
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-11 13:52:26
+ * @LastEditTime: 2021-01-04 11:10:28
 -->
 <template>
   <div class="new-verify">
@@ -70,9 +70,9 @@
                     <el-row>
                       <el-col :span="24">
                         <el-form-item label="检验类型：" prop="device_space">
-                          <el-select v-model="selectVal" placeholder="请选择">
+                          <el-select v-model="selectVal" @change="selectType" placeholder="请选择">
                             <el-option
-                              v-for="item in options"
+                              v-for="item in selectTypeList"
                               :key="item.value"
                               :label="item.label"
                               :value="item.value"
@@ -82,7 +82,7 @@
                         </el-form-item>
                       </el-col>
                       <!-- 图像 -->
-                      <div v-if="false">
+                      <div v-if="selectVal === 'img'">
                         <el-col :span="24">
                           <el-form-item label="匹配结果：" prop="device_space">
                             <el-select v-model="selectVal" placeholder="请选择">
@@ -120,7 +120,7 @@
                         </el-col>
                       </div>
                       <!-- 文本 -->
-                      <div v-if="false">
+                      <div v-if="selectVal === 'txt'">
                         <el-col :span="24">
                           <el-form-item label="文本内容：">
                             <el-input
@@ -180,7 +180,7 @@
                         </el-col>
                       </div>
                       <!-- 语音 -->
-                      <div v-if="false">
+                      <div v-if="selectVal === 'voice'">
                         <el-col :span="24">
                           <el-form-item label="预期结果：">
                             <el-input
@@ -226,7 +226,7 @@
                         </el-col>
                       </div>
                       <!-- 日志 -->
-                      <div v-if="false">
+                      <div v-if="selectVal === 'log'">
                         <el-col :span="24">
                           <el-form-item label="预期结果：">
                             <el-input
@@ -259,7 +259,7 @@
                         </el-col>
                       </div>
                       <!-- 音频 -->
-                      <div v-if="false">
+                      <div v-if="selectVal === 'audio'">
                         <el-col :span="24">
                           <el-form-item label="预期结果：">
                             <!-- <el-input
@@ -296,7 +296,8 @@
                           </el-form-item>
                         </el-col>
                       </div>
-                      <div>
+                      <!-- 页面 -->
+                      <div v-if="selectVal === 'page'">
                         <el-col :span="24">
                           <el-form-item label="页面元素：">
                             <el-input
@@ -346,7 +347,7 @@
                     </el-row>
                   </div>
                 </el-col>
-                <el-col :span="12">
+                <el-col :span="12" v-if="selectVal === 'img' ||selectVal === 'txt'||selectVal === 'page' ">
                   <div class="gutter">
                     <div class="screen" ref="screen">
                       <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
@@ -356,7 +357,6 @@
               </el-row>
             </div>
           </el-form>
-
         </div>
       </div>
     </div>
@@ -374,6 +374,33 @@ export default {
         name: '新建校验点'
       },
       loading: true, // 任务名称动态验证动画
+      selectTypeList: [ // 选择类型
+        {
+          value: 'img',
+          label: '图像'
+        },
+        {
+          value: 'txt',
+          label: '文本'
+        },
+        {
+          value: 'voice',
+          label: '语音'
+        },
+        {
+          value: 'log',
+          label: '日志'
+        },
+        {
+          value: 'audio',
+          label: '音频'
+        },
+        {
+          value: 'page',
+          label: '页面'
+        }
+      ],
+
       options: [
         {
           value: '选项1',
@@ -396,7 +423,7 @@ export default {
           label: '北京烤鸭'
         }
       ],
-      selectVal: '', // 选中项
+      selectVal: 'img', // 选中项
       tabClickIndex: '',
       caseInfo: {
         caseInfoTable: [
@@ -457,6 +484,10 @@ export default {
   watch: {
   },
   methods: {
+    // 选择类型
+    selectType(e) {
+      this.selectVal = e
+    },
     // wh-获取当前屏幕截图
     getCurrentScreen() {
       this.$axios.get('/api/v1/devices/' + encodeURIComponent(this.deviceId || '-') + '/screenshot').then(res => {
