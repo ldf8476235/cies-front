@@ -4,7 +4,7 @@
  * @Date: 2020-12-03 18:23:17
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-28 16:03:33
+ * @LastEditTime: 2021-01-07 11:27:48
 -->
 <template>
     <codemirror
@@ -123,11 +123,11 @@ export default {
   },
   watch: {
     codeVal(val) {
-      if (this.editorValue) {
-        this.editorValue = this.editorValue + '\n' + val
-      } else {
-        this.editorValue = val
-      }
+      // if (this.editorValue) {
+      // this.editorValue = this.editorValue + '\n' + val
+      // } else {
+      this.editorValue = val
+      // }
 
     },
     cmTheme: function(newValue, oldValue) {

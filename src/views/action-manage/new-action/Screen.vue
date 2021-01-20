@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-06 13:41:37
+ * @LastEditTime: 2021-01-19 11:20:15
 -->
 <template>
   <div class="new-screen">
@@ -32,18 +32,14 @@
                             <el-input
                               :suffix-icon="loading ? 'el-icon-loading' : ''"
                               v-model.trim="actionInfo.actionName"
-                              placeholder="请输入"
+                              placeholder="输入任务名称"
                             ></el-input>
                           </el-form-item>
                           <el-form-item label="动作类型：">
-                            <!-- <el-input
-                              v-model="actionInfo.actionType"
-                              placeholder=""
-                            ></el-input> -->
                             <span>屏幕操作</span>
                           </el-form-item>
-                          <el-form-item label="所属项目：" prop="actionProject ">
-                            <el-select style="width:100%;" v-model="actionInfo.actionProject " placeholder="请选择">
+                          <el-form-item label="所属项目：" prop="actionProject">
+                            <el-select style="width:100%;" v-model="actionInfo.actionProject " placeholder="选择所属项目">
                               <el-option
                                 v-for="item in options"
                                 :key="item.value"
@@ -53,25 +49,25 @@
                               </el-option>
                             </el-select>
                           </el-form-item>
-                          <el-form-item label="软件版本：">
+                          <el-form-item label="软件版本：" prop='actionVersion'>
                             <el-input
                               v-model="actionInfo.actionVersion"
-                              placeholder=""
+                              placeholder="输入软件版本"
                             ></el-input>
                           </el-form-item>
 
 
-                          <el-form-item label="超时时长：">
+                          <el-form-item label="超时时长：" prop='actionTimeout'>
                             <el-input
                               v-model="actionInfo.actionTimeout"
-                              placeholder=""
+                              placeholder="输入超时时长"
                             ></el-input>
                           </el-form-item>
-                          <el-form-item label="任务描述：">
+                          <el-form-item label="任务描述：" prop='actionDesc'>
                             <el-input
                               type="textarea"
                               v-model="actionInfo.actionDesc"
-                              placeholder="请输入"
+                              placeholder="输入任务描述"
                             ></el-input>
                           </el-form-item>
                         </el-form>
@@ -125,13 +121,13 @@
                         <div v-if="tabFlag === 0">
                           <div class="row" v-for=" (item,index) in actionSequence" :key="index">
                             <!-- 奇数行 -->
+                            <template v-if="index % 2 === 0">
                             <div
-                              v-if="index % 2 === 0"
                               :class="cindex === 9 ? 'row-wrap' : 'action-item'"
                               v-for="(citem,cindex) in item"
                               :key='cindex'>
                               <div class="click-icon">
-                                <span>{{citem.name}}</span>
+                                <span>{{citem.text}}</span>
                                 <el-popover
                                   placement="top-start"
                                   title="属性"
@@ -143,7 +139,7 @@
                                     <el-row>
                                       <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>名称：</span></el-col>
                                       <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
+                                        <span>{{citem.text}}</span>
                                       </el-col>
                                     </el-row>
 
@@ -152,7 +148,7 @@
                                     <el-row>
                                       <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>类型：</span></el-col>
                                       <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
+                                        <span>{{citem._type}}</span>
                                       </el-col>
                                     </el-row>
                                   </el-col>
@@ -160,7 +156,7 @@
                                     <el-row>
                                       <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>文本：</span></el-col>
                                       <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
+                                        <span>{{citem.text}}</span>
                                       </el-col>
                                     </el-row>
                                   </el-col>
@@ -176,7 +172,7 @@
                                     <el-row>
                                       <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>区域：</span></el-col>
                                       <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
+                                        <span>{{citem.rect.x}},{{citem.rect.y}},{{citem.rect.width}},{{citem.rect.height}}</span>
                                       </el-col>
                                     </el-row>
                                   </el-col>
@@ -184,7 +180,7 @@
                                     <el-row>
                                       <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>动作：</span></el-col>
                                       <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
+                                        <span>{{citem.action}}</span>
                                       </el-col>
                                     </el-row>
                                   </el-col>
@@ -215,9 +211,10 @@
                                 <span :class="cindex === 9 ? 'el-icon-bottom' : 'el-icon-right'"></span>
                               </div>
                             </div>
+                            </template>
                             <!-- 偶数行 -->
+                            <template v-if="index % 2 === 1">
                             <div
-                              v-if="index % 2 === 1"
                               :class="cindex === 9 ? 'row-wrap' : 'action-item'"
                               v-for="(citem,cindex) in item"
                               :key='cindex'>
@@ -225,7 +222,7 @@
                                 <span class="el-icon-back"></span>
                               </div>
                               <div class="click-icon">
-                                <span>{{citem.name}}</span>
+                                <span>{{citem.text}}</span>
                                 <el-popover
                                   placement="top-start"
                                   title="属性"
@@ -308,6 +305,7 @@
                                 <span :class="cindex === 9 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
                               </div>
                             </div>
+                            </template>
                           </div>
                         </div>
                         <div v-else>
@@ -350,8 +348,8 @@
                 </div>
               </el-card>
               <div class='mobile-btn'  v-show='mobileBtn'>
-                <el-button>Tap Widget</el-button>
-                <el-button>Tap</el-button>
+                <el-button @click='doTapWidget'>Tap Widget</el-button>
+                <el-button @click='doTap'>Tap</el-button>
                 <el-button>Send Keys</el-button>
                 <el-button>LongPress</el-button>
                 <el-button>ScrollWidget</el-button>
@@ -369,7 +367,7 @@
 <script>
 import CodeMirror from '../../../components/codemirror/Codemirror.vue'
 import VJstree from 'vue-jstree'
-import { b64toBlob, ImagePool, copyToClipboard } from '@/utils/common.js';
+import { b64toBlob, ImagePool } from '@/utils/common.js';
 export default {
 
   name: 'NewScreen',
@@ -472,18 +470,6 @@ export default {
           label: '黄金糕'
         },
         {
-          value: '选项2',
-          label: '双皮奶'
-        },
-        {
-          value: '选项3',
-          label: '蚵仔煎'
-        },
-        {
-          value: '选项4',
-          label: '龙须面'
-        },
-        {
           value: '选项5',
           label: '北京烤鸭'
         }
@@ -491,9 +477,25 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       actionInfo: {
-        actionType: 'screen'
+        actionType: 0
       },
-      rulesActionInfo: {},
+      rulesActionInfo: {
+        actionName: [
+          { required: true, message: '请输入动作名称', trigger: 'blur' }
+        ],
+        actionProject: [
+          { required: true, message: '请选择所属项目', trigger: 'blur' }
+        ],
+        actionVersion: [
+          { required: true, message: '请输入软件版本', trigger: 'blur' }
+        ],
+        actionTimeout: [
+          { required: true, message: '请输入超时时长', trigger: 'blur' }
+        ],
+        actionDesc: [
+          { required: true, message: '请输入动作描述', trigger: 'blur' }
+        ]
+      },
       canvasStyle: { // 画布内联style
         opacity: 1,
         width: 'inherit',
@@ -514,31 +516,44 @@ export default {
       tabFlag: 0,
       jsTreeData: [], // 树形节点对象
       actionSequence: [
-        [
-          {
-            name: 'name',
-            type: 'type',
-            text: 'text',
-            picture: 'picture',
-            area: 'area',
-            action: 'action',
-            exectuteWait: '',
-            params: 'params'
-          },
-          {
-            name: 'name2',
-            type: 'type2',
-            text: 'text2',
-            picture: 'picture2',
-            area: 'area2',
-            action: 'action2',
-            exectuteWait: '',
-            params: 'params2'
-          }
-        ]
+        // [
+        //   {
+        //     name: 'name',
+        //     type: 'type',
+        //     text: 'text',
+        //     picture: 'picture',
+        //     area: 'area',
+        //     action: 'action',
+        //     exectuteWait: '',
+        //     params: 'params'
+        //   },
+        //   {
+        //     name: 'name2',
+        //     type: 'type2',
+        //     text: 'text2',
+        //     picture: 'picture2',
+        //     area: 'area2',
+        //     action: 'action2',
+        //     exectuteWait: '',
+        //     params: 'params2'
+        //   }
+        // ]
       ],
       autoCopy: true,
-      mobileBtn: false
+      mobileBtn: false,
+      mapAttrCount: {},
+      pyshell: {
+        running: false,
+        restarting: false,
+        consoleData: [],
+        wsOpen: false,
+        ws: null,
+        lineno: {
+          offset: 0,
+          current: -1
+        }
+      },
+      clickMobileApp: [] // 收集点击手机app数据
     };
   },
   created() {
@@ -553,10 +568,16 @@ export default {
     this.getCurrentScreen()
     this.doConnect()
     this.activeMouseControl()
+    // this.initPythonWebSocket()
 
     // window.onresize = () => {
     //   this.resizeScreen()
     // }
+    // 编辑进入
+    const actionId = this.$route.query.actionId
+    if (actionId) {
+      this.editData()
+    }
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
@@ -567,17 +588,77 @@ export default {
       get: function() {
         return this.originNodes
       }
+    },
+    elemXPathLite() {
+      // scan nodes
+      // this.mapAttrCount = {}
+      this.nodes.forEach((n) => {
+        this.incrAttrCount('label', n.label)
+        this.incrAttrCount('resourceId', n.resourceId)
+        this.incrAttrCount('text', n.text)
+        this.incrAttrCount('_type', n._type)
+        this.incrAttrCount('description', n.description)
+      })
 
+      let node = this.elem;
+      const array = [];
+      while (node && node._parentId) {
+        const parent = this.originNodeMaps[node._parentId]
+        if (this.getAttrCount('label', node.label) === 1) {
+          array.push(`*[@label="${node.label}"]`)
+          break
+        } else if (this.getAttrCount('resourceId', node.resourceId) === 1) {
+          array.push(`*[@resource-id="${node.resourceId}"]`)
+          break
+        } else if (this.getAttrCount('text', node.text) === 1) {
+          array.push(`*[@text="${node.text}"]`)
+          break
+        } else if (this.getAttrCount('description', node.description) === 1) {
+          array.push(`*[@content-desc="${node.description}"]`)
+          break
+        } else if (this.getAttrCount('_type', node._type) === 1) {
+          array.push(`${node._type}`)
+          break
+        } else if (!parent) {
+          array.push(`${node._type}`)
+        } else {
+          let index = 0;
+          parent.children.some((n) => {
+            if (n._type == node._type) {
+              index++
+            }
+            return n._id == node._id
+          })
+          array.push(`${node._type}[${index}]`)
+        }
+        node = parent;
+      }
+      return `//${array.reverse().join('/')}`
     }
   },
   methods: {
+    // 编辑
+    editData() {
+      const actionData = this.$route.params.data
+      if (actionData) {
+        localStorage.setItem('actionData', JSON.stringify(actionData))
+      }
+      this.actionInfo = actionData || JSON.parse(localStorage.getItem('actionData'))
+      this.disposeActionSequence(this.actionInfo.actionData)
+    },
     // 点击按钮外部区域，隐藏元素
     onClickOutside() {
       this.mobileBtn = false;
     },
     // 处理动作序列数据
-    disposeActionSequence() {
+    disposeActionSequence(data) {
       const arr = []
+      // actionSequence
+      const len = data.length
+      for (let i = 0; i < len;) {
+        arr.push(data.slice(i, i += 10))
+      }
+      this.actionSequence = arr
 
     },
     // 元素节点点击事件
@@ -587,6 +668,155 @@ export default {
     // 动作/元素结构切换
     tab(i) {
       this.tabFlag = i
+    },
+    doTapWidget() {
+      const node = this.nodeSelected
+      node.action = 'tap widget'
+      this.clickMobileApp.push(node)
+      this.disposeActionSequence(this.clickMobileApp)
+      const url = '/api/v1/widgets'
+      const data = {
+        bounds: [node.rect.x, node.rect.y, node.rect.x + node.rect.width, node.rect.y + node.rect.height],
+        text: node.text,
+        className: node._type,
+        description: node.description,
+        resourceId: node.resourceId,
+        xpath: this.elemXPathLite,
+        package: node.package,
+        hierarchy: localStorage.xmlHierarchy,
+        screenshot: localStorage.screenshotBase64,
+        windowSize: localStorage.windowSize.split(',').map(v => { return parseInt(v, 10) }),
+        activity: localStorage.activity
+      }
+      this.$axios({
+        method: 'POST',
+        url: url,
+        data: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(res => {
+        if (this.generatedCode) {
+          this.generatedCode = this.generatedCode + '\n' + `d.widget.click("${res.id}#${res.note}")`;
+        } else {
+          this.generatedCode = `d.widget.click("${res.id}#${res.note}")`;
+        }
+
+        // this.codeInsert(code)
+        this.nodeSelected = null;
+        // this.runPythonWithConnect(code)
+        //   .then(this.delayReload)
+      })
+    },
+    doTap() {
+      const node = this.nodeSelected
+      node.action = 'tap'
+      this.clickMobileApp.push(node)
+      this.disposeActionSequence(this.clickMobileApp)
+      var code = this.generateNodeSelectorCode(node);
+      if (this.generatedCode) {
+        this.generatedCode = this.generatedCode + '\n' + code + '.click()'
+      } else {
+        this.generatedCode = code + '.click()'
+      }
+
+      this.nodeSelected = null;
+      // this.runPythonWithConnect(code)
+      //   .then(this.delayReload)
+    },
+    // 运行python代码
+    runPythonWithConnect(code) {
+      this.tabActiveName = 'console'
+      if (!this.deviceId) {
+        return this.doConnect().then(() => {
+          this.runPythonWithConnect(code)
+        })
+      }
+      // this.pyshell.lineno.offset = 0
+      return this.runPython(code)
+    },
+    initPythonWebSocket() {
+      // 初始化变量
+      this.pyshell.running = false
+      this.pyshell.restarting = false
+
+      const ws = this.pyshell.ws = new WebSocket('ws://192.168.210.130:8000/ws/v1/python')
+      ws.onopen = () => {
+        this.pyshell.wsOpen = true
+        // this.resetConsole()
+      }
+      ws.onmessage = (message) => {
+        const data = JSON.parse(message.data)
+        let lineNumber = null
+        let timeUsed = null
+        // 用蓝色的breakpoint标记已经运行过的代码
+        // 用另外的breakpoint标记当前运行中的代码
+        // 代码行号:lineno 从0开始
+        switch (data.method) {
+          case 'gotoLine':
+            lineNumber = data.value + this.pyshell.lineno.offset;
+            this.setLineGoThrough(this.pyshell.lineno.current)
+            this.pyshell.lineno.current = lineNumber
+            this.editor.session.setBreakpoint(lineNumber)
+
+            // 下面这两行注释掉，因为会影响 "运行当前行" 功能中的自动跳到下一行的功能
+            // this.editor.selection.moveTo(lineNumber, 0) // 移动光标
+            // this.editor.scrollToLine(lineNumber) // 屏幕滚动到当前行
+            break;
+          case 'resetContent':
+            this.editor.setValue(data.value)
+            break;
+          case 'output':
+            this.appendConsole(data.value)
+            break;
+          case 'finish':
+            this.setLineGoThrough(this.pyshell.lineno.current)
+            this.pyshell.running = false
+            timeUsed = (data.value / 1000) + 's'
+            this.appendConsole('[Finished ' + timeUsed + ']')
+            break;
+          case 'restarted':
+            this.pyshell.restarting = false
+            this.pyshell.running = false
+            this.resetEditor()
+            this.$notify.success({
+              title: '重启内核',
+              message: '成功',
+              duration: 800,
+              offset: 100
+            })
+            this.runPython(this.generatePreloadCode())
+            break
+          default:
+            console.error('Unknown method', data.method)
+        }
+      }
+      ws.onclose = () => {
+        this.pyshell.wsOpen = false
+        this.pyshell.ws = null
+        this.pyshell.running = false
+        // this.resetEditor()
+        console.log('websocket closed')
+      }
+    },
+    // wh-运行python
+    runPython(code) {
+      return new Promise((resolve, reject) => {
+        // this.resetConsole()
+        // this.resetEditor()
+        this.pyshell.running = true
+        this.pyshell.ws.send(JSON.stringify({ method: 'input', value: code }))
+        resolve()
+      })
+    },
+
+    incrAttrCount(collectionKey, key) {
+      const flag = Object.prototype.hasOwnProperty.call(this.mapAttrCount, collectionKey)
+      if (!flag) {
+        this.mapAttrCount[collectionKey] = {}
+      }
+      const count = this.mapAttrCount[collectionKey][key] || 0;
+      this.mapAttrCount[collectionKey][key] = count + 1;
     },
     // wh-检查版本
     checkVersion: function() {
@@ -608,7 +838,7 @@ export default {
     },
     // 获取当前屏幕截图
     getCurrentScreen() {
-      this.$axios.get('/api/v1/devices/' + encodeURIComponent(this.deviceId || '-') + '/screenshot').then(res => {
+      this.$axios.get('/api/v1/devices/' + (this.deviceId || '-') + '/screenshot').then(res => {
         var blob = b64toBlob(res.data, 'image/' + res.type);
         this.drawBlobImageToScreen(blob);
         this.dumpHierarchy().then(this.loadLiveScreen)
@@ -624,7 +854,6 @@ export default {
 
         this.deviceId = res.deviceId
         this.screenWebSocketUrl = res.screenWebSocketUrl
-        console.log(this.screenWebSocketUrl)
       }).catch(err => {
         console.log('err', err)
       })
@@ -678,7 +907,7 @@ export default {
     },
     // wh-获取安卓屏幕结构
     dumpHierarchy() { // v2
-      return this.$axios.get('/api/v2/devices/' + encodeURIComponent(this.deviceId || '-') + '/hierarchy').then(res => {
+      return this.$axios.get('/api/v2/devices/' + (this.deviceId || '-') + '/hierarchy').then(res => {
         localStorage.setItem('xmlHierarchy', res.xmlHierarchy);
         localStorage.setItem('jsonHierarchy', JSON.stringify(res.jsonHierarchy));
         localStorage.setItem('activity', res.activity);
@@ -907,7 +1136,6 @@ export default {
     loadLiveHierarchy() {
       // 选中后不在实时计算元素(app)边框
       if (this.nodeHovered || this.nodeSelected) {
-        console.log('进入判断')
         setTimeout(this.loadLiveHierarchy, 500)
         return
       }
@@ -1022,7 +1250,6 @@ export default {
     },
     // wh-鼠标移动，点击事件
     activeMouseControl() {
-      console.log('鼠标事件监控')
       var self = this;
       var element = this.canvas.fg;
 
@@ -1070,14 +1297,12 @@ export default {
         activeFinger(0, e.pageX, e.pageY, pressure);
         // that.touchMove(0, x / screen.bounds.w, y / screen.bounds.h, pressure);
       }
-
       function mouseHoverLeaveListener(event) {
         self.nodeHovered = null;
         self.drawRefresh()
       }
 
       function mouseUpListener(event) {
-        console.log('鼠标抬起')
         var e = event
         if (e.originalEvent) {
           e = e.originalEvent
@@ -1087,7 +1312,6 @@ export default {
           return
         }
         e.preventDefault()
-
         var pos = coord(e);
         // change precision
         pos.px = Math.floor(pos.px * 1000) / 1000;
@@ -1155,7 +1379,6 @@ export default {
       }
       // 鼠标按下
       function mouseDownListener(event) {
-        console.log('鼠标按下')
         var e = event;
         // var pos = coord(event);
         if (e.originalEvent) {
@@ -1182,11 +1405,11 @@ export default {
           self.drawAllNode();
           // self.drawHoverNode(pos);
           self.drawNode(self.nodeSelected, 'red');
-          var generatedCode = self.generateNodeSelectorCode(self.nodeSelected);
+          // var generatedCode = self.generateNodeSelectorCode(self.nodeSelected);
           if (self.autoCopy) {
-            copyToClipboard(generatedCode);
+            // copyToClipboard(generatedCode);
           }
-          self.generatedCode = generatedCode;
+          // self.generatedCode = generatedCode;
           // document.getElementById(self.nodeHovered._id).scrollIntoView(false);
         }
         // self.touchDown(0, x / screen.bounds.w, y / screen.bounds.h, pressure);
@@ -1218,7 +1441,30 @@ export default {
       element.addEventListener('mouseleave', mouseHoverLeaveListener);
     },
     save() {
-      console.log('保存', this.actionInfo)
+      this.$refs.actionInfo.validate(valid => {
+        if (!valid) return
+        this.actionInfo.actionData = this.clickMobileApp
+        this.actionInfo.actionScript = this.generatedCode
+        console.log('保存', this.actionInfo)
+        let url = ''
+        if (this.$route.query.actionId) {
+          url = 'action/update'
+        } else {
+          url = 'action/add'
+        }
+        this.$http.post(url, this.actionInfo).then(res => {
+          if (res.code === 1) {
+            this.$message({
+              type: 'success',
+              message: '添加动作成功！'
+            })
+            this.$router.push({
+              path: '/action'
+            })
+          }
+        })
+      })
+
     }
   }
 };
@@ -1409,8 +1655,8 @@ export default {
           padding: 10px;
         }
         .screen{
-          // width: 100%;
-          height: 390px;
+          width: 100%;
+          height: 430px;
           position: relative;
           overflow: hidden;
           display: flex;

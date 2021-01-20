@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-28 14:15:57
+ * @LastEditTime: 2021-01-18 15:03:12
 -->
 <template>
   <div class="newTask">
@@ -26,21 +26,21 @@
                     <el-input
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
                       v-model.trim="taskInfo.taskName"
-                      placeholder="请输入"
+                      placeholder="输入任务名称"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：">
+                  <el-form-item label="软件版本：" prop="taskVersion">
                     <el-input
                       v-model="taskInfo.taskVersion"
-                      placeholder=""
+                      placeholder="输入软件版本"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="device_space">
-                    <el-select v-model="taskInfo.taskProject" placeholder="请选择">
+                  <el-form-item label="所属项目：" prop="taskProject">
+                    <el-select v-model="taskInfo.taskProject" placeholder="选择所属项目">
                       <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -52,8 +52,8 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="指派人：">
-                    <el-select v-model="taskInfo.taskAssign" placeholder="请选择">
+                  <el-form-item label="指派人：" prop="taskAssign">
+                    <el-select v-model="taskInfo.taskAssign" placeholder="选择指派人">
                       <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -69,7 +69,7 @@
                     <el-input
                       type="textarea"
                       v-model="taskInfo.taskDesc"
-                      placeholder="请输入"
+                      placeholder="输入任务描述"
                     ></el-input>
                   </el-form-item>
                 </el-col>
@@ -383,6 +383,21 @@ export default {
         ]
       },
       rulesTaskInfo: {
+        taskName: [
+          { required: true, message: '请输入任务名称', trigger: 'blur' }
+        ],
+        taskAssign: [
+          { required: true, message: '请选择指派人', trigger: 'blur' }
+        ],
+        taskProject: [
+          { required: true, message: '请选择所属项目', trigger: 'blur' }
+        ],
+        taskVersion: [
+          { required: true, message: '请输入软件版本', trigger: 'blur' }
+        ],
+        taskDesc: [
+          { required: true, message: '请输入任务描述', trigger: 'blur' }
+        ],
         taskCase: {}
       },
       iconFlag: true, // 折叠图标标识
@@ -605,24 +620,30 @@ export default {
         // 'taskProject': 'string',
         // 'taskVersion': 'string'
       }
-      let url = ''
-      const queryId = this.$route.query.editId
-      if (queryId) {
-        url = 'task/update'
-      } else {
-        url = 'task/add'
-      }
-      this.$http.post(url, this.taskInfo).then(res => {
-        console.log(res)
-        if (res.code === 1) {
-          this.$message({
-            type: 'success',
-            message: '添加任务成功！'
+      this.$refs.taskInfo.validate((valid) => {
+        console.log(valid)
+        if (valid) {
+          let url = ''
+          const queryId = this.$route.query.editId
+          if (queryId) {
+            url = 'task/update'
+          } else {
+            url = 'task/add'
+          }
+          this.$http.post(url, this.taskInfo).then(res => {
+            console.log(res)
+            if (res.code === 1) {
+              this.$message({
+                type: 'success',
+                message: '添加任务成功！'
+              })
+              this.$router.push('/task')
+            }
           })
-          this.$router.push('/task')
         }
+
       })
-      // console.log(this.taskInfo, data)
+
     }
   }
 };

@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2020-12-28 15:31:57
+ * @LastEditTime: 2021-01-08 15:15:50
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -31,7 +31,7 @@
             </el-button>
           </div>
           <div class="newBtn">
-            <!-- <el-button  type="primary" icon="el-icon-plus">新建动作</el-button> -->
+            <el-button @click="delBatch" class="del-btn" icon="el-icon-delete">删除</el-button>
             <el-dropdown @command="goNewTask">
               <el-button type="primary">
                 <i class="el-icon-plus"></i>
@@ -48,50 +48,67 @@
           </div>
         </div>
         <div class="tableContent">
-          <el-table :data="actionList" class='borderTop' style="width: 100%">
+          <el-table
+            :data="actionList"
+            class='borderTop'
+            @selection-change="handleSelectionChange"
+            style="width: 100%">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="name" label="类型" width="50">
-              <template>
-                <svg-icon data_iconName="icon-gesture" className="icon"/>
+            <el-table-column label="类型" width="50">
+              <template slot-scope="scope">
+                <div >
+                  <svg-icon v-if="scope.row.actionType === 0" data_iconName="icon-gesture" className="icon"/>
+                  <svg-icon v-if="scope.row.actionType === 1" data_iconName="icon-voice" className="icon"/>
+                  <svg-icon v-if="scope.row.actionType === 2" data_iconName="icon-code" className="icon"/>
+                </div>
               </template>
             </el-table-column>
-            <el-table-column prop="date" label="动作名称" width="180">
+            <el-table-column prop="actionName" label="动作名称" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="引用" min-width="180">
+            <el-table-column prop="name" label="引用" min-width="80">
+              <template slot-scope="scope">
+                <div >
+                  {{scope.row.actionCite.length}}
+                </div>
+              </template>
             </el-table-column>
-            <el-table-column prop="name" label="所属项目" width="180">
+            <el-table-column prop="actionProject" label="所属项目" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="创建人" width="180">
+            <el-table-column prop="actionCreator" label="创建人" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="软件版本" width="140">
+            <el-table-column prop="actionVersion" label="软件版本" width="140">
             </el-table-column>
-            <el-table-column prop="name" label="创建时间" width="140">
+            <el-table-column prop="createTime" label="创建时间" width="140">
+            </el-table-column>
+            <el-table-column prop="updateTime" label="更新时间" width="140">
             </el-table-column>
 
             <el-table-column prop="name" label="操作" width="60">
-              <el-popover
-                placement="bottom"
-                width="100"
-                trigger="click">
-                <p><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
-                <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
-                <p><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
-                <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
-                <div slot="reference">
-                    <svg-icon data_iconName='icon-more'></svg-icon>
-                  </div>
-              </el-popover>
+              <template slot-scope="scope">
+                <el-popover
+                  placement="bottom"
+                  width="100"
+                  trigger="click">
+                  <p @click="edit(scope.row)"><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
+                  <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
+                  <p @click="del(scope.row)"><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
+                  <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
+                  <div slot="reference">
+                      <svg-icon data_iconName='icon-more'></svg-icon>
+                    </div>
+                </el-popover>
+              </template>
             </el-table-column>
           </el-table>
-
-          <!-- <action-list></action-list> -->
         </div>
         <PageUtil
           ref="pageutil"
           :total="total"
           :pageSize="pageSize"
           :currPage="currPage"
+          @handleSizeChange = "handleSizeChange"
+          @handleCurrChange ='handleCurrChange'
         ></PageUtil>
       </div>
     </div>
@@ -121,28 +138,86 @@ export default {
         {
           value: '选项2',
           label: '双皮奶'
-        },
-        {
-          value: '选项3',
-          label: '蚵仔煎'
-        },
-        {
-          value: '选项4',
-          label: '龙须面'
-        },
-        {
-          value: '选项5',
-          label: '北京烤鸭'
         }
       ],
       selectVal: '', // 选中项
       inputKey: '', // 搜索输入项
       tabIndex: 1,
-      actionList: [{}] // 动作列表
+      actionList: [], // 动作列表
+      selectData: [] // 选中的数据
 
     };
   },
+  mounted() {
+    this.getActionList(this.currPage, this.pageSize)
+  },
   methods: {
+    // 选择数据
+    handleSelectionChange(val) {
+      this.selectData = val;
+    },
+    // 编辑
+    edit(row) {
+      console.log(row)
+      if (row.actionType === 0) {
+        this.$router.push({
+          name: 'NewScreen',
+          query: {
+            actionId: row.actionId
+          },
+          params: {
+            data: row
+          }
+        })
+      }
+    },
+    // 批量删除数据
+    delBatch() {
+      const url = 'action/batchDelete'
+      if (this.selectData.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '请先选择任何数据！'
+        })
+        return
+      }
+      const idList = this.selectData.map(item => {
+        return item.actionId
+      })
+      this.$http.post(url, idList).then(res => {
+        console.log(res)
+        if (res.code === 1) {
+          this.$message({
+            type: 'success',
+            message: '批量删除成功!'
+          })
+          this.getActionList(this.currPage, this.pageSize)
+        }
+      })
+    },
+    // 删除单个数据
+    async del(row) {
+      const url = 'action/delete/' + row.actionId
+      const res = await this.$http.delete(url)
+      if (res.code === 1) {
+        this.$message({
+          type: 'success',
+          message: '删除成功！'
+        })
+        this.getActionList(this.currPage, this.pageSize)
+      }
+    },
+    // 获取动作列表
+    getActionList(page, size) {
+      const url = `action/list?page=${page}&limit=${size}`
+      this.$http.get(url).then(res => {
+        console.log(res)
+        if (res.code === 1) {
+          this.actionList = res.data.list
+          this.total = res.data.totalCount
+        }
+      })
+    },
     // 新建任务
     goNewTask(i) {
       console.log(i)
@@ -165,6 +240,18 @@ export default {
     tabCut(index) {
       console.log(index)
       this.tabIndex = index
+    },
+    // 当前页条数
+    handleSizeChange(size) {
+      console.log(typeof size)
+      this.pageSize = size
+      this.getActionList(this.currPage, size)
+    },
+    // 当前页数
+    handleCurrChange(page) {
+      this.currPage = page
+      console.log(this.currPage)
+      this.getActionList(page, this.pageSize)
     }
   }
 };
@@ -173,32 +260,6 @@ export default {
 <style lang='less' scoped>
 // @import "../../assets/css/pub.less";
 .action {
-  .crumbs {
-    // .tab{
-    //   width: 192px;
-    //   display: flex;
-    //   justify-content: space-between;
-    //   font-size: 16px;
-    //   font-family: 'SourceHanSansCN-Normal', SourceHanSansCN;
-    //   font-weight: 400;
-    //   .actionTab{
-    //     cursor: pointer;
-    //     width: 72px;
-    //     text-align: center;
-    //     // border-bottom: 4px solid #006CEB;
-    //   }
-    //   .verifyTab{
-    //     cursor: pointer;
-    //     width: 90px;
-    //     text-align: center;
-    //     // border-bottom: 4px solid #006CEB;
-    //   }
-    //   .pitch{
-    //     border-bottom: 4px solid #006CEB;
-    //   }
-    // }
-
-  }
   .content {
     padding: 20px;
     box-sizing: border-box;
@@ -231,6 +292,9 @@ export default {
       }
     }
     .newBtn {
+      .del-btn{
+        margin-right: 10px;
+      }
       .el-button {
         padding: 7px 8px;
         span{

@@ -49,7 +49,7 @@
             :data="deviceList"
             :row-key="getRowKeys"
             tooltip-effect="dark"
-            style="width: 100%"
+            style="width: 100%;border-top:1px solid #e4e4e4"
             @selection-change="selectHandler"
           >
             <el-table-column width="10px"></el-table-column>
@@ -61,25 +61,25 @@
             >
             </el-table-column>
             <el-table-column label="设备名称" show-overflow-tooltip :span="10">
-              <template slot-scope="scope">{{ scope.row.deviceName }}</template>
+              <template slot-scope="scope">{{ scope.row.name }}</template>
             </el-table-column>
             <el-table-column
               label="负责人"
-              prop="deviceAdmin"
+              prop="user"
               show-overflow-tooltip
-              width="80"
+              width="100"
             >
             </el-table-column>
             <el-table-column
               label="IP地址"
-              prop="deviceIp"
+              prop="ip"
               show-overflow-tooltip
-              width="120"
+              width="150"
             >
             </el-table-column>
             <el-table-column
               label="端口号"
-              prop="devicePort"
+              prop="port"
               show-overflow-tooltip
               width="80"
             >
@@ -87,7 +87,7 @@
             <el-table-column
               label="类型"
               show-overflow-tooltip
-              width="130"
+              width="150"
               :formatter="formatterType"
             >
             </el-table-column>
@@ -114,7 +114,7 @@
             </el-table-column> -->
             <el-table-column
               label="操作"
-              width="50"
+              width="80"
               align="center">
               <template slot-scope="scope">
                 <el-dropdown trigger="click">
@@ -180,6 +180,9 @@ export default {
       }]
     }
   },
+  mounted() {
+    this.getList(this.currPage, this.pageSize);
+  },
   methods: {
     goAdd() {
       this.$router.push('/device/add');
@@ -191,22 +194,30 @@ export default {
       })
       console.log(this.deviceIds)
     },
-    getList() {
-      this.loading = true;
-      var params = {
-        page: this.currPage,
-        limit: this.pageSize
-      }
-      if (this.condition != '') {
-        params[this.condition] = this.value
-      }
+    // 获取搜索下拉框内容
+    getSelectOptions() {
       this.$http({
-        url: 'device/list',
-        method: 'get',
-        params: params
+        url: 'device/options/'
+      }).then(res => {
+        this.options = res
+      })
+    },
+    // 获取设备列表
+    getList(page, size) {
+      this.loading = true;
+      // var params = {
+      //   page: this.currPage,
+      //   limit: this.pageSize
+      // }
+      // if (this.condition != '') {
+      //   params[this.condition] = this.value
+      // }
+      this.$http({
+        url: `device/list/?page=${page}&count=${size}`,
+        method: 'get'
       }).then((res) => {
-        this.deviceList = res.data.list
-        this.total = res.data.totalCount
+        this.deviceList = res.data.result
+        this.total = res.data.count
         this.loading = false;
       });
     },
@@ -215,7 +226,7 @@ export default {
     },
     // 格式化设备类型数据
     formatterType(row) {
-      var typelist = row.deviceType;
+      var typelist = row.type;
       if (typelist.length == 1) {
         return typelist[0];
       } else {
@@ -227,8 +238,17 @@ export default {
       }
     },
     edit(row) {
-      row['update'] = true
-      this.$router.push({ path: '/device/update', query: row })
+      // row['update'] = true
+      console.log(row)
+      this.$router.push({
+        name: 'AddDevice',
+        query: {
+          id: row.id
+        },
+        params: {
+          data: row
+        }
+      })
     },
     copy(row) {
       this.$router.push({ path: '/device/update', query: row })
@@ -262,17 +282,17 @@ export default {
       });
     },
     // 当前页条数
-    handleSizeChange() {
-      this.getList()
+    handleSizeChange(size) {
+      this.pageSize = size
+      this.getList(this.currPage, this.pageSize)
     },
     // 当前页面
-    handleCurrChange() {
-      this.geList()
+    handleCurrChange(page) {
+      this.currPage = page
+      this.getList(this.currPage, this.pageSize)
     }
-  },
-  mounted: function() {
-    this.getList();
   }
+
 };
 </script>
 
@@ -291,7 +311,7 @@ export default {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   .action {
-    border-bottom: solid 2px rgba(221, 221, 221, 1);
+    // border-bottom: solid 2px rgba(221, 221, 221, 1);
     height: 70px;
     margin: 0 20px;
     .search {
@@ -301,7 +321,7 @@ export default {
   }
   .devicetable {
     margin: 0 20px;
-    border-bottom: solid 2px rgba(221, 221, 221, 1);
+    // border-bottom: solid 2px rgba(221, 221, 221, 1);
     .el-dropdown-link {
       cursor: pointer;
       // color: #409EFF;

@@ -4,15 +4,15 @@
  * @Autor: wh
  * @Date: 2020-11-30 17:12:31
  * @LastEditors: wh
- * @LastEditTime: 2020-12-28 15:23:17
+ * @LastEditTime: 2021-01-19 16:33:14
 -->
 <template>
   <div class="page">
     <el-select v-model="pageSize2" slot="prepend" placeholder="" style="width: 80px;" @change="handleSizeChange">
-      <el-option label=10 value=10></el-option>
-      <el-option label=20 value=20></el-option>
-      <el-option label=30 value=30></el-option>
-      <el-option label=50 value=50></el-option>
+      <el-option label=10 :value=10></el-option>
+      <el-option label=20 :value=20></el-option>
+      <el-option label=30 :value=30></el-option>
+      <el-option label=50 :value=50></el-option>
     </el-select>
     <el-pagination
       background
@@ -38,13 +38,13 @@ export default {
   },
   methods: {
     handleSizeChange() {
-      this.$parent.pageSize = parseInt(this.pageSize2);
-      this.$parent.currPage = 1;
+      // this.$parent.pageSize = parseInt(this.pageSize2);
+      // this.$parent.currPage = 1;
       this.$emit('handleSizeChange', this.pageSize2)
       // this.$parent.getList();
     },
     handleCurrChange(val) {
-      this.$parent.currPage = val;
+      // this.$parent.currPage = val;
       this.$emit('handleCurrChange', val)
       // this.$parent.getList();
     }

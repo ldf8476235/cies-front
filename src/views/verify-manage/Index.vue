@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-28 15:32:20
+ * @LastEditTime: 2021-01-11 10:12:31
 -->
 <template>
   <div class="action">
@@ -62,15 +62,12 @@
                 <p><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
                 <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
                 <p><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
-                <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
                 <div slot="reference">
                     <svg-icon data_iconName='icon-more'></svg-icon>
                   </div>
               </el-popover>
             </el-table-column>
           </el-table>
-
-          <!-- <action-list></action-list> -->
         </div>
         <PageUtil
           ref="pageutil"

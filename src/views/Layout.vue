@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2021-01-05 09:56:42
+ * @LastEditTime: 2021-01-13 09:41:07
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\views\Layout.vue
@@ -103,6 +103,7 @@ export default {
           icon: 'icon-checkoff'
           // children: [],
         },
+
         {
           id: '004',
           name: '设备管理',
@@ -115,6 +116,13 @@ export default {
           name: '脚本管理',
           path: '/script',
           icon: 'icon-script-on'
+          // children: [],
+        },
+        {
+          id: '010',
+          name: '环境管理',
+          path: '/environment',
+          icon: 'icon-checkoff'
           // children: [],
         },
         {

@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-10 10:28:03
+ * @LastEditTime: 2021-01-19 11:28:19
 -->
 <template>
   <div class="new-voice">
@@ -22,17 +22,17 @@
             <div class="scriptInfo">
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="动作名称：" prop="device_name">
+                  <el-form-item label="动作名称：" prop="actionName">
                     <el-input
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
-                      v-model.trim="scriptInfo.device_name"
-                      placeholder="请输入"
+                      v-model.trim="scriptInfo.actionName"
+                      placeholder="输入动作名称"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="device_space">
-                    <el-select v-model="selectVal" placeholder="请选择">
+                  <el-form-item label="所属项目：" prop="actionProject">
+                    <el-select v-model="scriptInfo.actionProject" placeholder="选择所属项目">
                       <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -44,20 +44,32 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：">
+                  <el-form-item label="动作类型：">
+                    命令脚本
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="软件版本：" prop='actionVersion'>
                     <el-input
-                      v-model="scriptInfo.device_sn"
-                      placeholder=""
+                      v-model="scriptInfo.actionVersion"
+                      placeholder="输入软件版本"
                     ></el-input>
                   </el-form-item>
                 </el-col>
-
                 <el-col :span="12">
-                  <el-form-item label="用例描述：">
+                  <el-form-item label="超时时长：" prop='actionTimeout'>
+                    <el-input
+                      v-model="scriptInfo.actionTimeout"
+                      placeholder="输入超时时长"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="动作描述：" prop='actionDesc'>
                     <el-input
                       type="textarea"
-                      v-model="scriptInfo.device_desc"
-                      placeholder="请输入"
+                      v-model="scriptInfo.actionDesc"
+                      placeholder="输入动作描述"
                     ></el-input>
                   </el-form-item>
                 </el-col>
@@ -74,16 +86,21 @@
                 </div>
               </el-row>
               <div class="editor">
-                <CodeMirror
+                <!-- <CodeMirror
                 ref="cmEditor"
                 :cmTheme="cmTheme"
                 :cmMode="cmMode"
                 :autoFormatJson="autoFormatJson"
                 :jsonIndentation="jsonIndentation"
                 :codeVal='generatedCode'
-                ></CodeMirror>
+                ></CodeMirror> -->
+                <codemirror
+                  ref="chartOption"
+                  v-model="generatedCode"
+                  :options="cmOptions"
+                  >
+                </codemirror>
               </div>
-
             </div>
           </el-form>
 
@@ -94,10 +111,15 @@
 </template>
 
 <script>
-import CodeMirror from '../../../components/codemirror/Codemirror.vue'
+// import CodeMirror from '../../../components/codemirror/Codemirror.vue'
+import { codemirror } from 'vue-codemirror' // 引入组件
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/material.css';
+import 'codemirror/theme/base16-light.css'
+import 'codemirror/mode/python/python.js';
 export default {
   name: 'NewScript',
-  components: { CodeMirror },
+  components: { codemirror },
   data() {
     return {
       crumbs: {
@@ -128,127 +150,80 @@ export default {
         }
       ],
       cmTheme: 'base16-light', // codeMirror主题
-      // codeMirror主题选项
-      cmThemeOptions: [
-        'default',
-        '3024-day',
-        '3024-night',
-        'abcdef',
-        'ambiance',
-        'ayu-dark',
-        'ayu-mirage',
-        'base16-dark',
-        'base16-light',
-        'bespin',
-        'blackboard',
-        'cobalt',
-        'colorforth',
-        'darcula',
-        'dracula',
-        'duotone-dark',
-        'duotone-light',
-        'eclipse',
-        'elegant',
-        'erlang-dark',
-        'gruvbox-dark',
-        'hopscotch',
-        'icecoder',
-        'idea',
-        'isotope',
-        'lesser-dark',
-        'liquibyte',
-        'lucario',
-        'material',
-        'material-darker',
-        'material-palenight',
-        'material-ocean',
-        'mbo',
-        'mdn-like',
-        'midnight',
-        'monokai',
-        'moxer',
-        'neat',
-        'neo',
-        'night',
-        'nord',
-        'oceanic-next',
-        'panda-syntax',
-        'paraiso-dark',
-        'paraiso-light',
-        'pastel-on-dark',
-        'railscasts',
-        'rubyblue',
-        'seti',
-        'shadowfox',
-        'solarized dark',
-        'solarized light',
-        'the-matrix',
-        'tomorrow-night-bright',
-        'tomorrow-night-eighties',
-        'ttcn',
-        'twilight',
-        'vibrant-ink',
-        'xq-dark',
-        'xq-light',
-        'yeti',
-        'yonce',
-        'zenburn'
-      ],
-      cmEditorMode: 'default', // 编辑模式
-      // 编辑模式选项
-      cmEditorModeOptions: [
-        'default',
-        'json',
-        'sql',
-        'javascript',
-        'css',
-        'xml',
-        'html',
-        'yaml',
-        'markdown',
-        'python'
-      ],
       cmMode: 'python', // codeMirror模式
       jsonIndentation: 2, // json编辑模式下，json格式化缩进 支持字符或数字，最大不超过10，默认缩进2个空格
       autoFormatJson: true, // json编辑模式下，输入框失去焦点时是否自动格式化，true 开启， false 关闭
-      generatedCode: '',
+      generatedCode: 'asda  ↵asd↵ad↵ad↵adq', // 输入代码
+      cmOptions: {
+        tabSize: 2, // Tab键空格数
+        mode: 'python', // 模式
+        theme: 'material', // 主题
+        lineNumbers: true, // 是否显示行号
+        line: true,
+        extraKeys: { 'Ctrl': 'autocomplete' }, // 自定义快捷键
+        autofocus: true,
+        smartIndent: false,
+        autocorrect: true,
+        spellcheck: true,
+        hintOptions: { // 自定义提示选项
+          tables: {
+            users: ['name', 'score', 'birthDate'],
+            countries: ['name', 'population', 'size']
+          }
+        }
+      },
       selectVal: '', // 选中项
       tabClickIndex: '',
       scriptInfo: {
-        scriptInfoTable: [
-          {
-            editNode: false,
-            editLoop: false,
-            nodeName: '节点名称1',
-            loopTimes: 10,
-            error: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134'
-          },
-          {
-            editNode: false,
-            editLoop: false,
-            nodeName: '节点名称2',
-            loopTimes: 10,
-            error: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134'
-          }
-        ]
+        actionType: 2
       },
       rulesScriptInfo: {
+        actionName: [
+          { required: true, message: '请输入动作名称', trigger: 'blur' }
+        ],
+        actionProject: [
+          { required: true, message: '请选择所属项目', trigger: 'blur' }
+        ],
+        actionVersion: [
+          { required: true, message: '请输入软件版本', trigger: 'blur' }
+        ],
+        actionTimeout: [
+          { required: true, message: '请输入超时时长', trigger: 'blur' }
+        ],
+        actionCorpus: [
+          { required: true, message: '请选择语料库', trigger: 'blur' }
+        ],
+        actionDesc: [
+          { required: true, message: '请输入动作描述', trigger: 'blur' }
+        ],
         scriptInfoTable: {}
-      }
+      },
+      coder: null
     };
   },
-  computed: {
-  },
-  watch: {
+  mounted() {
   },
   methods: {
-    addCaseRow() {},
     save() {
-      console.log('保存')
+      this.$refs.scriptInfo.validate(valid => {
+        if (!valid) return
+        this.scriptInfo.actionScript = this.generatedCode
+        console.log('保存', this.scriptInfo)
+        const url = 'action/add'
+        this.$http.post(url, this.scriptInfo).then(res => {
+          console.log(res)
+          if (res.code === 1) {
+            this.$message({
+              type: 'success',
+              message: '添加动作成功！'
+            })
+            this.$router.push({
+              path: '/action'
+            })
+          }
+        })
+      })
+
     }
   }
 };
