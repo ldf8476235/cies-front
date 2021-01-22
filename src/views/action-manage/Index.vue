@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2021-01-08 15:15:50
+ * @LastEditTime: 2021-01-22 16:55:23
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -11,32 +11,47 @@
     <Crumbs :crumbs='crumbs'></Crumbs>
     <div class="container">
       <div class="content">
-        <div class="funcTop">
-          <div class="search">
-            <el-select v-model="selectVal" placeholder="请选择">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-
-            <el-input v-model="inputKey" placeholder="请输入内容">
-              <i slot="suffix" class="el-input__icon el-icon-search"></i>
-            </el-input>
-            <el-button class="btnFilter">
-              <svg-icon data_iconName='icon-filter'></svg-icon>
-            </el-button>
-          </div>
-          <div class="newBtn">
-            <el-button @click="delBatch" class="del-btn" icon="el-icon-delete">删除</el-button>
-            <el-dropdown @command="goNewTask">
+        <Func ref='func' :options='options' :txt='text'>
+          <el-form slot='actionForm' :inline='true' label-position="top" :model="seachInfo" class="demo-form-inline">
+            <el-form-item style='width:150px;' label="动作名称">
+              <el-input  v-model="seachInfo.user" placeholder="输入动作名称"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="动作类型">
+              <el-input v-model="seachInfo.user" placeholder="输入动作类型"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="创建人">
+              <el-input v-model="seachInfo.user" placeholder="输入创建人"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="所属项目">
+              <el-select v-model="seachInfo.region" placeholder="选择所属项目">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="软件版本">
+              <el-select v-model="seachInfo.region" placeholder="选择软件版本">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item style='display:block; width:150px;border-top:1px solid #e4e4e4' label="创建时间">
+              <el-select v-model="seachInfo.region" placeholder="活动区域">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item style="display:block;text-align:right; margin: 0">
+              <div>
+                <el-button size="mini" type="text" @click="clearSeach">清空列表</el-button>
+                <el-button size="mini" style='border: 1px solid #DCDFE6;' @click="cancel">取消</el-button>
+                <el-button type="primary" size="mini" @click="confirm">确定</el-button>
+              </div>
+            </el-form-item>
+          </el-form>
+          <el-dropdown slot="action" @command="goNewTask">
               <el-button type="primary">
                 <i class="el-icon-plus"></i>
                 <span>新建动作</span>
-                <!-- <svg-icon data_iconName='icon-arrow-down'></svg-icon> -->
                 <i class="el-icon-caret-bottom"></i>
               </el-button>
               <el-dropdown-menu slot="dropdown">
@@ -45,8 +60,7 @@
                 <el-dropdown-item :command="2">命令脚本</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
-          </div>
-        </div>
+        </Func>
         <div class="tableContent">
           <el-table
             :data="actionList"
@@ -69,7 +83,7 @@
             <el-table-column prop="name" label="引用" min-width="80">
               <template slot-scope="scope">
                 <div >
-                  {{scope.row.actionCite.length}}
+                  <!-- {{scope.row.actionCite.length}} -->
                 </div>
               </template>
             </el-table-column>
@@ -90,10 +104,14 @@
                   placement="bottom"
                   width="100"
                   trigger="click">
+                  <p @click="detail(scope.row)">
+                    <svg-icon data_iconName="icon-configure" />
+                    <span>详情</span>
+                  </p>
                   <p @click="edit(scope.row)"><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
                   <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
                   <p @click="del(scope.row)"><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
-                  <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
+                  <!-- <el-button slot="reference"><i class="el-icon-more"></i></el-button> -->
                   <div slot="reference">
                       <svg-icon data_iconName='icon-more'></svg-icon>
                     </div>
@@ -116,9 +134,12 @@
 </template>
 
 <script>
+import { b64toBlob, ImagePool } from '@/utils/common.js';
+import Func from '@/components/seach-func-header/Func.vue'
 export default {
   name: 'Action',
   components: {
+    Func
   },
   data() {
     return {
@@ -143,18 +164,62 @@ export default {
       selectVal: '', // 选中项
       inputKey: '', // 搜索输入项
       tabIndex: 1,
-      actionList: [], // 动作列表
-      selectData: [] // 选中的数据
+      actionList: [{ type: 'screen' }, { type: 'voice' }, { type: 'script' }], // 动作列表
+      selectData: [], // 选中的数据
+      seachInfo: {},
+      text: '新建校验点'
 
     };
+  },
+  created() {
+    this.deviceId = 'android:'
+    this.getCurrentScreen()
   },
   mounted() {
     this.getActionList(this.currPage, this.pageSize)
   },
   methods: {
+    // 清空条件
+    clearSeach() {},
+    // 取消搜索
+    cancel() {
+      this.$refs.func.visible = false
+    },
+    // 确认搜索
+    confirm() {
+      console.log(this.seachInfo)
+    },
     // 选择数据
     handleSelectionChange(val) {
       this.selectData = val;
+    },
+    // 详情
+    detail(row) {
+      console.log(row)
+      const type = row.type
+      let name
+      switch (type) {
+        case 'screen':
+          name = 'ScreenDetails'
+          break;
+        case 'voice':
+          name = 'VoiceDetails'
+          break;
+        case 'script':
+          name = 'ScriptDetails'
+          break;
+        default:
+          break;
+      }
+      this.$router.push({
+        name: name,
+        query: {
+          editId: row.taskId
+        },
+        params: {
+          data: row
+        }
+      })
     },
     // 编辑
     edit(row) {
@@ -221,25 +286,66 @@ export default {
     // 新建任务
     goNewTask(i) {
       console.log(i)
+      let path = ''
       switch (i) {
         case 0:
-          this.$router.push('/action/newscreen');
+          path = this.screen === 'landscape' ? '/action/newscreen' : '/action/carsscreen'
           break;
         case 1:
-          this.$router.push('/action/newvoice');
+          path = '/action/newvoice'
           break;
         case 2:
-          this.$router.push('/action/newscript');
+          path = '/action/newscript'
           break;
         default:
           break;
       }
-
+      this.$router.push(path);
     },
     // tab切换
     tabCut(index) {
       console.log(index)
       this.tabIndex = index
+    },
+    // 获取当前屏幕截图
+    getCurrentScreen() {
+      this.$axios.get('/api/v1/devices/' + (this.deviceId || '-') + '/screenshot').then(res => {
+        var blob = b64toBlob(res.data, 'image/' + res.type);
+        this.drawBlobImageToScreen(blob);
+      }).catch(err => {
+        console.log('err:', err)
+      })
+    },
+    // 绘制当前屏幕
+    drawBlobImageToScreen(blob) {
+      var URL = window.URL || window.webkitURL;
+      var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+      var img = this.imagePool.next()
+      img.onload = function() {
+        const r = img.width / img.height
+        if (r > 0) {
+          this.screen = 'landscape'
+        } else {
+          this.screen = 'portrait'
+        }
+        img.onload = img.onerror = null
+        img.src = BLANK_IMG
+        img = null
+        blob = null
+        URL.revokeObjectURL(url)
+        url = null
+      }
+
+      img.onerror = function() {
+        img.onload = img.onerror = null
+        img.src = BLANK_IMG
+        img = null
+        blob = null
+        URL.revokeObjectURL(url)
+        url = null
+      }
+      var url = URL.createObjectURL(blob)
+      img.src = url;
     },
     // 当前页条数
     handleSizeChange(size) {
@@ -263,6 +369,9 @@ export default {
   .content {
     padding: 20px;
     box-sizing: border-box;
+    .el-dropdown{
+      margin-left:10px;
+    }
   }
   .funcTop {
     display: flex;

@@ -1,10 +1,10 @@
 <!--
  * @Autor: wh
  * @Version: 1.0
- * @Date: 2020-12-10 16:07:02
+ * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-14 15:35:01
+ * @LastEditTime: 2021-01-22 11:14:08
 -->
 <template>
   <div class="new-verify">
@@ -18,358 +18,246 @@
             :model="verifyInfo"
             :rules="rulesCaseInfo"
             label-width="100px"
-          >
-            <div class="verifyInfo">
-              <el-row>
-                <el-col :span="12">
-                  <el-form-item label="校验点名称：" prop="device_name">
-                    <el-input
-                      :suffix-icon="loading ? 'el-icon-loading' : ''"
-                      v-model.trim="verifyInfo.device_name"
-                      placeholder="请输入"
-                    ></el-input>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="device_space">
-                    <el-select v-model="verifyInfo.selectVal" placeholder="请选择">
-                      <el-option
-                        v-for="item in belongPreject"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      >
-                      </el-option>
-                    </el-select>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                  <el-form-item label="软件版本：">
-                    <el-input
-                      v-model="verifyInfo.device_sn"
-                      placeholder=""
-                    ></el-input>
-                  </el-form-item>
-                </el-col>
-
-                <el-col :span="12">
-                  <el-form-item label="校验点描述：">
-                    <el-input
-                      type="textarea"
-                      v-model="verifyInfo.device_desc"
-                      placeholder="请输入"
-                    ></el-input>
-                  </el-form-item>
-                </el-col>
-              </el-row>
-            </div>
-            <div class="taskCase">
-              <el-row :gutter="20">
-                <el-col :span="12">
-                  <div class="gutter">
-                    <el-row>
-                      <el-col :span="24">
-                        <el-form-item label="检验类型：" prop="device_space">
-                          <el-select v-model="selectVal" @change="selectType" placeholder="请选择">
-                            <el-option
-                              v-for="item in selectTypeList"
-                              :key="item.value"
-                              :label="item.label"
-                              :value="item.value"
-                            >
-                            </el-option>
-                          </el-select>
-                        </el-form-item>
-                      </el-col>
-                      <!-- 图像 -->
-                      <div v-if="selectVal === 'img'">
-                        <el-col :span="24">
-                          <el-form-item label="匹配结果：" prop="device_space">
-                            <el-select v-model="selectVal" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="类型：">
-                            <el-button @click="imgCollect">图像采集</el-button>
-                            <el-button>检验范围</el-button>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="超时时长：">
-                            <el-input
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="测试：">
-                            <el-button>
-                              <i class="el-icon-caret-right"></i>
-                              <!-- <svg-icon data_iconName='icon-start'></svg-icon> -->
-                            </el-button>
-                          </el-form-item>
-                        </el-col>
-                      </div>
-                      <!-- 文本 -->
-                      <div v-if="selectVal === 'txt'">
-                        <el-col :span="24">
-                          <el-form-item label="文本内容：">
-                            <el-input
-                              type="textarea"
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="匹配规则：" prop="device_space">
-                            <el-select v-model="selectVal" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="匹配结果：" prop="device_space">
-                            <el-select v-model="selectVal" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="类型：">
-                            <el-button>图像采集</el-button>
-                            <el-button>检验范围</el-button>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="超时时长：">
-                            <el-input
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="测试：">
-                            <el-button>
-                              <i class="el-icon-caret-right"></i>
-                              <!-- <svg-icon data_iconName='icon-start'></svg-icon> -->
-                            </el-button>
-                          </el-form-item>
-                        </el-col>
-                      </div>
-                      <!-- 语音 -->
-                      <div v-if="selectVal === 'voice'">
-                        <el-col :span="24">
-                          <el-form-item label="预期结果：">
-                            <el-input
-                              type="textarea"
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="匹配方式：" prop="device_space">
-                            <el-select v-model="selectVal" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="匹配结果：" prop="device_space">
-                            <el-select v-model="selectVal" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="超时时长：">
-                            <el-input
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                      </div>
-                      <!-- 日志 -->
-                      <div v-if="selectVal === 'log'">
-                        <el-col :span="24">
-                          <el-form-item label="预期结果：">
-                            <el-input
-                              type="textarea"
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="匹配结果：" prop="device_space">
-                            <el-select v-model="selectVal" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="超时时长：">
-                            <el-input
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                      </div>
-                      <!-- 音频 -->
-                      <div v-if="selectVal === 'audio'">
-                        <el-col :span="24">
-                          <el-form-item label="预期结果：">
-                            <!-- <el-input
-                              type="textarea"
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input> -->
-                            <el-button>浏览</el-button>
-                            <span style="padding:0 5px;">空调提示音</span>
-                            <el-button>
-                              <i class="el-icon-caret-right"></i>
-                            </el-button>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="匹配结果：" prop="device_space">
-                            <el-select v-model="selectVal" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="超时时长：">
-                            <el-input
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                      </div>
-                      <!-- 页面 -->
-                      <div v-if="selectVal === 'page'">
-                        <el-col :span="24">
-                          <el-form-item label="页面元素：">
-                            <el-input
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="页面内容：">
-                            <el-input
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="匹配结果：" prop="device_space">
-                            <el-select v-model="selectVal" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="超时时长：">
-                            <el-input
-                              v-model="verifyInfo.device_desc"
-                              placeholder="请输入"
-                            ></el-input>
-                          </el-form-item>
-                        </el-col>
-                        <el-col :span="24">
-                          <el-form-item label="测试：">
-                            <el-button>
-                              <i class="el-icon-caret-right"></i>
-                              <!-- <svg-icon data_iconName='icon-start'></svg-icon> -->
-                            </el-button>
-                          </el-form-item>
-                        </el-col>
-                      </div>
-                    </el-row>
+            >
+            <el-row>
+              <el-col :span="9">
+                <el-row class="left">
+                  <el-col :span="24">
+                    <el-form-item label="校验点名称：" prop="device_name">
+                      <el-input
+                        :suffix-icon="loading ? 'el-icon-loading' : ''"
+                        v-model.trim="verifyInfo.device_name"
+                        placeholder="请输入"
+                      ></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-form-item label="所属项目：" prop="device_space">
+                      <el-select v-model="verifyInfo.selectVal" placeholder="请选择">
+                        <el-option
+                          v-for="item in belongPreject"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                        >
+                        </el-option>
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-form-item label="软件版本：">
+                      <el-input
+                        v-model="verifyInfo.device_sn"
+                        placeholder=""
+                      ></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-form-item label="检验点类型：" prop="device_space">
+                      <el-select v-model="selectVal" @change="selectType" placeholder="请选择">
+                        <el-option
+                          v-for="item in selectTypeList"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                        >
+                        </el-option>
+                      </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="24">
+                    <el-form-item label="校验点描述：">
+                      <el-input
+                        type="textarea"
+                        v-model="verifyInfo.device_desc"
+                        placeholder="请输入"
+                      ></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
+                <el-row class="left-bottom">
+                  <!-- 图像 -->
+                  <div v-if="selectVal === 'img'">
+                    <el-col :span="24">
+                      <el-form-item label="匹配结果：" prop="device_space">
+                        <el-select v-model="selectVal" placeholder="请选择">
+                          <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          >
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="类型：">
+                        <el-button @click="imgCollect">图像采集</el-button>
+                        <el-button>检验范围</el-button>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="超时时长：">
+                        <el-input
+                          v-model="verifyInfo.device_desc"
+                          placeholder="请输入"
+                        ></el-input>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="测试：">
+                        <el-button>
+                          <i class="el-icon-caret-right"></i>
+                          <!-- <svg-icon data_iconName='icon-start'></svg-icon> -->
+                        </el-button>
+                      </el-form-item>
+                    </el-col>
                   </div>
-                </el-col>
-                <el-col :span="12" v-if="selectVal === 'img' ||selectVal === 'txt'||selectVal === 'page' ">
-                  <div class="gutter" >
-                    <div class="screen" ref="screen" >
-                      <canvas id="bgCanvas" class="canvas-bg" @mousedown.stop.prevent="mouseDown" :style="canvasStyle"></canvas>
-                      <template v-if="domArr.length > 0">
-                        <div v-for="(item,index) in domArr" :key="index">
-                          <div
-                          :id="item.id"
-                          v-if="item.flag"
-                          :class="item.class">
-                            <!-- <p :class="item.class_1">
-                              <span @click.stop="delDom(item.id)">X</span>
-                            </p> -->
-                          </div>
+                  <!-- 文本 -->
+                  <div v-if="selectVal === 'txt'">
+                    <el-col :span="24">
+                      <el-form-item label="文本内容：">
+                        <el-input
+                          type="textarea"
+                          v-model="verifyInfo.device_desc"
+                          placeholder="请输入"
+                        ></el-input>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="匹配规则：" prop="device_space">
+                        <el-select v-model="selectVal" placeholder="请选择">
+                          <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          >
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="匹配结果：" prop="device_space">
+                        <el-select v-model="selectVal" placeholder="请选择">
+                          <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          >
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="类型：">
+                        <el-button>图像采集</el-button>
+                        <el-button>检验范围</el-button>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="超时时间：">
+                        <el-input
+                          v-model="verifyInfo.device_desc"
+                          placeholder="请输入"
+                        ></el-input>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="测试：">
+                        <el-button>
+                          <i class="el-icon-caret-right"></i>
+                          <!-- <svg-icon data_iconName='icon-start'></svg-icon> -->
+                        </el-button>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="链接设备：" prop="device_space">
+                        <el-select v-model="selectVal" placeholder="请选择">
+                          <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          >
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-col>
+                  </div>
+                  <!-- 页面 -->
+                  <div v-if="selectVal === 'page'">
+                    <el-col :span="24">
+                      <el-form-item label="页面元素：">
+                        <el-input
+                          v-model="verifyInfo.device_desc"
+                          placeholder="请输入"
+                        ></el-input>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="页面内容：">
+                        <el-input
+                          v-model="verifyInfo.device_desc"
+                          placeholder="请输入"
+                        ></el-input>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="匹配结果：" prop="device_space">
+                        <el-select v-model="selectVal" placeholder="请选择">
+                          <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                          >
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="超时时长：">
+                        <el-input
+                          v-model="verifyInfo.device_desc"
+                          placeholder="请输入"
+                        ></el-input>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="测试：">
+                        <el-button>
+                          <i class="el-icon-caret-right"></i>
+                          <!-- <svg-icon data_iconName='icon-start'></svg-icon> -->
+                        </el-button>
+                      </el-form-item>
+                    </el-col>
+                  </div>
+                </el-row>
+              </el-col>
+              <el-col :span="15">
+                <div class="gutter" >
+                  <div class="screen" ref="screen" >
+                    <canvas id="bgCanvas" class="canvas-bg" @mousedown.stop.prevent="mouseDown" :style="canvasStyle"></canvas>
+                    <template v-if="domArr.length > 0">
+                      <div v-for="(item,index) in domArr" :key="index">
+                        <div
+                        :id="item.id"
+                        v-if="item.flag"
+                        :class="item.class">
+                          <!-- <p :class="item.class_1">
+                            <span @click.stop="delDom(item.id)">X</span>
+                          </p> -->
                         </div>
-                      </template>
-
-                    </div>
+                      </div>
+                    </template>
+                    <svg-icon class="svgIcon" v-if="screenLoading" data_iconName='loading'></svg-icon>
                   </div>
-                </el-col>
-              </el-row>
-              <canvas id="imgCanvas"></canvas>
-            </div>
+                </div>
+              </el-col>
+            </el-row>
           </el-form>
         </div>
       </div>
@@ -380,7 +268,7 @@
 <script>
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 export default {
-  name: 'NewVoice',
+  name: '',
   data() {
     return {
       crumbs: {
@@ -398,39 +286,15 @@ export default {
           label: '文本'
         },
         {
-          value: 'voice',
-          label: '语音'
-        },
-        {
-          value: 'log',
-          label: '日志'
-        },
-        {
-          value: 'audio',
-          label: '音频'
-        },
-        {
           value: 'page',
           label: '页面'
         }
       ],
-
+      screenLoading: true, // 屏幕未加载完成loading动画
       options: [
-        {
-          value: '选项1',
-          label: '黄金糕'
-        },
-        {
-          value: '选项2',
-          label: '双皮奶'
-        },
         {
           value: '选项3',
           label: '蚵仔煎'
-        },
-        {
-          value: '选项4',
-          label: '龙须面'
         },
         {
           value: '选项5',
@@ -467,15 +331,12 @@ export default {
     this.imagePool = new ImagePool(100);
   },
   mounted() {
+    this.doConnect()
     this.getCurrentScreen()
     this.canvas.bg = document.querySelector('#bgCanvas')
     window.onresize = () => {
       // this.resizeScreen()
     }
-  },
-  computed: {
-  },
-  watch: {
   },
   methods: {
     // 图片采集
@@ -486,14 +347,25 @@ export default {
     selectType(e) {
       this.selectVal = e
     },
+    // wh-连接手机
+    doConnect() {
+      const params = `platform=${'Android'}&deviceUrl=${''}`
+      this.$axios.post('/api/v1/connect', params, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}).then(res => {
+
+        this.deviceId = res.deviceId
+        this.screenWebSocketUrl = res.screenWebSocketUrl
+      }).catch(err => {
+        console.log('err', err)
+      })
+    },
     // wh-获取当前屏幕截图
     getCurrentScreen() {
       this.$axios.get('/api/v1/devices/' + encodeURIComponent(this.deviceId || '-') + '/screenshot').then(res => {
-        console.log(res)
         console.log('screenRefresh----:', res)
-        var blob = b64toBlob(res.data, 'image/' + res.type);
+        this.screenLoading = false
+        const blob = b64toBlob(res.data, 'image/' + res.type);
         this.drawBlobImageToScreen(blob);
-        // this.dumpHierarchy().then(this.loadLiveScreen)
+        this.loadLiveScreen()
         localStorage.setItem('screenshotBase64', res.data);
       }).catch(err => {
         console.log('err:', err)
@@ -501,35 +373,37 @@ export default {
     },
     // wh-绘制当前屏幕
     drawBlobImageToScreen(blob) {
-      var bgcanvas = this.canvas.bg;
-      var ctx = bgcanvas.getContext('2d');
-      var URL = window.URL || window.webkitURL;
-      var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+      const bgcanvas = this.canvas.bg;
+      const ctx = bgcanvas.getContext('2d');
+      const URL = window.URL || window.webkitURL;
+      const BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+      const screen = document.getElementsByClassName('screen')[0]
 
-      var img = this.imagePool.next();
+      let img = this.imagePool.next();
+      let url = URL.createObjectURL(blob)
+      img.src = url;
       img.onload = function() {
-        bgcanvas.width = img.width
-        bgcanvas.height = img.height
-        // var screenDiv = document.getElementById('screen');
+        const w = bgcanvas.width = img.width;
+        const h = bgcanvas.height = img.height
+        console.log(img.width, img.height)
+        const r = img.width / img.height
+        if (w > h) {
+          screen.style.width = Math.floor(330 * r) + 'px'
+          screen.style.height = '330px'
+        } else {
+          screen.style.width = Math.floor(500 * r) + 'px'
+          screen.style.height = '500px'
+        }
+        // let screenDiv = document.getElementById('screen');
         ctx.drawImage(img, 0, 0, img.width, img.height);
         // self.resizeScreen(img);
 
-        // Try to forcefully clean everything to get rid of memory
-        // leaks. Note self despite this effort, Chrome will still
-        // leak huge amounts of memory when the developer tools are
-        // open, probably to save the resources for inspection. When
-        // the developer tools are closed no memory is leaked.
-        // img.onload = img.onerror = null
-        // img.src = BLANK_IMG
-        // img = null
-        // blob = null
-        // URL.revokeObjectURL(url)
-        // url = null
-      }
+        /**
+         * 尝试强制清除所有东西以消除内存泄漏。
+         * 尽管如此，当开发者工具打开时，Chrome仍然会泄漏大量的内存，可能是为了节省检查的资源。
+         * 关闭开发人员工具时，内存不会泄漏。
+        */
 
-      img.onerror = function() {
-        // Happily ignore. I suppose this shouldn't happen, but sometimes it does, presumably when we're loading images too quickly.
-        // Do the same cleanup here as in onload.
         img.onload = img.onerror = null
         img.src = BLANK_IMG
         img = null
@@ -537,8 +411,85 @@ export default {
         URL.revokeObjectURL(url)
         url = null
       }
-      var url = URL.createObjectURL(blob)
-      img.src = url;
+
+      img.onerror = function() {
+        /**
+         * 幸福的忽视。
+         * 我认为这是不应该发生的，但有时它会发生，大概当我们加载图像太快。和onload中一样，在这里做同样的清理。
+        */
+        img.onload = img.onerror = null
+        img.src = BLANK_IMG
+        img = null
+        blob = null
+        URL.revokeObjectURL(url)
+        url = null
+      }
+
+    },
+
+    loadLiveHierarchy() {
+      this.dumpHierarchy()
+        .then(() => {
+          this.loadLiveHierarchy()
+        })
+    },
+    loadLiveScreen() {
+      var self = this;
+      var BLANK_IMG =
+        'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      // var protocol = location.protocol == 'http:' ? 'ws://' : 'wss://'
+      var ws = new WebSocket(this.screenWebSocketUrl);
+      var canvas = document.getElementById('bgCanvas')
+      var ctx = canvas.getContext('2d');
+      const screen = document.getElementsByClassName('screen')[0]
+
+      // self.loadLiveHierarchy() // 计算手机app所有元素的黑色框
+      this.screenWebSocket = ws;
+      ws.onopen = function(ev) {
+        console.log('screen websocket connected')
+      };
+      ws.onmessage = function(message) {
+        var blob = new Blob([message.data], {
+          type: 'image/jpeg'
+        })
+        var img = self.imagePool.next();
+        img.onload = function() {
+          const w = canvas.width = img.width
+          const h = canvas.height = img.height
+          const r = img.width / img.height
+          if (w > h) {
+            screen.style.width = Math.floor(330 * r) + 'px'
+            screen.style.height = '330px'
+          } else {
+            screen.style.width = Math.floor(500 * r) + 'px'
+            screen.style.height = '500px'
+          }
+          ctx.drawImage(img, 0, 0, img.width, img.height);
+          // self.resizeScreen(img);
+          img.onload = img.onerror = null
+          img.src = BLANK_IMG
+          img = null
+          blob = null
+
+          URL.revokeObjectURL(url)
+          url = null
+        }
+        img.onerror = function() {
+          img.onload = img.onerror = null
+          img.src = BLANK_IMG
+          img = null
+          blob = null
+
+          URL.revokeObjectURL(url)
+          url = null
+        }
+        var url = URL.createObjectURL(blob)
+        img.src = url;
+      }
+
+      ws.onclose = (ev) => {
+        this.liveScreen = false;
+      }
     },
     // wh-可视区域尺寸变化
     resizeScreen(img) {
@@ -554,7 +505,7 @@ export default {
           return;
         }
       }
-      var screenDiv = this.$refs.screen // document.getElementById('screen');
+      const screenDiv = this.$refs.screen // document.getElementById('screen');
       this.lastScreenSize = {
         canvas: {
           width: img.width,
@@ -566,8 +517,8 @@ export default {
         }
       }
 
-      // var canvasRatio = img.width / img.height;
-      // var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
+      // let canvasRatio = img.width / img.height;
+      // let screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
       console.log(img.width, img.height)
       // Object.assign(this.canvasStyle, {
       //   width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', //'inherit',
@@ -653,7 +604,7 @@ export default {
           //   document.onmouseup = null
           //   return
           // } else {
-          const canvas = document.getElementById('imgCanvas')
+          const canvas = document.createElement('canvas')
           const ctx = canvas.getContext('2d')
           const rateX = canvasWidth / screen.offsetWidth
           const rateY = canvasHeight / screen.offsetHeight
@@ -667,6 +618,8 @@ export default {
             0,
             parseInt(divEle.style.width),
             parseInt(divEle.style.height))
+          const blob = _this.dataURLtoBlob(canvas.toDataURL())
+          console.log(blob)
           _this.drag(divEle)
           _this.flexible(divEle)
           document.onmousemove = null
@@ -678,11 +631,11 @@ export default {
     // 拖拽函数
     drag(divEle) {
       const _this = this
-      var twidth = 0;
-      var theight = 0;
+      let twidth = 0;
+      let theight = 0;
       const bgCanvas = document.getElementById('bgCanvas')
-      var canvasWidth = bgCanvas.width;
-      var canvasHeight = bgCanvas.height;
+      const canvasWidth = bgCanvas.width;
+      const canvasHeight = bgCanvas.height;
       const screen = document.getElementsByClassName('screen')[0]
       divEle.onmousedown = function(e) {
         if (e.target.className === 'desc_1') return
@@ -726,7 +679,7 @@ export default {
         document.onmouseup = function(e) {
           e.stopPropagation();
           e.preventDefault();
-          const canvas = document.getElementById('imgCanvas')
+          const canvas = document.createElement('canvas')
           const ctx = canvas.getContext('2d')
           const rateX = canvasWidth / screen.offsetWidth
           const rateY = canvasHeight / screen.offsetHeight
@@ -750,8 +703,8 @@ export default {
     flexible(divEle) {
       let twidth = parseInt(divEle.style.width);
       let theight = parseInt(divEle.style.height);
-      var canvasWidth = document.getElementById('bgCanvas').width;
-      var canvasHeight = document.getElementById('bgCanvas').height;
+      const canvasWidth = document.getElementById('bgCanvas').width;
+      const canvasHeight = document.getElementById('bgCanvas').height;
       const dLeft = parseInt(divEle.style.left);
       const dTop = parseInt(divEle.style.top);
       let arrows = ''
@@ -820,6 +773,19 @@ export default {
         }
       }
     },
+    // base64转化blob
+    dataURLtoBlob(dataurl) {
+      var arr = dataurl.split(',');
+      var mime = arr[0].match(/:(.*?);/)[1];
+      var bstr = atob(arr[1]);
+      var n = bstr.length;
+      var u8arr = new Uint8Array(n);
+      console.log(mime)
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new Blob([u8arr], { type: mime });
+    },
     // 保存数据
     save() {
       console.log('保存', this.verifyInfo)
@@ -829,8 +795,7 @@ export default {
 </script>
 
 <style lang='less' scoped>
-.new-verify {
-  // height: 100%;
+.new-verify{
   .title {
     height: 41px;
     line-height: 41px;
@@ -838,65 +803,56 @@ export default {
     padding: 0 20px;
     border-bottom: 1px solid #ddd;
   }
-  .formData {
-    .el-input {
-        width: 50%;
+  .formData{
+    padding: 10px 10px 10px 10px;
+    .el-select{
+        width: 100%;
       }
-      .el-select {
-        width: 50%;
-      }
-      .el-textarea {
-        width: 50%;
-      }
-    padding: 20px 20px;
-    .verifyInfo{
+    .left{
+      padding: 0 10px;
 
+      border-bottom: 1px solid #ddd;
     }
-    .taskCase {
-      // height: 100%;
-      padding: 10px 0;
-      border-top: 1px solid #DDDDDD;
-      .screen{
-          width: 100%;
-          height: 330px;
-          position: relative;
-          overflow-x: hidden;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: center;
-          flex: 1;
-          background-color: gray;
-          .canvas-fg {
-            // z-index: 1;
-            // position: absolute;
-          }
-
-          .canvas-bg {
-            // z-index: 0;
-            // position: absolute;
-
-          }
-          .border{
-            border: 2px solid red;
-            position: absolute;
-            z-index: 999;
-            cursor: Move;
-          }
-          .arrows {
-            position: absolute;
-            border: 1px solid #000 !important;
-            z-index: 99;
-            cursor: nw-resize;
-          }
-
-        }
-      .gutter {
-        // background: #ccc;
+    .left-bottom{
+      padding: 10px 10px 0 10px;
+    }
+    .screen{
+      // width: 100%;
+      // height: 330px;
+      margin: 0 auto;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      // background-color: gray;
+      .border{
+        border: 2px solid red;
+        position: absolute;
+        z-index: 999;
+        cursor: Move;
       }
+      .arrows {
+        position: absolute;
+        border: 1px solid #000 !important;
+        z-index: 99;
+        cursor: nw-resize;
+      }
+      .svgIcon{
+        // display: flex;
+        // justify-content: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        width: 101px;
+        height: 116px;
+      }
+
     }
   }
-
 }
 </style>

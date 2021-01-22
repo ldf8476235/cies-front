@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2020-12-09 14:47:41
+ * @LastEditTime: 2021-01-21 15:24:39
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\App.vue
@@ -24,8 +24,8 @@
   min-width: 120px !important;
   padding: 5px !important;
   p{
-    width: 120px;
-    height: 36px;
+    // width: 120px;
+    height: 30px;
     // line-height: 36px;
     display: flex;
     align-items: center;

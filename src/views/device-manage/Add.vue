@@ -15,7 +15,7 @@
             <el-row>
               <el-col :span="12">
                 <el-form-item label="设备名称：" prop="name">
-                  <el-input v-model="deviceMsg.name" :disabled="title=='编辑设备'" placeholder="输入设备名称"></el-input>
+                  <el-input v-model="deviceMsg.name" :disabled="title==='编辑设备'" placeholder="输入设备名称"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="12">
@@ -123,7 +123,6 @@ export default {
   },
   created() {
     var id = this.$route.query.id
-
     if (id) {
       this.editInto()
     }
@@ -172,6 +171,7 @@ export default {
         localStorage.setItem('deviceData', JSON.stringify(this.$route.params.data))
       }
       this.deviceMsg = JSON.parse(localStorage.getItem('deviceData'))
+      console.log(this.deviceMsg)
     },
     // 添加设备
     add() {
@@ -182,12 +182,12 @@ export default {
           url: 'device/add',
           method: 'post',
           data: this.deviceMsg
-        }).then((data) => {
-          if (data.code == 1) {
+        }).then((res) => {
+          if (res.status_code == 200) {
             this.$message.success('添加成功')
             this.$router.replace('/device')
           } else {
-            this.$message.error(data.msg)
+            this.$message.error(res.msg)
           }
         })
       })
@@ -196,11 +196,12 @@ export default {
     update() {
       this.$http({
         url: 'device/edit',
-        method: 'post',
+        method: 'put',
         data: this.deviceMsg
       }).then((data) => {
-        if (data.code == 1) {
+        if (data.status_code === 200) {
           this.$message.success('编辑成功')
+          this.$router.replace('/device')
         } else {
           this.$message.error(data.msg)
         }

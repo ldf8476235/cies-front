@@ -2,44 +2,51 @@
   <div class="device">
     <div class="tab">设备列表</div>
     <div style="margin: 20px; border: 1px solid #e8e8e8;">
-      <div class="action">
-        <div class="search">
-          <el-select style="width:100px" v-model="condition" placeholder="请选择" size="small">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-          <el-input
-            style="margin: 20px 0 0 10px; width: 180px"
-            size="small"
-            placeholder="请输入关键字"
-            v-model="value">
-            <i slot="suffix" class="el-input__icon el-icon-search" style="cursor: pointer;" @click="getList"></i>
-          </el-input>
-        </div>
-        <el-button
-          type="primary"
-          size="small"
-          @click="goAdd"
-          style="float: right; margin-top: 20px"
-        >
-          <i class="el-icon-plus" style="margin: 0 4px 0 -10px"></i>添加设备
-        </el-button>
-        <div class="batchDelete">
+      <div class='action'>
+        <Func ref='func' :options='options' @deleteBatch='deleteBatch' :txt='text'>
+          <el-form slot='device' :inline='true' label-position="top" :model="seachInfo" class="demo-form-inline">
+            <el-form-item style='width:150px;' label="设备名称">
+              <el-input  v-model="seachInfo.user" placeholder="输入设备名称"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="负责人">
+              <el-input v-model="seachInfo.user" placeholder="输入负责人"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="设备类型">
+              <el-input v-model="seachInfo.user" placeholder="输入设备类型"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="IP地址">
+              <el-input v-model="seachInfo.user" placeholder="输入IP地址"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="状态">
+              <el-select v-model="seachInfo.region" placeholder="选择状态">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+            <!-- <el-form-item style='display:block; width:150px;border-top:1px solid #e4e4e4' label="创建时间">
+              <el-select v-model="seachInfo.region" placeholder="创建时间">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item> -->
+            <el-form-item style="display:block;text-align:right; margin: 0">
+              <div>
+                <el-button size="mini" type="text" @click="clearSeach">清空列表</el-button>
+                <el-button size="mini" style='border: 1px solid #DCDFE6;' @click="cancel">取消</el-button>
+                <el-button type="primary" size="mini" @click="confirm">确定</el-button>
+              </div>
+            </el-form-item>
+          </el-form>
           <el-button
+            slot='refresh'
             size="small"
-            @click="batchDel"
-            style="float:right;margin-top:20px;margin-right:10px"
-            v-if="this.deviceIds.length > 0"
-          >
-            <i class="el-icon-delete" style="margin:0 4px 0 -10px"></i>删除
+            @click="refresh"
+            >
+            刷新
           </el-button>
-        </div>
+        </Func>
       </div>
+
       <div class="devicetable">
         <template>
           <el-table
@@ -106,12 +113,12 @@
                 <span v-else style="color: #7ed321">online</span>
               </template>
             </el-table-column>
-            <!-- <el-table-column
+            <el-table-column
               label="挂载设备"
               show-overflow-tooltip
               prop="deviceMount"
               width="80">
-            </el-table-column> -->
+            </el-table-column>
             <el-table-column
               label="操作"
               width="80"
@@ -122,9 +129,10 @@
                     <i class="el-icon-more"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item icon="el-icon-edit-outline" @click.native="edit(scope.row)">编辑</el-dropdown-item>
+                    <!-- <el-dropdown-item icon="el-icon-edit-outline" @click.native="edit(scope.row)">编辑</el-dropdown-item>
                     <el-dropdown-item icon="el-icon-document-copy" @click.native="copy(scope.row)">复制</el-dropdown-item>
-                    <el-dropdown-item icon="el-icon-delete" @click.native="del(scope.row.deviceId)">删除</el-dropdown-item>
+                    <el-dropdown-item icon="el-icon-delete" @click.native="del(scope.row.uid)">删除</el-dropdown-item> -->
+                    <el-dropdown-item icon="el-icon-tickets" @click.native="del(scope.row.uid)">执行报告</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
               </template>
@@ -135,7 +143,7 @@
       <div
         class="page"
         style="height: 50px; font-size: 15px; margin: 20px 10px 5px 20px"
-      >
+        >
         <PageUtil
           ref="pageutil"
           :total="total"
@@ -150,8 +158,12 @@
 </template>
 
 <script>
+import Func from '@/components/seach-func-header/Func.vue'
 export default {
   name: 'Device',
+  components: {
+    Func
+  },
   data() {
     return {
       condition: '',
@@ -177,20 +189,37 @@ export default {
       }, {
         value: 'device_status',
         label: '状态'
-      }]
+      }],
+      text: '新建校验点',
+      seachInfo: {} // 高级搜索条件
     }
   },
   mounted() {
     this.getList(this.currPage, this.pageSize);
   },
   methods: {
+    // 清空条件
+    clearSeach() {},
+    // 取消搜索
+    cancel() {
+      this.$refs.func.visible = false
+    },
+    // 确认搜索
+    confirm() {
+      console.log(this.seachInfo)
+    },
+    goNewTask() {},
+    // 刷新
+    refresh() {
+      this.getList(this.currPage, this.pageSize);
+    },
     goAdd() {
       this.$router.push('/device/add');
     },
     selectHandler(val) {
       this.deviceIds = [];
       val.forEach(element => {
-        this.deviceIds.push(element.deviceId)
+        this.deviceIds.push(element.uid)
       })
       console.log(this.deviceIds)
     },
@@ -219,7 +248,10 @@ export default {
         this.deviceList = res.data.result
         this.total = res.data.count
         this.loading = false;
-      });
+      }).catch(err => {
+        console.warn(err)
+        this.loading = false
+      })
     },
     getRowKeys(row) {
       return row.deviceId;
@@ -227,15 +259,19 @@ export default {
     // 格式化设备类型数据
     formatterType(row) {
       var typelist = row.type;
-      if (typelist.length == 1) {
-        return typelist[0];
-      } else {
-        var type = '';
-        typelist.forEach((element) => {
-          type = type + ' | ' + element;
-        });
-        return type.substring(2);
-      }
+      const arr = []
+      typelist.forEach(item => {
+        if (item === 'voice_type') {
+          arr.push('语音')
+        } else if (item === 'phone') {
+          arr.push('手机互联')
+        } else if (item === 'camera') {
+          arr.push('camera')
+        }
+      })
+      console.log(arr.join('|'))
+      return arr.join(' | ')
+
     },
     edit(row) {
       // row['update'] = true
@@ -243,7 +279,7 @@ export default {
       this.$router.push({
         name: 'AddDevice',
         query: {
-          id: row.id
+          id: row.uid
         },
         params: {
           data: row
@@ -253,29 +289,33 @@ export default {
     copy(row) {
       this.$router.push({ path: '/device/update', query: row })
     },
-    del(id) {
+    del(uid) {
+      const data = {
+        'uid': [uid]
+      }
       this.$http({
-        url: 'device/delete/' + id,
-        method: 'delete'
+        url: 'device/del/',
+        method: 'delete',
+        data: data
       }).then((res) => {
-        if (res.code == 1) {
+        if (res.status_code == 200) {
           this.$message.success('删除成功');
-          this.getList();
+          this.getList(this.currPage, this.pageSize);
         } else {
           this.$message.error(res.msg);
         }
       });
     },
-    batchDel() {
+    deleteBatch() {
       this.$http({
-        url: 'device/batchDelete',
-        method: 'post',
-        data: this.deviceIds
+        url: 'device/del',
+        method: 'delete',
+        data: { uid: this.deviceIds }
       }).then((res) => {
-        if (res.code == 1) {
+        if (res.status_code === 200) {
           this.$message.success('删除成功');
           this.deviceIds = []
-          this.getList()
+          this.getList(this.currPage, this.pageSize)
         } else {
           this.$message.error(res.msg);
         }
@@ -312,10 +352,10 @@ export default {
   }
   .action {
     // border-bottom: solid 2px rgba(221, 221, 221, 1);
-    height: 70px;
-    margin: 0 20px;
+    // height: 70px;
+    margin: 10px 20px;
     .search {
-      float: left;
+      // float: left;
     }
     // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }

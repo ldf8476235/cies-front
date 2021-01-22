@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-18 15:03:12
+ * @LastEditTime: 2021-01-22 17:45:03
 -->
 <template>
   <div class="newTask">
@@ -151,7 +151,7 @@
                                 <span>插入用例</span>
                               </p>
                               <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>替换用例</span></p>
-                              <p><svg-icon data_iconName="icon-configure" className="icon-gesture"/><span>配置环境</span></p>
+                              <!-- <p><svg-icon data_iconName="icon-configure" className="icon-gesture"/><span>配置环境</span></p> -->
                               <p @click="upMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
                               <p @click="downMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
                               <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
@@ -277,11 +277,11 @@
                         <span>添加用例</span>
                       </p>
                       <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>添加子用例</span></p>
-                      <p><svg-icon data_iconName="icon-configure" className="icon-gesture"/><span>配置环境</span></p>
+                      <p @click="config(scope.row)"><svg-icon data_iconName="icon-configure" className="icon-gesture"/><span>配置环境</span></p>
                       <p @click="upMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
                       <p @click="downMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
                       <p @click="delCaseGroup(scope.$index)"><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
-                      <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
+                      <el-button slot="reference"><i class="el-icon-more"></i></el-button>
                     </el-popover>
                   </template>
                 </el-table-column>
@@ -298,7 +298,35 @@
               </el-row>
             </div>
           </el-form>
-
+          <el-dialog title="配置环境" :visible.sync="dialogTableVisible">
+            <el-input v-model="keyword" placeholder='输入关键字'>
+              <el-button slot="append" @click="seach" icon="el-icon-search"></el-button>
+            </el-input>
+            <el-table :data="environmentList">
+              <el-table-column  width="30">
+                <template slot-scope="scope">
+                  <el-radio v-model="radio" :label="scope.$index">{{''}}</el-radio>
+                </template>
+              </el-table-column>
+              <el-table-column property="date" label="序号" type="index" width="50"></el-table-column>
+              <el-table-column property="date" label="动作名称" width="200"></el-table-column>
+              <el-table-column property="name" label="创建人" width="100"></el-table-column>
+              <el-table-column property="address" label="创建时间"></el-table-column>
+              <el-table-column property="address" label="软件版本"></el-table-column>
+            </el-table>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="dialogTableVisible = false">取 消</el-button>
+              <el-button type="primary" @click="dialogTableVisible = false">确 定</el-button>
+            </div>
+            <PageUtil
+              ref="pageutil"
+              :total="total"
+              :pageSize="pageSize"
+              :currPage="currPage"
+              @handleSizeChange='handleSizeChange'
+              @handleCurrChange='handleCurrChange'
+            ></PageUtil>
+          </el-dialog>
         </div>
       </div>
     </div>
@@ -315,16 +343,11 @@ export default {
         action: true,
         name: '新建任务'
       },
+      total: 0,
+      pageSize: 10,
+      currPage: 1,
       loading: false, // 任务名称动态验证动画
       options: [
-        {
-          value: '选项1',
-          label: '黄金糕'
-        },
-        {
-          value: '选项2',
-          label: '双皮奶'
-        },
         {
           value: '选项3',
           label: '蚵仔煎'
@@ -332,10 +355,6 @@ export default {
         {
           value: '选项4',
           label: '龙须面'
-        },
-        {
-          value: '选项5',
-          label: '北京烤鸭'
         }
       ],
       selectVal: '', // 选中项
@@ -348,38 +367,38 @@ export default {
         'taskProject': '',
         'taskVersion': '',
         taskCase: [
-          // {
-          //   id: '1',
-          //   editCaseGroup: false,
-          //   editLoop: false,
-          //   caseGroup: '节点名称1',
-          //   loopTimes: 11,
-          //   error: '123',
-          //   overtime: 'asdasd',
-          //   executeWait: 'aq2134',
-          //   childrens: [
-          //     {
-          //       id: '101',
-          //       editCaseGroup: false,
-          //       editLoop: false,
-          //       caseGroup: '',
-          //       loopTimes: 11,
-          //       error: '123',
-          //       overtime: 'asdasd',
-          //       executeWait: 'aq2134'
-          //     },
-          //     {
-          //       id: '102',
-          //       editCaseGroup: false,
-          //       editLoop: false,
-          //       caseGroup: '',
-          //       loopTimes: 12,
-          //       error: '1qwe',
-          //       overtime: 'asdasd',
-          //       executeWait: 'aq2134'
-          //     }
-          //   ]
-          // }
+          {
+            id: '1',
+            editCaseGroup: false,
+            editLoop: false,
+            caseGroup: '节点名称1',
+            loopTimes: 11,
+            error: '123',
+            overtime: 'asdasd',
+            executeWait: 'aq2134',
+            childrens: [
+              {
+                id: '101',
+                editCaseGroup: false,
+                editLoop: false,
+                caseGroup: '',
+                loopTimes: 11,
+                error: '123',
+                overtime: 'asdasd',
+                executeWait: 'aq2134'
+              },
+              {
+                id: '102',
+                editCaseGroup: false,
+                editLoop: false,
+                caseGroup: '',
+                loopTimes: 12,
+                error: '1qwe',
+                overtime: 'asdasd',
+                executeWait: 'aq2134'
+              }
+            ]
+          }
         ]
       },
       rulesTaskInfo: {
@@ -401,7 +420,12 @@ export default {
         taskCase: {}
       },
       iconFlag: true, // 折叠图标标识
-      iconIndex: null
+      iconIndex: null,
+      dialogTableVisible: false,
+      environmentList: [{}, {}],
+      radio: '1',
+      keyword: '' // 环境配置搜索关键字
+
     }
   },
   mounted() {
@@ -412,6 +436,17 @@ export default {
     }
   },
   methods: {
+    // 获取环境列表
+    getEnvironmentList() {},
+    seach() {
+      console.log(this.keyword)
+    },
+    // 配置环境
+    config(row) {
+      console.log(row)
+      this.getEnvironmentList()
+      this.dialogTableVisible = true
+    },
     // 编辑
     edit() {
       const data = this.$route.params.data
@@ -644,6 +679,16 @@ export default {
 
       })
 
+    },
+    // 当前页条数
+    handleSizeChange(size) {
+      this.pageSize = size
+      this.getEnvironmentList(this.currPage, size)
+    },
+    // 当前页面
+    handleCurrChange(page) {
+      this.currPage = page
+      this.getEnvironmentList(page, this.pageSize)
     }
   }
 };

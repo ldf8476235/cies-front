@@ -4,7 +4,7 @@
  * @Date: 2020-12-15 09:38:07
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-18 14:08:10
+ * @LastEditTime: 2021-01-21 11:13:38
 -->
 <template>
   <div>
@@ -22,9 +22,19 @@
         <el-input v-model="inputKey" placeholder="请输入内容">
           <i slot="suffix" class="el-input__icon el-icon-search"></i>
         </el-input>
-        <el-button class="btnFilter">
-          <svg-icon data_iconName='icon-filter'></svg-icon>
-        </el-button>
+        <el-popover
+            placement="bottom"
+            width="650"
+            v-model="visible">
+            <slot name='task'></slot>
+            <slot name='actionForm'></slot>
+            <slot name='verify'></slot>
+            <slot name='case'></slot>
+            <slot name='device'></slot>
+            <el-button class="btnFilter" slot="reference">
+              <svg-icon data_iconName='icon-filter'></svg-icon>
+            </el-button>
+          </el-popover>
 
       </div>
       <div class="newBtn">
@@ -33,10 +43,14 @@
           icon="el-icon-delete"
           >删除</el-button>
         <el-button
+          v-if="txt !== '新建校验点'"
           @click="goNew"
           type="primary"
           icon="el-icon-plus"
           >{{txt}}</el-button>
+          <slot name='dropBtn'></slot>
+          <slot name='refresh'></slot>
+          <slot name="action"></slot>
       </div>
     </div>
   </div>
@@ -58,8 +72,11 @@ export default {
       // 选择项内容
       // options: this.options,
       selectVal: '', // 选中项
-      inputKey: '' // 搜索输入项
+      inputKey: '', // 搜索输入项
+      visible: false
     };
+  },
+  watch: {
   },
   methods: {
     goNew() {

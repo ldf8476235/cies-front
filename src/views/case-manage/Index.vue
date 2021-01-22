@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2020-12-28 15:31:13
+ * @LastEditTime: 2021-01-21 17:25:56
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -13,27 +13,44 @@
     </div>
     <div class="container">
       <div class="content">
-        <!-- <div class="funcTop">
-          <div class="search">
-            <el-select v-model="selectVal" placeholder="请选择">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
-            <el-input v-model="inputKey" placeholder="请输入内容">
-              <i slot="suffix" class="el-input__icon el-icon-search"></i>
-            </el-input>
-          </div>
-          <div class="newBtn">
-            <el-button @click="goNewCase" type="primary" icon="el-icon-plus"
-              >新建用例</el-button>
-          </div>
-        </div> -->
-        <Func :options='options' @goNew='goNewCase' :txt='text' @deleteBatch='deleteBatch'></Func>
+        <Func :options='options' @goNew='goNewCase' :txt='text' @deleteBatch='deleteBatch'>
+          <el-form slot='case' :inline='true' label-position="top" :model="seachInfo" class="demo-form-inline">
+            <el-form-item style='width:150px;' label="用例名称">
+              <el-input  v-model="seachInfo.user" placeholder="输入用例名称"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="创建人">
+              <el-input v-model="seachInfo.user" placeholder="输入创建人"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="指派人">
+              <el-input v-model="seachInfo.user" placeholder="输入指派人"></el-input>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="所属项目">
+              <el-select v-model="seachInfo.region" placeholder="选择所属项目">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item style='width:150px;' label="软件版本">
+              <el-select v-model="seachInfo.region" placeholder="选择软件版本">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item style='display:block; width:150px;border-top:1px solid #e4e4e4' label="创建时间">
+              <el-select v-model="seachInfo.region" placeholder="创建时间">
+                <el-option label="区域一" value="shanghai"></el-option>
+                <el-option label="区域二" value="beijing"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item style="display:block;text-align:right; margin: 0">
+              <div>
+                <el-button size="mini" type="text" @click="clearSeach">清空列表</el-button>
+                <el-button size="mini" style='border: 1px solid #DCDFE6;' @click="cancel">取消</el-button>
+                <el-button type="primary" size="mini" @click="confirm">确定</el-button>
+              </div>
+            </el-form-item>
+          </el-form>
+        </Func>
         <div class="tableContent">
           <el-table
             :data="caseList"
@@ -46,7 +63,7 @@
             </el-table-column>
             <el-table-column prop="caseCite" label="引用" width="60">
               <template slot-scope='scope'>
-                <div>{{scope.row.caseCite.length}}</div>
+                <!-- <div>{{scope.row.caseCite.length}}</div> -->
               </template>
             </el-table-column>
             <el-table-column prop="caseProject" label="所属项目" min-width="180">
@@ -65,6 +82,10 @@
                   placement="bottom"
                   width="100"
                   trigger="click">
+                  <p @click="detail(scope.row)">
+                    <svg-icon data_iconName="icon-configure" />
+                    <span>详情</span>
+                  </p>
                   <p @click="editCase(scope.row)">
                     <svg-icon data_iconName="icon-edit" className="icon-gesture"/>
                     <span>编辑</span>
@@ -131,7 +152,8 @@ export default {
       ],
       selectVal: '', // 选中项
       inputKey: '', // 搜索输入项
-      caseList: [] // 任务列表
+      caseList: [{}], // 任务列表
+      seachInfo: {} // 高级检索条件
     };
   },
   created() {
@@ -139,6 +161,16 @@ export default {
   },
   mounted() {},
   methods: {
+    // 清空条件
+    clearSeach() {},
+    // 取消搜索
+    cancel() {
+      this.$refs.func.visible = false
+    },
+    // 确认搜索
+    confirm() {
+      console.log(this.seachInfo)
+    },
     // 获取case列表
     getCaseList() {
       const url = 'case/list'
@@ -185,6 +217,21 @@ export default {
     // 复制用例
     copyCase() {
 
+    },
+    // 详情
+    detail(row) {
+      console.log(row)
+      this.$router.push(
+        {
+          name: 'CaseDetails',
+          query: {
+            editId: row.taskId
+          },
+          params: {
+            data: row
+          }
+        }
+      )
     },
     // 编辑用例
     editCase(row) {

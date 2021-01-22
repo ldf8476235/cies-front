@@ -4,7 +4,7 @@
  * @Date: 2020-12-08 17:59:01
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-09 15:37:11
+ * @LastEditTime: 2021-01-21 14:53:48
 -->
 <template>
   <svg :class="svgClass" aria-hidden="true">
@@ -51,5 +51,8 @@ export default {
 }
 .svg-class{
   margin-right: 10px;
+}
+.colorFFF{
+  color:#fff;
 }
 </style>

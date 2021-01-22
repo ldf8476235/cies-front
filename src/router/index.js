@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-01-13 09:52:43
+ * @LastEditTime: 2021-01-22 14:26:59
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\router\index.js
@@ -78,6 +78,22 @@ const routes = [
         name: 'NewScript',
         component: () => import('../views/action-manage/new-action/Script.vue')
       },
+      // 动作详情
+      {
+        path:'/action/screendetails',
+        name:'ScreenDetails',
+        component: () => import('../views/action-manage/action-details/Screen.vue')
+      },
+      {
+        path:'/action/scriptdetails',
+        name:'ScriptDetails',
+        component: () => import('../views/action-manage/action-details/Script.vue')
+      },
+      {
+        path:'/action/voicedetails',
+        name:'VoiceDetails',
+        component: () => import('../views/action-manage/action-details/Voice.vue')
+      },
       // 检验点
       {
         path: '/verify',
@@ -90,14 +106,19 @@ const routes = [
         component: () => import('../views/verify-manage/new-verify/Image.vue')
       },
       {
-        path: '/verify/newaudio',
-        name: 'NewAudio',
-        component: () => import('../views/verify-manage/new-verify/Audio.vue')
+        path: '/verify/newother',
+        name: 'NewOther',
+        component: () => import('../views/verify-manage/new-verify/Other.vue')
       },
       {
-        path: '/verify/newtext',
-        name: 'NewText',
-        component: () => import('../views/verify-manage/new-verify/Text.vue')
+        path: '/verify/imagedetails',
+        name: 'ImageDetails',
+        component: () => import('../views/verify-manage/verify-details/Image.vue')
+      },
+      {
+        path: '/verify/otherdetails',
+        name: 'OtherDetails',
+        component: () => import('../views/verify-manage/verify-details/Other.vue')
       },
       {
         //设备管理

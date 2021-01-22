@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2021-01-13 09:41:07
+ * @LastEditTime: 2021-01-21 14:17:37
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\views\Layout.vue
@@ -122,7 +122,7 @@ export default {
           id: '010',
           name: '环境管理',
           path: '/environment',
-          icon: 'icon-checkoff'
+          icon: 'icon-configure-off'
           // children: [],
         },
         {

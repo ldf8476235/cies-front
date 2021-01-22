@@ -4,11 +4,11 @@
  * @Date: 2020-12-09 14:04:56
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-14 15:09:24
+ * @LastEditTime: 2021-01-22 14:21:46
 -->
 <template>
   <div class="case-details">
-    <Crumbs :crumbs='crumbs' @edit='edit' @copy='copy'></Crumbs>
+    <Crumbs :crumbs='crumbs' @edit='edit' @copy='copy' @cancel='cancel' @save='save'></Crumbs>
     <div class="container">
       <div class="content">
         <div class="title">任务信息</div>
@@ -84,66 +84,134 @@
                   <span class="del-color">删除</span>
                 </p>
               </el-row>
-              <div v-else class="action-list-title">动作列表</div>
+              <div v-else class="action-list-title">用例列表</div>
               <el-table
                 width="100%"
-                border
-                :data="taskInfo.taskInfoTable"
+                class="borderStyle"
+                ref="refTable"
+                :data="taskInfo.taskCase"
+                row-key="id"
                 >
                 <el-table-column
-                  type="selection"
-                  width="55">
+                  width="100">
                   <template slot-scope="scope">
                     <div class="func">
-                      <el-checkbox @change="selectRow(scope.row)"></el-checkbox>
-                      <div @click="drag(scope.row)">
+                      <el-checkbox v-if="editFlag" @change="selectRow(scope.row)"></el-checkbox>
+                      <div class="drag" v-if="editFlag">
                         <svg-icon data_iconName = 'icon-grab'></svg-icon>
                       </div>
-                      <div @click="expand(scope.row)">
-                        <svg-icon data_iconName = 'icon-start'></svg-icon>
+                      <div @click="expand(scope.row,scope.$index)">
+                        <svg-icon v-if="iconFlag || iconIndex !== scope.$index" data_iconName = 'icon-start'></svg-icon>
+                        <svg-icon v-else data_iconName = 'icon-arrow-down'></svg-icon>
                       </div>
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column
-                  type="index"
-                  label="序号"
-                  width="55">
-                </el-table-column>
-                <el-table-column
-                  label="动作类型"
-                  width="100">
-                  <template>
-                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
+                <el-table-column type="expand" width="1">
+                  <template slot-scope="scope">
+                    <div class="demo-table-expand">
+                      <el-table
+                        :data='scope.row.childrens'
+                        :show-header='false'
+                        row-key="id"
+                        >
+                        <el-table-column
+                          width="100">
+                          <template slot-scope="scope">
+                            <div class="func">
+                              <el-checkbox v-if="editFlag" @change="selectRow(scope.row)"></el-checkbox>
+                              <div v-if="editFlag" draggable="true" @dragstart="dragClick(scope.row)" class="childDrag">
+                                <svg-icon data_iconName = 'icon-grab'></svg-icon>
+                              </div>
+                              <div>
+                                <svg-icon data_iconName = 'icon-subset'></svg-icon>
+                              </div>
+                            </div>
+                          </template>
+                        </el-table-column>
+                        <el-table-column prop="caseGroup">
+                        </el-table-column>
+                        <el-table-column prop="loopTimes">
+
+                        </el-table-column>
+                        <el-table-column prop="error">
+
+                        </el-table-column>
+                        <el-table-column prop="caseGroup">
+
+                        </el-table-column>
+                        <el-table-column prop="loopTimes">
+
+                        </el-table-column>
+                        <el-table-column label="操作" align="center" width="80">
+                          <template slot-scope="scope">
+                            <el-popover
+                              placement="bottom"
+                              width="100"
+                              trigger="click">
+                              <p>
+                                <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
+                                <span>插入用例</span>
+                              </p>
+                              <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>替换用例</span></p>
+                              <p><svg-icon data_iconName="icon-configure" className="icon-gesture"/><span>配置环境</span></p>
+                              <p @click="upMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
+                              <p @click="downMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
+                              <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
+                              <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
+                            </el-popover>
+                          </template>
+                        </el-table-column>
+                      </el-table>
+                    </div>
                   </template>
                 </el-table-column>
-                <el-table-column label="动作名称">
+                <el-table-column label="用例组">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'taskInfoTable.' + scope.$index + '.nodeName'"
-                      :rules="rulesTaskInfo.taskInfoTable.name"
+                      :prop="'taskCase.' + scope.$index + '.caseGroup'"
+                      :rules="rulesTaskInfo.taskCase.caseGroup"
                       label-width="0px"
-                    >
-                      <span v-if="editFlag">
+                      >
+                      <span v-if="scope.row.editCaseGroup">
                         <el-input
                           ref="inputBlur"
-                          v-model="scope.row.nodeName"
+                          v-model="scope.row.caseGroup"
                           placeholder=""
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.nodeName}} </span>
+                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.caseGroup}} </span>
+                    </el-form-item>
+                  </template>
+                </el-table-column>
+                <el-table-column label="用例">
+                  <template slot-scope="scope">
+                    <el-form-item
+                      :prop="'taskCase.' + scope.$index + '.case'"
+                      :rules="rulesTaskInfo.taskCase.case"
+                      label-width="0px"
+                    >
+                      <span v-if="scope.row.editCase">
+                        <el-input
+                          ref="inputBlur"
+                          v-model="scope.row.case"
+                          placeholder=""
+                          @blur="inputBlur(scope.row,scope.column)"
+                        ></el-input>
+                      </span>
+                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.case}} </span>
                     </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="循环次数">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'taskInfoTable.' + scope.$index + '.loopTimes'"
-                      :rules="rulesTaskInfo.taskInfoTable.hope_status_name"
+                      :prop="'taskCase.' + scope.$index + '.loopTimes'"
+                      :rules="rulesTaskInfo.taskCase.loopTimes"
                       label-width="0px"
                     >
-                      <span v-if="editFlag">
+                      <span v-if="scope.row.editLoop">
                         <el-input
                           ref="inputBlur"
                           v-model="scope.row.loopTimes"
@@ -158,72 +226,89 @@
                 <el-table-column label="出错处理">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'taskInfoTable.' + scope.$index + '.error'"
-                      :rules="rulesTaskInfo.taskInfoTable.device_function"
+                      :prop="'taskCase.' + scope.$index + '.error'"
+                      :rules="rulesTaskInfo.taskCase.error"
                       label-width="0px"
                     >
-                      <!-- <span> -->
-                        <el-select  v-if="editFlag" v-model="selectVal" placeholder="请选择">
+                        <el-select v-if="editFlag" v-model="selectVal" placeholder="请选择">
                           <el-option
                             v-for="item in options"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
-                          >
+                            >
                           </el-option>
                         </el-select>
-                      <!-- </span> -->
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}} </span>
+                        <span v-else>跳出</span>
                     </el-form-item>
                   </template>
                 </el-table-column>
-
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
-
-                      :prop="'taskInfoTable.' + scope.$index + '.executeWait'"
-                      :rules="rulesTaskInfo.taskInfoTable.device_function"
+                      :prop="'taskCase.' + scope.$index + '.executeWait'"
+                      :rules="rulesTaskInfo.taskCase.executeWait"
                       label-width="0px"
-                    >
+                      >
                       <el-select v-if="editFlag" v-model="selectVal" placeholder="请选择">
                         <el-option
                           v-for="item in options"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value"
-                        >
+                          >
                         </el-option>
                       </el-select>
-                      <span v-else>{{scope.row.loopTimes}}</span>
+                      <span v-else>无处理</span>
                     </el-form-item>
                   </template>
                 </el-table-column>
-                <el-table-column v-if="editFlag" label="操作" align="center" width="80">
+                <el-table-column label="执行位置">
+                  <template slot-scope="scope">
+                    <el-form-item
+
+                      :prop="'taskCase.' + scope.$index + '.executeWait'"
+                      :rules="rulesTaskInfo.taskCase.executeWait"
+                      label-width="0px"
+                      >
+                      <el-select v-if="editFlag" v-model="selectVal" placeholder="请选择">
+                        <el-option
+                          v-for="item in options"
+                          :key="item.value"
+                          :label="item.label"
+                          :value="item.value"
+                          >
+                        </el-option>
+                      </el-select>
+                      <span v-else>被测设备</span>
+                    </el-form-item>
+
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="80">
                   <template slot-scope="scope">
                     <el-popover
                       placement="bottom"
                       width="100"
                       trigger="click">
-                      <p @click="showFuncBtn(scope.row)">
+                      <p @click="addCaseGroup(scope.$index)">
                         <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
-                        <span>插入用例</span>
+                        <span>添加用例组</span>
                       </p>
-                      <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>替换动作</span></p>
-                      <p><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
-                      <p><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
-                      <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
+                      <p @click="addCase(scope.$index)">
+                        <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
+                        <span>添加用例</span>
+                      </p>
+                      <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>添加子用例</span></p>
+                      <p><svg-icon data_iconName="icon-configure" className="icon-gesture"/><span>配置环境</span></p>
+                      <p @click="upMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
+                      <p @click="downMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
+                      <p @click="delCaseGroup(scope.$index)"><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
                       <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
                     </el-popover>
                   </template>
                 </el-table-column>
               </el-table>
-              <!-- <el-row class="add-node">
-                <el-col>
-                  <el-button type="" @click="addCaseRow">
-                    <i class="el-icon-plus"></i> 添加动作</el-button>
-                </el-col>
-              </el-row> -->
             </div>
           </el-form>
         </div>
@@ -233,6 +318,7 @@
 </template>
 
 <script>
+import Sortable from 'sortablejs';
 export default {
   name: 'CaseDetails',
   data() {
@@ -246,18 +332,6 @@ export default {
       loading: false, // 任务名称动态验证动画
       options: [
         {
-          value: '选项1',
-          label: '黄金糕'
-        },
-        {
-          value: '选项2',
-          label: '双皮奶'
-        },
-        {
-          value: '选项3',
-          label: '蚵仔煎'
-        },
-        {
           value: '选项4',
           label: '龙须面'
         },
@@ -269,30 +343,66 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       taskInfo: {
-        taskInfoTable: [
+        'taskAssign': '',
+        'taskDesc': '',
+        'taskId': 0,
+        'taskName': '',
+        'taskProject': '',
+        'taskVersion': '',
+        taskCase: [
           {
-            editNode: false,
+            id: '1',
+            editCaseGroup: false,
             editLoop: false,
-            nodeName: '节点名称1',
-            loopTimes: 10,
+            caseGroup: '节点名称1',
+            loopTimes: 11,
             error: '123',
             overtime: 'asdasd',
-            executeWait: 'aq2134'
-          },
-          {
-            editNode: false,
-            editLoop: false,
-            nodeName: '节点名称2',
-            loopTimes: 10,
-            error: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134'
+            executeWait: 'aq2134',
+            childrens: [
+              {
+                id: '101',
+                editCaseGroup: false,
+                editLoop: false,
+                caseGroup: '',
+                loopTimes: 11,
+                error: '123',
+                overtime: 'asdasd',
+                executeWait: 'aq2134'
+              },
+              {
+                id: '102',
+                editCaseGroup: false,
+                editLoop: false,
+                caseGroup: '',
+                loopTimes: 12,
+                error: '1qwe',
+                overtime: 'asdasd',
+                executeWait: 'aq2134'
+              }
+            ]
           }
         ]
       },
       rulesTaskInfo: {
-        taskInfoTable: {}
-      }
+        taskName: [
+          { required: true, message: '请输入任务名称', trigger: 'blur' }
+        ],
+        taskAssign: [
+          { required: true, message: '请选择指派人', trigger: 'blur' }
+        ],
+        taskProject: [
+          { required: true, message: '请选择所属项目', trigger: 'blur' }
+        ],
+        taskVersion: [
+          { required: true, message: '请输入软件版本', trigger: 'blur' }
+        ],
+        taskDesc: [
+          { required: true, message: '请输入任务描述', trigger: 'blur' }
+        ],
+        taskCase: {}
+      },
+      iconFlag: true // 折叠图标标识
     };
   },
   computed: {
@@ -300,14 +410,55 @@ export default {
   watch: {
   },
   methods: {
+    // 展开
+    expand(row, index) {
+      console.log(row, index)
+      this.iconFlag = !this.iconFlag
+      this.iconIndex = index
+      this.$refs.refTable.toggleRowExpansion(row)
+      this.childDrag()
+    },
+    // 子元素拖动
+    childDrag() {
+      this.$nextTick(() => {
+        // 表格拖拽事件的添加
+        const el = document.querySelectorAll('.demo-table-expand .el-table__body-wrapper tbody')[0]
+        if (!el) return
+        // const self = this;
+        Sortable.create(el, {
+          handle: '.childDrag',
+          fallbackOnBody: true,
+          // 开始拖拽的时候
+          onStart: function(evt) {
+            console.log(evt)
+          },
+          // 拖拽结束后的操作
+          onEnd({ newIndex, oldIndex }) {
+            console.log(newIndex, oldIndex)
+            if (newIndex === oldIndex) return
+          }
+        })
+      })
+    },
     // 复制
     copy() {
       console.log('复制')
     },
     // 编辑
     edit() {
-      this.editFlag = true
+      // this.editFlag = true
+      // this.crumbs.details = false
       console.log('编辑')
+    },
+    // 取消
+    cancel() {
+      this.editFlag = false
+    },
+    // 保存
+    save() {
+      this.editFlag = false
+      this.crumbs.details = true
+      console.log(this.taskInfo)
     }
   }
 };
@@ -349,6 +500,9 @@ export default {
     }
     .taskCase {
       padding: 0 20px;
+      .borderStyle{
+        border-top: 1px solid #EBEEF5;
+      }
       .text-title{
         font-size: 12px;
         .del-color{
@@ -359,6 +513,12 @@ export default {
         .func {
           display: flex;
           align-content: center;
+        }
+        /deep/ .el-table__expand-icon{
+          display: none;
+        }
+        /deep/ .el-table__expanded-cell{
+          padding: 0;
         }
       }
       .action-list-title{

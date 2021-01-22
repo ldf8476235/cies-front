@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2021-01-06 13:27:37
+ * @LastEditTime: 2021-01-22 15:51:14
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\main.js
@@ -21,14 +21,14 @@ import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI, { size: 'mini' });
 
 // 分页组件
-import PageUtil from './components/utils/PageUtil'
+import PageUtil from './components/page/PageUtil'
 Vue.component('PageUtil', PageUtil)
 
 // 引入菜单栏变化问题
 import Fragment from 'vue-fragment'
 Vue.use(Fragment.Plugin)
 // 登峰请求引入
-import httpRequest from '@/utils/request'
+import httpRequest from '@/axios/request'
 Vue.prototype.$http = httpRequest
 // 引入阿里矢量图标
 // import './assets/iconfont/iconfont.css'
