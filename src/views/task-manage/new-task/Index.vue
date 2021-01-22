@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 17:45:03
+ * @LastEditTime: 2021-01-22 18:05:18
 -->
 <template>
   <div class="newTask">
@@ -327,6 +327,20 @@
               @handleCurrChange='handleCurrChange'
             ></PageUtil>
           </el-dialog>
+          <Dialog>
+            <el-table slot='environment' :data="environmentList">
+              <el-table-column  width="30">
+                <template slot-scope="scope">
+                  <el-radio v-model="radio" :label="scope.$index">{{''}}</el-radio>
+                </template>
+              </el-table-column>
+              <el-table-column property="date" label="序号" type="index" width="50"></el-table-column>
+              <el-table-column property="date" label="动作名称" width="200"></el-table-column>
+              <el-table-column property="name" label="创建人" width="100"></el-table-column>
+              <el-table-column property="address" label="创建时间"></el-table-column>
+              <el-table-column property="address" label="软件版本"></el-table-column>
+            </el-table>
+          </Dialog>
         </div>
       </div>
     </div>
@@ -334,9 +348,13 @@
 </template>
 
 <script>
+import Dialog from '@/components/config-dialog/Dialog.vue';
 import Sortable from 'sortablejs';
 export default {
   name: 'NewTask',
+  components: {
+    Dialog
+  },
   data() {
     return {
       crumbs: {

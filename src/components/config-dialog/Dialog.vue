@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 17:53:18
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 17:57:08
+ * @LastEditTime: 2021-01-22 18:05:42
 -->
 <template>
   <div>
@@ -13,6 +13,7 @@
         <el-button slot="append" @click="seach" icon="el-icon-search"></el-button>
       </el-input>
       <slot name="executeDevice"></slot>
+      <slot name="environment"></slot>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogTableVisible = false">取 消</el-button>
         <el-button type="primary" @click="dialogTableVisible = false">确 定</el-button>
@@ -34,6 +35,9 @@ export default {
   name: '',
   data() {
     return {
+      total: 0,
+      pageSize: 10,
+      currPage: 1,
       keyword: '',
       dialogTableVisible: true
     };
@@ -41,6 +45,17 @@ export default {
   methods: {
     // 执行机搜索关键字
     seach() {
+    },
+    // 当前页条数
+    handleSizeChange(size) {
+      this.pageSize = size
+      this.getTaskList(this.currPage, size)
+    },
+    // 当前页面
+    handleCurrChange(page) {
+      this.currPage = page
+      console.log(this.currPage)
+      this.getTaskList(page, this.pageSize)
     }
   }
 };

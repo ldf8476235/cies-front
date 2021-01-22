@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-01-22 17:57:28
+ * @LastEditTime: 2021-01-22 18:01:02
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -141,7 +141,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <el-dialog title="配置环境" :visible.sync="dialogTableVisible">
+        <!-- <el-dialog title="配置环境" :visible.sync="dialogTableVisible">
           <el-input v-model="keyword" placeholder='输入关键字'>
             <el-button slot="append" @click="seach" icon="el-icon-search"></el-button>
           </el-input>
@@ -166,7 +166,18 @@
             @handleSizeChange='handleSizeChange'
             @handleCurrChange='handleCurrChange'
           ></PageUtil>
-        </el-dialog>
+        </el-dialog> -->
+        <Dialog>
+          <el-table slot='executeDevice' :data="executeDeviceList">
+            <el-table-column  width="30">
+              <template slot-scope="scope">
+                <el-radio v-model="radio" :label="scope.$index">{{''}}</el-radio>
+              </template>
+            </el-table-column>
+            <el-table-column property="date" label="序号" type="index" width="50"></el-table-column>
+            <el-table-column property="date" label="执行机"></el-table-column>
+          </el-table>
+        </Dialog>
         <PageUtil
           ref="pageutil"
           :total="total"
@@ -181,12 +192,13 @@
 </template>
 
 <script>
-import { } from 'module';
+import Dialog from '@/components/config-dialog/Dialog.vue';
 import Func from '@/components/seach-func-header/Func.vue'
 export default {
   name: 'Task',
   components: {
-    Func
+    Func,
+    Dialog
   },
   data() {
     return {
