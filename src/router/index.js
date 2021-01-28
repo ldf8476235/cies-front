@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-01-22 14:26:59
+ * @LastEditTime: 2021-01-25 15:49:12
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\router\index.js
@@ -137,6 +137,11 @@ const routes = [
         path: '/script',
         name: 'Script',
         component: () => import('../views/script-manage/Index.vue')
+      },
+      {
+        path: '/config',
+        name: 'Config',
+        component: () => import('../views/config-manage/Index.vue')
       },
       // 环境管理
       {

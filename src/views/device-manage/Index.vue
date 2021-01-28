@@ -68,25 +68,25 @@
             >
             </el-table-column>
             <el-table-column label="设备名称" show-overflow-tooltip :span="10">
-              <template slot-scope="scope">{{ scope.row.name }}</template>
+              <template slot-scope="scope">{{ scope.row.actuator_name }}</template>
             </el-table-column>
             <el-table-column
               label="负责人"
-              prop="user"
+              prop="actuator_username"
               show-overflow-tooltip
               width="100"
             >
             </el-table-column>
             <el-table-column
               label="IP地址"
-              prop="ip"
+              prop="actuator_ip"
               show-overflow-tooltip
               width="150"
             >
             </el-table-column>
             <el-table-column
               label="端口号"
-              prop="port"
+              prop="actuator_port"
               show-overflow-tooltip
               width="80"
             >
@@ -129,9 +129,6 @@
                     <i class="el-icon-more"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <!-- <el-dropdown-item icon="el-icon-edit-outline" @click.native="edit(scope.row)">编辑</el-dropdown-item>
-                    <el-dropdown-item icon="el-icon-document-copy" @click.native="copy(scope.row)">复制</el-dropdown-item>
-                    <el-dropdown-item icon="el-icon-delete" @click.native="del(scope.row.uid)">删除</el-dropdown-item> -->
                     <el-dropdown-item icon="el-icon-tickets" @click.native="del(scope.row.uid)">执行报告</el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
@@ -233,6 +230,7 @@ export default {
     },
     // 获取设备列表
     getList(page, size) {
+      const that = this
       this.loading = true;
       // var params = {
       //   page: this.currPage,
@@ -252,20 +250,22 @@ export default {
         console.warn(err)
         this.loading = false
       })
+
     },
     getRowKeys(row) {
       return row.deviceId;
     },
     // 格式化设备类型数据
     formatterType(row) {
-      var typelist = row.type;
+      console.log(row.actuator_type)
+      var typelist = row.actuator_type;
       const arr = []
       typelist.forEach(item => {
-        if (item === 'voice_type') {
+        if (item === 'Voice') {
           arr.push('语音')
-        } else if (item === 'phone') {
+        } else if (item === 'Phone') {
           arr.push('手机互联')
-        } else if (item === 'camera') {
+        } else if (item === 'Vamera') {
           arr.push('camera')
         }
       })

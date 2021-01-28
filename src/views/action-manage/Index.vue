@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2021-01-22 16:55:23
+ * @LastEditTime: 2021-01-27 13:53:41
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -174,6 +174,7 @@ export default {
   created() {
     this.deviceId = 'android:'
     this.getCurrentScreen()
+    this.imagePool = new ImagePool(100)
   },
   mounted() {
     this.getActionList(this.currPage, this.pageSize)
@@ -285,11 +286,13 @@ export default {
     },
     // 新建任务
     goNewTask(i) {
-      console.log(i)
       let path = ''
+      console.log(this.options)
       switch (i) {
         case 0:
-          path = this.screen === 'landscape' ? '/action/newscreen' : '/action/carsscreen'
+          // path = this.screen === 'portrait' ? '/action/newscreen' : '/action/carscreen'
+          path = '/action/newscreen'
+          console.log(path)
           break;
         case 1:
           path = '/action/newvoice'
@@ -318,15 +321,16 @@ export default {
     },
     // 绘制当前屏幕
     drawBlobImageToScreen(blob) {
+      const that = this
       var URL = window.URL || window.webkitURL;
       var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
       var img = this.imagePool.next()
       img.onload = function() {
         const r = img.width / img.height
-        if (r > 0) {
-          this.screen = 'landscape'
+        if (r > 1) {
+          that.screen = 'landscape'
         } else {
-          this.screen = 'portrait'
+          that.screen = 'portrait' // 'landscape'
         }
         img.onload = img.onerror = null
         img.src = BLANK_IMG

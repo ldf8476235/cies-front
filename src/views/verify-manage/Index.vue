@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 15:18:34
+ * @LastEditTime: 2021-01-28 17:59:36
 -->
 <template>
   <div class="verify">
@@ -65,24 +65,24 @@
           <el-table :data="verifyList" class='borderTop' style="width: 100%">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="name" label="类型" width="50">
+            <el-table-column label="类型" width="50">
               <template>
                 <svg-icon data_iconName="icon-gesture" className="icon"/>
               </template>
             </el-table-column>
-            <el-table-column prop="date" label="检验点名称" min-width="180">
+            <el-table-column prop="name" label="检验点名称" min-width="180">
             </el-table-column>
-            <el-table-column prop="name" label="所属项目" width="180">
+            <el-table-column prop="project" label="所属项目" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="创建人" width="180">
+            <el-table-column prop="builder" label="创建人" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="软件版本" width="140">
+            <el-table-column prop="version" label="软件版本" width="140">
             </el-table-column>
-            <el-table-column prop="name" label="创建时间" width="140">
+            <el-table-column prop="time_create" label="创建时间" width="160">
             </el-table-column>
-            <el-table-column prop="name" label="更新时间" width="140">
+            <el-table-column prop="time_modify" label="更新时间" width="160">
             </el-table-column>
-            <el-table-column prop="name" label="操作" width="60">
+            <el-table-column label="操作" width="60">
               <template slot-scope='scope'>
                 <el-popover
                   placement="bottom"
@@ -92,7 +92,7 @@
                       <svg-icon data_iconName="icon-configure" />
                       <span>详情</span>
                     </p>
-                  <p><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
+                  <p @click='edit(scope.row)'><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
                   <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
                   <p><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
                   <div slot="reference">
@@ -150,6 +150,9 @@ export default {
 
     };
   },
+  mounted() {
+    this.getVerifyList(this.currPage, this.pageSize)
+  },
   methods: {
     // 清空条件
     clearSeach() {},
@@ -160,6 +163,17 @@ export default {
     // 确认搜索
     confirm() {
       console.log(this.seachInfo)
+    },
+    // 获取检验点列表
+    getVerifyList(page, size) {
+      const url = `/verify/list/?page=${page}&count=${size}`
+      this.$http.get(url).then(res => {
+        console.log(res)
+        if (res.status_code === 200) {
+          this.verifyList = res.data.result
+          this.total = res.data.count
+        }
+      })
     },
     // 新建任务
     goNewVerify(i) {
@@ -175,13 +189,42 @@ export default {
           break;
       }
     },
+    // 编辑
+    edit(row) {
+      const type = row.type
+      let name
+      switch (type) {
+        case 'Image':
+        case 'Text':
+        case 'U3':
+          name = 'NewImage'
+          break;
+        case 'other':
+          name = 'NewOther'
+          break;
+        default:
+          break;
+      }
+      this.$router.push({
+        name: name,
+        query: {
+          detailsId: row.uid,
+          type: type
+        },
+        params: {
+          data: row
+        }
+      })
+    },
     // 详情
     detail(row) {
       console.log(row)
       const type = row.type
       let name
       switch (type) {
-        case 'image':
+        case 'Image':
+        case 'Text':
+        case 'U3':
           name = 'ImageDetails'
           break;
         case 'other':
@@ -193,7 +236,7 @@ export default {
       this.$router.push({
         name: name,
         query: {
-          detailsId: row.taskId,
+          detailsId: row.uid,
           type: type
         },
         params: {

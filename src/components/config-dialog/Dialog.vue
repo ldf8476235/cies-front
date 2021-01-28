@@ -4,11 +4,11 @@
  * @Date: 2021-01-22 17:53:18
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 18:05:42
+ * @LastEditTime: 2021-01-25 10:08:24
 -->
 <template>
   <div>
-    <el-dialog title="配置环境" :visible.sync="dialogTableVisible">
+    <el-dialog :title="title" :visible.sync="dialogTableVisible">
       <el-input v-model="keyword" placeholder='输入关键字'>
         <el-button slot="append" @click="seach" icon="el-icon-search"></el-button>
       </el-input>
@@ -33,6 +33,12 @@
 <script>
 export default {
   name: '',
+  props: {
+    title: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       total: 0,

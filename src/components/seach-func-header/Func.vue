@@ -4,7 +4,7 @@
  * @Date: 2020-12-15 09:38:07
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-21 11:13:38
+ * @LastEditTime: 2021-01-26 14:51:26
 -->
 <template>
   <div>
@@ -20,7 +20,7 @@
           </el-option>
         </el-select>
         <el-input v-model="inputKey" placeholder="请输入内容">
-          <i slot="suffix" class="el-input__icon el-icon-search"></i>
+          <i slot="suffix" @click="seach" class="el-input__icon el-icon-search"></i>
         </el-input>
         <el-popover
             placement="bottom"
@@ -31,6 +31,7 @@
             <slot name='verify'></slot>
             <slot name='case'></slot>
             <slot name='device'></slot>
+            <slot name='environment'></slot>
             <el-button class="btnFilter" slot="reference">
               <svg-icon data_iconName='icon-filter'></svg-icon>
             </el-button>
@@ -79,6 +80,16 @@ export default {
   watch: {
   },
   methods: {
+    // 普通搜索
+    seach() {
+      console.log('搜索', this.selectVal, this.inputKey)
+      const data = {
+        'filed': 'actuator_name',
+        'filed_str': 'DESKTOP-NIF4RB9'
+      }
+      console.log()
+      this.$emit('seach', data)
+    },
     goNew() {
       const obj = {
         selectVal: '',

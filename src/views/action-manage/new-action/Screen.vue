@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-19 11:20:15
+ * @LastEditTime: 2021-01-28 10:55:04
 -->
 <template>
   <div class="new-screen">
@@ -28,46 +28,41 @@
                           :rules="rulesActionInfo"
                           label-width="100px"
                         >
-                          <el-form-item label="任务名称：" prop="actionName">
+                          <el-form-item label="动作名称：" prop="name">
                             <el-input
                               :suffix-icon="loading ? 'el-icon-loading' : ''"
-                              v-model.trim="actionInfo.actionName"
+                              v-model.trim="actionInfo.name"
                               placeholder="输入任务名称"
                             ></el-input>
                           </el-form-item>
                           <el-form-item label="动作类型：">
                             <span>屏幕操作</span>
                           </el-form-item>
-                          <el-form-item label="所属项目：" prop="actionProject">
-                            <el-select style="width:100%;" v-model="actionInfo.actionProject " placeholder="选择所属项目">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value"
-                              >
-                              </el-option>
-                            </el-select>
-                          </el-form-item>
-                          <el-form-item label="软件版本：" prop='actionVersion'>
+                          <el-form-item label="所属项目：" prop="project">
                             <el-input
-                              v-model="actionInfo.actionVersion"
+                              v-model.trim="actionInfo.project"
+                              placeholder="输入所属项目"
+                            ></el-input>
+                          </el-form-item>
+                          <el-form-item label="软件版本：" prop='version'>
+                            <el-input
+                              v-model="actionInfo.version"
                               placeholder="输入软件版本"
                             ></el-input>
                           </el-form-item>
 
 
-                          <el-form-item label="超时时长：" prop='actionTimeout'>
+                          <el-form-item label="超时时长：" prop='timeout'>
                             <el-input
-                              v-model="actionInfo.actionTimeout"
+                              v-model="actionInfo.timeout"
                               placeholder="输入超时时长"
                             ></el-input>
                           </el-form-item>
-                          <el-form-item label="任务描述：" prop='actionDesc'>
+                          <el-form-item label="动作描述：" prop='desc'>
                             <el-input
                               type="textarea"
-                              v-model="actionInfo.actionDesc"
-                              placeholder="输入任务描述"
+                              v-model="actionInfo.desc"
+                              placeholder="输入动作描述"
                             ></el-input>
                           </el-form-item>
                         </el-form>
@@ -82,14 +77,12 @@
                         <span>脚本</span>
                       </div>
                       <div class="editor">
-                        <CodeMirror
-                          ref="cmEditor"
-                          :cmTheme="cmTheme"
-                          :cmMode="cmMode"
-                          :autoFormatJson="autoFormatJson"
-                          :jsonIndentation="jsonIndentation"
-                          :codeVal='generatedCode'
-                          ></CodeMirror>
+                          <codemirror
+                            ref="chartOption"
+                            v-model="generatedCode"
+                            :options="cmOptions"
+                            >
+                          </codemirror>
                       </div>
                     </el-card>
                   </div>
@@ -104,17 +97,19 @@
                         </p>
 
                         <div class="action-btn">
-                          <el-dropdown split-button type="">
-                            链接设备
+                          <el-dropdown @command='linkDevice'>
+                            <el-button type="primary">
+                              链接设备<i class="el-icon-arrow-down el-icon--right"></i>
+                            </el-button>
                             <el-dropdown-menu slot="dropdown">
-                              <el-dropdown-item>黄金糕</el-dropdown-item>
-                              <el-dropdown-item>狮子头</el-dropdown-item>
-                              <el-dropdown-item>螺蛳粉</el-dropdown-item>
+                              <el-dropdown-item v-for='(item,index) in hasDeviceList' :key='index' :command="item.device_ip">
+                                {{item.device_name}} : {{item.device_ip}}
+                              </el-dropdown-item>
                             </el-dropdown-menu>
                           </el-dropdown>
                           <el-button type="">导出</el-button>
                           <el-button type="">清空</el-button>
-                          <el-button type="">预览</el-button>
+                          <el-button @click='preview' type="">预览</el-button>
                         </div>
                       </div>
                       <div class="action-sequence-content">
@@ -214,97 +209,97 @@
                             </template>
                             <!-- 偶数行 -->
                             <template v-if="index % 2 === 1">
-                            <div
-                              :class="cindex === 9 ? 'row-wrap' : 'action-item'"
-                              v-for="(citem,cindex) in item"
-                              :key='cindex'>
-                              <div class="point-to" v-if="cindex !== 9">
-                                <span class="el-icon-back"></span>
+                              <div
+                                :class="cindex === 9 ? 'row-wrap' : 'action-item'"
+                                v-for="(citem,cindex) in item"
+                                :key='cindex'>
+                                <div class="point-to" v-if="cindex !== 9">
+                                  <span class="el-icon-back"></span>
+                                </div>
+                                <div class="click-icon">
+                                  <span>{{citem.text}}</span>
+                                  <el-popover
+                                    placement="top-start"
+                                    title="属性"
+                                    width="220"
+                                    trigger="click"
+                                  >
+                                  <el-row style='padding-bottom:10px;'>
+                                    <el-col>
+                                      <el-row>
+                                        <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>名称：</span></el-col>
+                                        <el-col :span='14'>
+                                          <span>{{citem.name}}</span>
+                                        </el-col>
+                                      </el-row>
+                                    </el-col>
+                                    <el-col>
+                                      <el-row>
+                                        <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>类型：</span></el-col>
+                                        <el-col :span='14'>
+                                          <span>{{citem.name}}</span>
+                                        </el-col>
+                                      </el-row>
+                                    </el-col>
+                                    <el-col>
+                                      <el-row>
+                                        <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>文本：</span></el-col>
+                                        <el-col :span='14'>
+                                          <span>{{citem.name}}</span>
+                                        </el-col>
+                                      </el-row>
+                                    </el-col>
+                                    <el-col>
+                                      <el-row>
+                                        <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>图片：</span></el-col>
+                                        <el-col :span='14'>
+                                          <span>{{citem.name}}</span>
+                                        </el-col>
+                                      </el-row>
+                                    </el-col>
+                                    <el-col>
+                                      <el-row>
+                                        <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>区域：</span></el-col>
+                                        <el-col :span='14'>
+                                          <span>{{citem.name}}</span>
+                                        </el-col>
+                                      </el-row>
+                                    </el-col>
+                                    <el-col>
+                                      <el-row>
+                                        <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>动作：</span></el-col>
+                                        <el-col :span='14'>
+                                          <span>{{citem.name}}</span>
+                                        </el-col>
+                                      </el-row>
+                                    </el-col>
+                                    <el-col>
+                                      <el-row>
+                                        <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>执行后等待：</span></el-col>
+                                        <el-col :span='14'>
+                                          <span>{{citem.name}}</span>
+                                        </el-col>
+                                      </el-row>
+                                    </el-col>
+                                    <el-col>
+                                      <el-row>
+                                        <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>参数：</span></el-col>
+                                        <el-col :span='14'>
+                                          <span>{{citem.name}}</span>
+                                        </el-col>
+                                      </el-row>
+                                    </el-col>
+                                  </el-row>
+                                    <el-button slot="reference" type=''>
+                                      <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
+                                    </el-button>
+                                  </el-popover>
+                                  <span class="el-icon-circle-close red"></span>
+                                </div>
+                                <div class="point-to" v-if="cindex === 9">
+                                  <span :class="cindex === 9 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
+                                </div>
                               </div>
-                              <div class="click-icon">
-                                <span>{{citem.text}}</span>
-                                <el-popover
-                                  placement="top-start"
-                                  title="属性"
-                                  width="220"
-                                  trigger="click"
-                                 >
-                                 <el-row style='padding-bottom:10px;'>
-                                  <el-col>
-                                    <el-row>
-                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>名称：</span></el-col>
-                                      <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
-                                      </el-col>
-                                    </el-row>
-                                  </el-col>
-                                  <el-col>
-                                    <el-row>
-                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>类型：</span></el-col>
-                                      <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
-                                      </el-col>
-                                    </el-row>
-                                  </el-col>
-                                  <el-col>
-                                    <el-row>
-                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>文本：</span></el-col>
-                                      <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
-                                      </el-col>
-                                    </el-row>
-                                  </el-col>
-                                  <el-col>
-                                    <el-row>
-                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>图片：</span></el-col>
-                                      <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
-                                      </el-col>
-                                    </el-row>
-                                  </el-col>
-                                  <el-col>
-                                    <el-row>
-                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>区域：</span></el-col>
-                                      <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
-                                      </el-col>
-                                    </el-row>
-                                  </el-col>
-                                  <el-col>
-                                    <el-row>
-                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>动作：</span></el-col>
-                                      <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
-                                      </el-col>
-                                    </el-row>
-                                  </el-col>
-                                  <el-col>
-                                    <el-row>
-                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>执行后等待：</span></el-col>
-                                      <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
-                                      </el-col>
-                                    </el-row>
-                                  </el-col>
-                                  <el-col>
-                                    <el-row>
-                                      <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>参数：</span></el-col>
-                                      <el-col :span='14'>
-                                        <span>{{citem.name}}</span>
-                                      </el-col>
-                                    </el-row>
-                                  </el-col>
-                                 </el-row>
-                                  <el-button slot="reference" type=''>
-                                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
-                                  </el-button>
-                                </el-popover>
-                                <span class="el-icon-circle-close red"></span>
-                              </div>
-                              <div class="point-to" v-if="cindex === 9">
-                                <span :class="cindex === 9 ? 'el-icon-bottom' : 'icon-jiantou-you' "></span>
-                              </div>
-                            </div>
                             </template>
                           </div>
                         </div>
@@ -334,21 +329,23 @@
                   <span>实时界面</span>
                 </div>
                 <div class="screen" id="screen" ref="screen">
+                  <svg-icon class="svgIcon" v-if="screenLoading" data_iconName='loading'></svg-icon>
                   <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
                   <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
                   <span class="finger finger-0" style="transform: translate3d(200px, 100px, 0px)"></span>
+                  <span style='color:#fff;'>请先连接设备</span>
                 </div>
                 <div class="screenBottomBtn">
                   <el-button>Power</el-button>
-                  <el-button>Home</el-button>
-                  <el-button>Back</el-button>
+                  <el-button @click='home'>Home</el-button>
+                  <el-button @click='back'>Back</el-button>
                   <el-button>Menu</el-button>
                   <el-button>Volume+</el-button>
                   <el-button>Volume-</el-button>
                 </div>
               </el-card>
               <div class='mobile-btn'  v-show='mobileBtn'>
-                <el-button @click='doTapWidget'>Tap Widget</el-button>
+                <!-- <el-button @click='doTapWidget'>Tap Widget</el-button> -->
                 <el-button @click='doTap'>Tap</el-button>
                 <el-button>Send Keys</el-button>
                 <el-button>LongPress</el-button>
@@ -365,13 +362,21 @@
 </template>
 
 <script>
-import CodeMirror from '../../../components/codemirror/Codemirror.vue'
+// import CodeMirror from '../../../components/codemirror/Codemirror.vue'
+import { codemirror } from 'vue-codemirror' // 引入组件
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/material.css'
+import 'codemirror/theme/base16-light.css'
+import 'codemirror/addon/hint/show-hint.css'
+import 'codemirror/mode/python/python.js'
+import 'codemirror/addon/hint/show-hint';
+
 import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 export default {
 
   name: 'NewScreen',
-  components: { CodeMirror, VJstree },
+  components: { codemirror, VJstree },
   data() {
     return {
       crumbs: {
@@ -379,90 +384,29 @@ export default {
         name: '新建动作'
       },
       cmTheme: 'base16-light', // codeMirror主题
-      // codeMirror主题选项
-      cmThemeOptions: [
-        'default',
-        '3024-day',
-        '3024-night',
-        'abcdef',
-        'ambiance',
-        'ayu-dark',
-        'ayu-mirage',
-        'base16-dark',
-        'base16-light',
-        'bespin',
-        'blackboard',
-        'cobalt',
-        'colorforth',
-        'darcula',
-        'dracula',
-        'duotone-dark',
-        'duotone-light',
-        'eclipse',
-        'elegant',
-        'erlang-dark',
-        'gruvbox-dark',
-        'hopscotch',
-        'icecoder',
-        'idea',
-        'isotope',
-        'lesser-dark',
-        'liquibyte',
-        'lucario',
-        'material',
-        'material-darker',
-        'material-palenight',
-        'material-ocean',
-        'mbo',
-        'mdn-like',
-        'midnight',
-        'monokai',
-        'moxer',
-        'neat',
-        'neo',
-        'night',
-        'nord',
-        'oceanic-next',
-        'panda-syntax',
-        'paraiso-dark',
-        'paraiso-light',
-        'pastel-on-dark',
-        'railscasts',
-        'rubyblue',
-        'seti',
-        'shadowfox',
-        'solarized dark',
-        'solarized light',
-        'the-matrix',
-        'tomorrow-night-bright',
-        'tomorrow-night-eighties',
-        'ttcn',
-        'twilight',
-        'vibrant-ink',
-        'xq-dark',
-        'xq-light',
-        'yeti',
-        'yonce',
-        'zenburn'
-      ],
       cmEditorMode: 'default', // 编辑模式
-      // 编辑模式选项
-      cmEditorModeOptions: [
-        'default',
-        'json',
-        'sql',
-        'javascript',
-        'css',
-        'xml',
-        'html',
-        'yaml',
-        'markdown',
-        'python'
-      ],
       cmMode: 'python', // codeMirror模式
       jsonIndentation: 2, // json编辑模式下，json格式化缩进 支持字符或数字，最大不超过10，默认缩进2个空格
       autoFormatJson: true, // json编辑模式下，输入框失去焦点时是否自动格式化，true 开启， false 关闭
       generatedCode: '',
+      cmOptions: {
+        tabSize: 2, // Tab键空格数
+        mode: 'python', // 模式
+        theme: 'default', // 主题
+        lineNumbers: true, // 是否显示行号
+        line: true,
+        extraKeys: { 'Ctrl': 'autocomplete' }, // 自定义快捷键
+        autofocus: true,
+        smartIndent: false,
+        autocorrect: true,
+        spellcheck: true,
+        hintOptions: { // 自定义提示选项
+          tables: {
+            users: ['name', 'score', 'birthDate'],
+            countries: ['name', 'population', 'size']
+          }
+        }
+      },
       loading: false, // 任务名称动态验证动画
       options: [
         {
@@ -477,22 +421,22 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       actionInfo: {
-        actionType: 0
+        type: 'screen'
       },
       rulesActionInfo: {
-        actionName: [
+        name: [
           { required: true, message: '请输入动作名称', trigger: 'blur' }
         ],
-        actionProject: [
-          { required: true, message: '请选择所属项目', trigger: 'blur' }
+        project: [
+          { required: true, message: '请输入所属项目', trigger: 'blur' }
         ],
-        actionVersion: [
+        version: [
           { required: true, message: '请输入软件版本', trigger: 'blur' }
         ],
-        actionTimeout: [
+        timeout: [
           { required: true, message: '请输入超时时长', trigger: 'blur' }
         ],
-        actionDesc: [
+        desc: [
           { required: true, message: '请输入动作描述', trigger: 'blur' }
         ]
       },
@@ -553,26 +497,30 @@ export default {
           current: -1
         }
       },
-      clickMobileApp: [] // 收集点击手机app数据
+      clickMobileApp: [], // 收集点击手机app数据
+      screenLoading: false, // 屏幕加载动画
+      hasDeviceList: [] // 已有设备选择框
+
     };
   },
   created() {
     this.imagePool = new ImagePool(100);
   },
   mounted() {
+    // console.log(this.$refs.chartOption.codemirror.on)
+    this.editor = this.$refs.chartOption.codemirror
+    this.editor.on('keypress', () => {
+      this.$refs.chartOption.codemirror.showHint();
+    });
+
     this.canvas.bg = document.querySelector('#bgCanvas')
     this.canvas.fg = document.querySelector('#fgCanvas')
 
     this.deviceId = 'android:'
-    this.checkVersion()
-    this.getCurrentScreen()
-    this.doConnect()
-    this.activeMouseControl()
-    // this.initPythonWebSocket()
-
-    // window.onresize = () => {
-    //   this.resizeScreen()
-    // }
+    // this.checkVersion()
+    // this.activeMouseControl()
+    this.initPythonWebSocket()
+    this.getHasDevice()
     // 编辑进入
     const actionId = this.$route.query.actionId
     if (actionId) {
@@ -581,6 +529,7 @@ export default {
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
+    this.loadLiveHierarchy = null
   },
   computed: {
     nodes: {
@@ -637,6 +586,24 @@ export default {
     }
   },
   methods: {
+
+    // 获取现有设备
+    getHasDevice() {
+      this.$http.get('/device/screen/phones/').then(res => {
+        console.log(res)
+        this.hasDeviceList = res.data
+      })
+    },
+    // 选择连接设备
+    linkDevice(ip) {
+      this.screenLoading = true
+      this.deviceUrl = ip
+      this.baseCode = "d = u3.connect('" + ip + "')"
+      this.editor.setValue(this.baseCode)
+      // this.getCurrentScreen()
+      this.screenWebSocket && this.screenWebSocket.close()
+      this.doConnect()
+    },
     // 编辑
     editData() {
       const actionData = this.$route.params.data
@@ -659,7 +626,6 @@ export default {
         arr.push(data.slice(i, i += 10))
       }
       this.actionSequence = arr
-
     },
     // 元素节点点击事件
     itemClick(a, b) {
@@ -669,63 +635,55 @@ export default {
     tab(i) {
       this.tabFlag = i
     },
-    doTapWidget() {
-      const node = this.nodeSelected
-      node.action = 'tap widget'
-      this.clickMobileApp.push(node)
-      this.disposeActionSequence(this.clickMobileApp)
-      const url = '/api/v1/widgets'
-      const data = {
-        bounds: [node.rect.x, node.rect.y, node.rect.x + node.rect.width, node.rect.y + node.rect.height],
-        text: node.text,
-        className: node._type,
-        description: node.description,
-        resourceId: node.resourceId,
-        xpath: this.elemXPathLite,
-        package: node.package,
-        hierarchy: localStorage.xmlHierarchy,
-        screenshot: localStorage.screenshotBase64,
-        windowSize: localStorage.windowSize.split(',').map(v => { return parseInt(v, 10) }),
-        activity: localStorage.activity
-      }
-      this.$axios({
-        method: 'POST',
-        url: url,
-        data: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(res => {
-        if (this.generatedCode) {
-          this.generatedCode = this.generatedCode + '\n' + `d.widget.click("${res.id}#${res.note}")`;
-        } else {
-          this.generatedCode = `d.widget.click("${res.id}#${res.note}")`;
-        }
-
-        // this.codeInsert(code)
-        this.nodeSelected = null;
-        // this.runPythonWithConnect(code)
-        //   .then(this.delayReload)
-      })
+    // 手机home建
+    home() {
+      const code = "d.press('home')"
+      this.editor.setValue(this.generatedCode + '\n' + code)
+      const codeComplate = this.baseCode + '\n' + code
+      this.runPythonWithConnect(codeComplate)
+        .then(this.delayReload)
     },
+    // 模拟手机返回
+    back() {
+      const code = "d.press('back')"
+      this.editor.setValue(this.generatedCode + '\n' + code)
+      const codeComplate = this.baseCode + '\n' + code
+      this.runPythonWithConnect(codeComplate)
+        .then(this.delayReload)
+    },
+    preview() {
+      const codeComplate = this.editor.getValue()
+      this.runPythonWithConnect(codeComplate)
+        .then(this.delayReload)
+    },
+    // 单击
     doTap() {
       const node = this.nodeSelected
       node.action = 'tap'
       this.clickMobileApp.push(node)
       this.disposeActionSequence(this.clickMobileApp)
-      var code = this.generateNodeSelectorCode(node);
-      if (this.generatedCode) {
-        this.generatedCode = this.generatedCode + '\n' + code + '.click()'
-      } else {
-        this.generatedCode = code + '.click()'
+      var code = this.generateNodeSelectorCode(node)
+      this.generatedCode = this.generatedCode + '\n' + code + '.click()'
+      this.editor.setValue(this.generatedCode)
+      const codeComplate = this.baseCode + '\n' + code + '.click()'
+      console.log(codeComplate)
+      this.runPythonWithConnect(codeComplate)
+        .then(this.delayReload)
+    },
+    doSendKeys(text) {
+      if (!text) {
+        text = window.prompt('Input text?')
       }
-
-      this.nodeSelected = null;
-      // this.runPythonWithConnect(code)
-      //   .then(this.delayReload)
+      if (!text) {
+        return;
+      }
+      const code = this.editor.getValue() + '\n' + `d.send_keys("${text}", clear=True)`
+      this.runPythonWithConnect(code)
+        .then(this.delayReload)
     },
     // 运行python代码
     runPythonWithConnect(code) {
+      console.log('code:', code)
       this.tabActiveName = 'console'
       if (!this.deviceId) {
         return this.doConnect().then(() => {
@@ -735,6 +693,24 @@ export default {
       // this.pyshell.lineno.offset = 0
       return this.runPython(code)
     },
+    // 推迟执行
+    delayReload(msec) {
+      if (!this.liveScreen) {
+        setTimeout(this.dumpHierarchyWithScreen, msec || 1000);
+      }
+    },
+    dumpHierarchyWithScreen() {
+      this.screenLoading = true;
+      // this.canvasStyle.opacity = 0.8;
+
+      if (!this.deviceId) {
+        return this.doConnect().then(this.dumpHierarchyWithScreen)
+      } else if (this.liveScreen) {
+        return this.dumpHierarchy()
+      } else {
+        return this.getCurrentScreen().then(this.dumpHierarchy)
+      }
+    },
     initPythonWebSocket() {
       // 初始化变量
       this.pyshell.running = false
@@ -743,62 +719,75 @@ export default {
       const ws = this.pyshell.ws = new WebSocket('ws://192.168.210.130:8000/ws/v1/python')
       ws.onopen = () => {
         this.pyshell.wsOpen = true
+        console.log('python:连接成功')
         // this.resetConsole()
       }
       ws.onmessage = (message) => {
         const data = JSON.parse(message.data)
-        let lineNumber = null
-        let timeUsed = null
+        console.log('message:', data)
+        const lineNumber = null
+        const timeUsed = null
         // 用蓝色的breakpoint标记已经运行过的代码
         // 用另外的breakpoint标记当前运行中的代码
         // 代码行号:lineno 从0开始
-        switch (data.method) {
-          case 'gotoLine':
-            lineNumber = data.value + this.pyshell.lineno.offset;
-            this.setLineGoThrough(this.pyshell.lineno.current)
-            this.pyshell.lineno.current = lineNumber
-            this.editor.session.setBreakpoint(lineNumber)
+        // switch (data.method) {
+        //   case 'gotoLine':
+        //     lineNumber = data.value + this.pyshell.lineno.offset;
+        //     this.setLineGoThrough(this.pyshell.lineno.current)
+        //     this.pyshell.lineno.current = lineNumber
 
-            // 下面这两行注释掉，因为会影响 "运行当前行" 功能中的自动跳到下一行的功能
-            // this.editor.selection.moveTo(lineNumber, 0) // 移动光标
-            // this.editor.scrollToLine(lineNumber) // 屏幕滚动到当前行
-            break;
-          case 'resetContent':
-            this.editor.setValue(data.value)
-            break;
-          case 'output':
-            this.appendConsole(data.value)
-            break;
-          case 'finish':
-            this.setLineGoThrough(this.pyshell.lineno.current)
-            this.pyshell.running = false
-            timeUsed = (data.value / 1000) + 's'
-            this.appendConsole('[Finished ' + timeUsed + ']')
-            break;
-          case 'restarted':
-            this.pyshell.restarting = false
-            this.pyshell.running = false
-            this.resetEditor()
-            this.$notify.success({
-              title: '重启内核',
-              message: '成功',
-              duration: 800,
-              offset: 100
-            })
-            this.runPython(this.generatePreloadCode())
-            break
-          default:
-            console.error('Unknown method', data.method)
-        }
+        //     // 下面这两行注释掉，因为会影响 "运行当前行" 功能中的自动跳到下一行的功能
+        //     // this.editor.selection.moveTo(lineNumber, 0) // 移动光标
+        //     // this.editor.scrollToLine(lineNumber) // 屏幕滚动到当前行
+        //     break;
+        //   case 'resetContent':
+        //     this.editor.setValue(data.value)
+        //     break;
+        //   case 'output':
+        //     this.appendConsole(data.value)
+        //     break;
+        //   case 'finish':
+        //     this.setLineGoThrough(this.pyshell.lineno.current)
+        //     this.pyshell.running = false
+        //     timeUsed = (data.value / 1000) + 's'
+        //     this.appendConsole('[Finished ' + timeUsed + ']')
+        //     break;
+        //   case 'restarted':
+        //     this.pyshell.restarting = false
+        //     this.pyshell.running = false
+        //     this.resetEditor()
+        //     this.$notify.success({
+        //       title: '重启内核',
+        //       message: '成功',
+        //       duration: 800,
+        //       offset: 100
+        //     })
+        //     this.runPython(this.generatePreloadCode())
+        //     break
+        //   default:
+        //     console.error('Unknown method', data.method)
+        // }
       }
       ws.onclose = () => {
         this.pyshell.wsOpen = false
         this.pyshell.ws = null
         this.pyshell.running = false
         // this.resetEditor()
-        console.log('websocket closed')
+        console.log('python关闭连接websocket closed')
       }
     },
+    // appendConsole(text) {
+    //   this.pyshell.consoleData.push({ lineno: this.pyshell.lineno.current, value: text })
+    //   setTimeout(() => {
+    //     const c = this.$refs.console
+    //     c.scrollTop = c.scrollHeight - c.clientHeight
+    //   }, 1)
+    // },
+    // setLineGoThrough(lineno) {
+    //   if (lineno >= 0) {
+    //     // this.editor.session.setBreakpoint(lineno, 'ace_code_exercised')
+    //   }
+    // },
     // wh-运行python
     runPython(code) {
       return new Promise((resolve, reject) => {
@@ -838,8 +827,9 @@ export default {
     },
     // 获取当前屏幕截图
     getCurrentScreen() {
-      this.$axios.get('/api/v1/devices/' + (this.deviceId || '-') + '/screenshot').then(res => {
+      return this.$axios.get('/api/v1/devices/' + (this.deviceId || '-') + '/screenshot').then(res => {
         var blob = b64toBlob(res.data, 'image/' + res.type);
+        this.screenLoading = false
         this.drawBlobImageToScreen(blob);
         this.dumpHierarchy().then(this.loadLiveScreen)
         localStorage.setItem('screenshotBase64', res.data);
@@ -849,32 +839,37 @@ export default {
     },
     // wh-连接手机
     doConnect() {
-      const params = `platform=${'Android'}&deviceUrl=${''}`
+      const params = `platform=${'Android'}&deviceUrl=${this.deviceUrl}`
       this.$axios.post('/api/v1/connect', params, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}).then(res => {
-
         this.deviceId = res.deviceId
         this.screenWebSocketUrl = res.screenWebSocketUrl
+        console.log(this.screenWebSocketUrl)
+        this.getCurrentScreen()
       }).catch(err => {
         console.log('err', err)
       })
     },
     // 绘制当前屏幕
     drawBlobImageToScreen(blob) {
-      // Support jQuery Promise
-      // var dtd = $.Deferred();
       var bgcanvas = this.canvas.bg;
       var fgcanvas = this.canvas.fg;
       var ctx = bgcanvas.getContext('2d');
-      var self = this;
+      // var self = this;
       var URL = window.URL || window.webkitURL;
       var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
       var img = this.imagePool.next()
       img.onload = function() {
-        fgcanvas.width = bgcanvas.width = img.width
-        fgcanvas.height = bgcanvas.height = img.height
-        // var screenDiv = document.getElementById('screen');
+        const w = fgcanvas.width = bgcanvas.width = img.width
+        const h = fgcanvas.height = bgcanvas.height = img.height
+        var screenDiv = document.getElementById('screen');
+        // ctx.drawImage(img, 0, 0, img.width, img.height);
+        // self.resizeScreen(img);
+        // const w = canvas.width = img.width
+        // const h = canvas.height = img.height
+        const r = w / h
+        screenDiv.style.width = Math.floor(500 * r) + 'px'
+        screenDiv.style.height = '430px'
         ctx.drawImage(img, 0, 0, img.width, img.height);
-        self.resizeScreen(img);
 
         // Try to forcefully clean everything to get rid of memory
         // leaks. Note self despite this effort, Chrome will still
@@ -908,15 +903,11 @@ export default {
     // wh-获取安卓屏幕结构
     dumpHierarchy() { // v2
       return this.$axios.get('/api/v2/devices/' + (this.deviceId || '-') + '/hierarchy').then(res => {
-        localStorage.setItem('xmlHierarchy', res.xmlHierarchy);
-        localStorage.setItem('jsonHierarchy', JSON.stringify(res.jsonHierarchy));
-        localStorage.setItem('activity', res.activity);
-        localStorage.setItem('packageName', res.packageName);
-        localStorage.setItem('windowSize', res.windowSize);
         this.activity = res.activity; // only for android
         this.packageName = res.packageName;
         this.drawAllNodeFromSource(res.jsonHierarchy);
-        this.nodeSelected = null;
+        this.activeMouseControl()
+        // this.nodeSelected = null;
       })
     },
     // wh-绘制所有安卓屏幕所有节点
@@ -1010,8 +1001,6 @@ export default {
         height: Math.floor(screenDiv.clientHeight) + 'px' // '100%',
       })
       // })
-
-
       // if (canvasRatio > screenRatio) {
       //   Object.assign(this.canvasStyle, {
       //     width: Math.floor(screenDiv.clientWidth) + 'px', //'100%',
@@ -1044,7 +1033,6 @@ export default {
         var ry = node.rect.height + ly;
         return lx < x && x < rx && ly < y && y < ry;
       }
-
       function nodeArea(node) {
         return node.rect.width * node.rect.height;
       }
@@ -1145,9 +1133,9 @@ export default {
         })
     },
     loadLiveScreen() {
+      console.log('---------------')
       var self = this;
-      var BLANK_IMG =
-        'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
       // var protocol = location.protocol == 'http:' ? 'ws://' : 'wss://'
       var ws = new WebSocket(this.screenWebSocketUrl);
       var canvas = document.getElementById('bgCanvas')
@@ -1156,7 +1144,7 @@ export default {
       self.loadLiveHierarchy() // 计算手机app所有元素的黑色框
       this.screenWebSocket = ws;
       ws.onopen = function(ev) {
-        console.log('screen websocket connected')
+        console.log('屏幕连接成功：screen websocket connected')
       };
       ws.onmessage = function(message) {
         var blob = new Blob([message.data], {
@@ -1167,7 +1155,7 @@ export default {
           canvas.width = img.width
           canvas.height = img.height
           ctx.drawImage(img, 0, 0, img.width, img.height);
-          self.resizeScreen(img);
+          // self.resizeScreen(img);
 
           // Try to forcefully clean everything to get rid of memory
           // leaks. Note self despite this effort, Chrome will still
@@ -1443,8 +1431,9 @@ export default {
     save() {
       this.$refs.actionInfo.validate(valid => {
         if (!valid) return
-        this.actionInfo.actionData = this.clickMobileApp
-        this.actionInfo.actionScript = this.generatedCode
+        this.actionInfo.sequence = this.clickMobileApp
+        this.actionInfo.script = this.generatedCode
+        this.actionInfo.builder = 'admin'
         console.log('保存', this.actionInfo)
         let url = ''
         if (this.$route.query.actionId) {
@@ -1453,13 +1442,18 @@ export default {
           url = 'action/add'
         }
         this.$http.post(url, this.actionInfo).then(res => {
-          if (res.code === 1) {
+          if (res.status_code === 200) {
             this.$message({
               type: 'success',
               message: '添加动作成功！'
             })
             this.$router.push({
               path: '/action'
+            })
+          } else {
+            this.$message({
+              type: 'error',
+              message: '添加动作失败！'
             })
           }
         })
@@ -1472,9 +1466,6 @@ export default {
 
 <style lang='less' scoped>
 .new-screen {
-  // height: 100%;
-  // overflow: hidden;
-  // .action-content{
     /deep/ .el-card__header{
       padding: 5px 10px 0px 10px;
     }
@@ -1496,17 +1487,13 @@ export default {
           clear: both
         }
         .action-btn{
-
-
         }
-
       }
       .box-card-top {
         height: 330px;
         overflow: hidden;
         .editor{
           .vue-codemirror{
-            // width: 100px;
             /deep/ .CodeMirror-scroll {
               padding-bottom: 0px;
               width: 100%;
@@ -1516,9 +1503,6 @@ export default {
           }
           /deep/ .CodeMirror-vscrollbar {
             overflow: hidden;
-          }
-          /deep/ .CodeMirror-sizer{
-            // border: none;
           }
         }
       }
@@ -1551,8 +1535,6 @@ export default {
             width: 830px;
             display: flex;
             margin: 0 auto;
-            // justify-content: center;
-            // align-items: flex-start;
             .row-wrap {
               display: flex;
               flex-direction: column;
@@ -1584,35 +1566,16 @@ export default {
               .red{
                 color: #D0021B;
               }
-              // p {
-              //   width: 46px;
-              //   height: 46px;
-              //   display: flex;
-              //   justify-content: center;
-              //   align-items: center;
-              //   border: 1px solid #DBDBDB;
-              //   text-align: center;
-              //   line-height: 46px;
-              //   border-radius: 5px;
-              //   span{
-              //     font-size: 24px;
-              //     color: #9B9B9B;
-              //   }
-              // }
             }
             .point-to{
               width: 30px;
               display: flex;
               justify-content: center;
-              // flex-wrap: wrap;
-              // text-align: center;
-              // width: 30px;
             }
         }
         /deep/ .action-sequence-content::-webkit-scrollbar{
             width:5px;
             height:5px;
-            // color: red;
           }
           /*正常情况下滑块的样式*/
          /deep/ .action-sequence-content::-webkit-scrollbar-thumb{
@@ -1655,8 +1618,9 @@ export default {
           padding: 10px;
         }
         .screen{
-          width: 100%;
+          // width: 100%;
           height: 430px;
+          margin: 0 auto;
           position: relative;
           overflow: hidden;
           display: flex;
@@ -1664,7 +1628,7 @@ export default {
           align-items: center;
           justify-content: center;
           flex: 1;
-          background-color: gray;
+          background-color: #4f4f4f;
           .canvas-fg {
             z-index: 1;
             position: absolute;
@@ -1673,6 +1637,15 @@ export default {
           .canvas-bg {
             z-index: 0;
             position: absolute;
+          }
+          .svgIcon{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            width: 101px;
+            height: 116px;
+            z-index: 333;
           }
         }
         .screenBottomBtn{
@@ -1706,7 +1679,5 @@ export default {
         }
       }
     }
-  // }
-
 }
 </style>

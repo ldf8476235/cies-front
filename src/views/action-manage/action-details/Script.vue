@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 10:22:08
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 13:51:59
+ * @LastEditTime: 2021-01-25 10:29:15
 -->
 <template>
   <div class="new-voice">
@@ -107,7 +107,7 @@ export default {
       cmMode: 'python', // codeMirror模式
       jsonIndentation: 2, // json编辑模式下，json格式化缩进 支持字符或数字，最大不超过10，默认缩进2个空格
       autoFormatJson: true, // json编辑模式下，输入框失去焦点时是否自动格式化，true 开启， false 关闭
-      generatedCode: 'asda  ↵asd↵ad↵ad↵adq', // 输入代码
+      generatedCode: '', // 输入代码
       cmOptions: {
         tabSize: 2, // Tab键空格数
         mode: 'python', // 模式
@@ -156,6 +156,7 @@ export default {
     };
   },
   mounted() {
+    codemirror.setValue('asda↵asd↵ad↵ad↵adq')
   },
   methods: {
     // 复制

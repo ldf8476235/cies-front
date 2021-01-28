@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-01-22 18:01:02
+ * @LastEditTime: 2021-01-25 10:14:54
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -141,33 +141,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <!-- <el-dialog title="配置环境" :visible.sync="dialogTableVisible">
-          <el-input v-model="keyword" placeholder='输入关键字'>
-            <el-button slot="append" @click="seach" icon="el-icon-search"></el-button>
-          </el-input>
-          <el-table :data="executeDeviceList">
-            <el-table-column  width="30">
-              <template slot-scope="scope">
-                <el-radio v-model="radio" :label="scope.$index">{{''}}</el-radio>
-              </template>
-            </el-table-column>
-            <el-table-column property="date" label="序号" type="index" width="50"></el-table-column>
-            <el-table-column property="date" label="执行机"></el-table-column>
-          </el-table>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogTableVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogTableVisible = false">确 定</el-button>
-          </div>
-          <PageUtil
-            ref="pageutil"
-            :total="total"
-            :pageSize="pageSize"
-            :currPage="currPage"
-            @handleSizeChange='handleSizeChange'
-            @handleCurrChange='handleCurrChange'
-          ></PageUtil>
-        </el-dialog> -->
-        <Dialog>
+        <Dialog :title='title'>
           <el-table slot='executeDevice' :data="executeDeviceList">
             <el-table-column  width="30">
               <template slot-scope="scope">
@@ -206,6 +180,7 @@ export default {
       total: 0,
       pageSize: 10,
       currPage: 1,
+      title: '配置环境',
       // 选择项内容
       options: [
         {
@@ -235,8 +210,6 @@ export default {
   methods: {
     // 执行机搜索关键字
     seach() {
-
-
     },
     format(percentage) {
       return percentage === 100 ? '' : '';

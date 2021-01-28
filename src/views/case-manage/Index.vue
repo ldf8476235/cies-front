@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-01-21 17:25:56
+ * @LastEditTime: 2021-01-28 10:09:53
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -59,22 +59,22 @@
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="caseName" label="用例名称" width="180">
+            <el-table-column prop="name" label="用例名称" width="180">
             </el-table-column>
-            <el-table-column prop="caseCite" label="引用" width="60">
+            <el-table-column prop="mount" label="引用" width="60">
               <template slot-scope='scope'>
                 <!-- <div>{{scope.row.caseCite.length}}</div> -->
               </template>
             </el-table-column>
-            <el-table-column prop="caseProject" label="所属项目" min-width="180">
+            <el-table-column prop="project" label="所属项目" min-width="140">
             </el-table-column>
-            <el-table-column prop="caseCreator" label="创建人" width="180">
+            <el-table-column prop="builder" label="创建人" width="180">
             </el-table-column>
-            <el-table-column prop="caseVersion" label="软件版本" width="140">
+            <el-table-column prop="version" label="软件版本" width="120">
             </el-table-column>
-            <el-table-column prop="createTime" label="创建时间" width="140">
+            <el-table-column prop="time_create" label="创建时间" width="180">
             </el-table-column>
-            <el-table-column prop="updateTime" label="更新时间" width="180">
+            <el-table-column prop="time_modify" label="更新时间" width="180">
             </el-table-column>
             <el-table-column prop="" label="操作" width="60">
               <template slot-scope="scope">
@@ -107,6 +107,8 @@
           :total="total"
           :pageSize="pageSize"
           :currPage="currPage"
+          @handleSizeChange='handleSizeChange'
+          @handleCurrChange='handleCurrChange'
         ></PageUtil>
 
       </div>
@@ -136,28 +138,17 @@ export default {
         {
           value: '选项2',
           label: '双皮奶'
-        },
-        {
-          value: '选项3',
-          label: '蚵仔煎'
-        },
-        {
-          value: '选项4',
-          label: '龙须面'
-        },
-        {
-          value: '选项5',
-          label: '北京烤鸭'
         }
       ],
       selectVal: '', // 选中项
       inputKey: '', // 搜索输入项
       caseList: [{}], // 任务列表
-      seachInfo: {} // 高级检索条件
+      seachInfo: {}, // 高级检索条件
+      delArr: [] // 批量删除的数据
     };
   },
   created() {
-    this.getCaseList()
+    this.getCaseList(this.currPage, this.pageSize)
   },
   mounted() {},
   methods: {
@@ -172,47 +163,75 @@ export default {
       console.log(this.seachInfo)
     },
     // 获取case列表
-    getCaseList() {
-      const url = 'case/list'
+    getCaseList(page, size) {
+      const url = `case/list/?page=${page}&count=${size}`
       this.$http.get(url).then(res => {
         console.log(res)
-        if (res.code === 1) {
-          this.caseList = res.data.list
+        if (res.status_code === 200) {
+          this.caseList = res.data.result
+          this.total = res.data.count
         }
       })
     },
     // 选择框
     handleSelectionChange(data) {
       this.delArr = data.map(item => {
-        return item.caseId
+        return item.uid
       })
       console.log(this.delArr)
     },
     // 批量删除
     deleteBatch() {
-      this.$http.post(`/case/batchDelete`, this.delArr).then(res => {
+      if (this.delArr.length === 0) {
+        this.$message({
+          type: 'warning',
+          message: '未选择删除数据！'
+        })
+        return
+      }
+      const data = {
+        uid: this.delArr
+      }
+      this.$http.delete(`case/del/`, { data }).then(res => {
         console.log(res)
-        if (res.code === 1) {
+        if (res.status_code === 200) {
           this.$message({
             type: 'success',
             message: '删除成功'
           })
-          this.getCaseList()
+          this.getCaseList(this.currPage, this.pageSize)
         }
       })
     },
     // 删除用例
     delCase(row) {
-      this.$http.delete(`/case/delete/${row.caseId}`).then(res => {
-        console.log(res)
-        if (res.code === 1) {
-          this.$message({
-            type: 'success',
-            message: '删除成功'
-          })
-          this.getCaseList()
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const url = 'case/del/'
+        const data = {
+          uid: [row.uid]
         }
+        console.log(data)
+        this.$http.delete(url, { data }).then(res => {
+          console.log(res)
+          if (res.status_code === 200) {
+            this.$message({
+              type: 'success',
+              message: '删除成功'
+            })
+            this.getCaseList(this.currPage, this.pageSize)
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
       })
+
     },
     // 复制用例
     copyCase() {
@@ -249,6 +268,17 @@ export default {
     // 新建用例
     goNewCase() {
       this.$router.push('/case/newcase');
+    },
+    // 当前页条数
+    handleSizeChange(size) {
+      this.pageSize = size
+      this.getCaseList(this.currPage, size)
+    },
+    // 当前页面
+    handleCurrChange(page) {
+      this.currPage = page
+      console.log(this.currPage)
+      this.getCaseList(page, this.pageSize)
     }
   }
 };

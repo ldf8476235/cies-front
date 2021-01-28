@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 18:05:18
+ * @LastEditTime: 2021-01-25 16:10:26
 -->
 <template>
   <div class="newTask">
@@ -97,7 +97,7 @@
                       <div  class="drag">
                         <svg-icon data_iconName = 'icon-grab'></svg-icon>
                       </div>
-                      <div @click="expand(scope.row,scope.$index)">
+                      <div v-if='scope.row.id' @click="expand(scope.row,scope.$index)">
                         <svg-icon v-if="iconFlag || iconIndex !== scope.$index" data_iconName = 'icon-start'></svg-icon>
                         <svg-icon v-else data_iconName = 'icon-arrow-down'></svg-icon>
                       </div>
@@ -327,7 +327,7 @@
               @handleCurrChange='handleCurrChange'
             ></PageUtil>
           </el-dialog>
-          <Dialog>
+          <Dialog :title='title'>
             <el-table slot='environment' :data="environmentList">
               <el-table-column  width="30">
                 <template slot-scope="scope">
@@ -361,6 +361,7 @@ export default {
         action: true,
         name: '新建任务'
       },
+      title: '新建任务',
       total: 0,
       pageSize: 10,
       currPage: 1,
@@ -478,7 +479,21 @@ export default {
       this.taskInfo.taskCase.splice(index, 1)
     },
     // 添加用例
-    addCase() {
+    addCase(index) {
+      console.log(index)
+      if (typeof index === 'number') {
+        this.taskInfo.taskCase[index].childrens.push(
+          {
+            case: '子用例',
+            loopTimes: '用例'
+          }
+        )
+      } else {
+        this.taskInfo.taskCase.push({
+          case: '用例',
+          loopTimes: '用例'
+        })
+      }
 
     },
     // 添加用例组
@@ -674,7 +689,7 @@ export default {
         // 'taskVersion': 'string'
       }
       this.$refs.taskInfo.validate((valid) => {
-        console.log(valid)
+        console.log(this.taskInfo)
         if (valid) {
           let url = ''
           const queryId = this.$route.query.editId

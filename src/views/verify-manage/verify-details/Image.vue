@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 14:22:34
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 15:27:32
+ * @LastEditTime: 2021-01-28 17:56:23
 -->
 <template>
   <div class="new-verify">
@@ -16,74 +16,74 @@
           <el-col :span="9">
             <el-row class="left">
               <el-col :span="24">
-                <p><span class='label'>校验点名称：</span><span>action_name_01</span></p>
+                <p><span class='label'>校验点名称：</span><span>{{verifyInfo.name}}</span></p>
               </el-col>
               <el-col :span="24">
-                <p><span class='label'>所属项目：</span><span>action_name_01</span></p>
+                <p><span class='label'>所属项目：</span><span>{{verifyInfo.project}}</span></p>
               </el-col>
               <el-col :span="24">
-                <p><span class='label'>软件版本：</span><span>action_name_01</span></p>
+                <p><span class='label'>软件版本：</span><span>{{verifyInfo.version}}</span></p>
               </el-col>
               <el-col :span="24">
-                <p><span class='label'>创建时间：</span><span>action_name_01</span></p>
+                <p><span class='label'>创建时间：</span><span>{{verifyInfo.time_create}}</span></p>
               </el-col>
               <el-col :span="24">
-                <p><span class='label'>修改时间：</span><span>action_name_01</span></p>
+                <p><span class='label'>修改时间：</span><span>{{verifyInfo.time_modify}}</span></p>
               </el-col>
               <el-col :span="24">
-                <p><span class='label'>创建人：</span><span>action_name_01</span></p>
+                <p><span class='label'>创建人：</span><span>{{verifyInfo.builder}}</span></p>
               </el-col>
               <el-col :span="24">
-                <p><span class='label'>校验点类型：</span><span>action_name_01</span></p>
+                <p><span class='label'>校验点类型：</span><span>{{verifyInfo.type}}</span></p>
               </el-col>
               <el-col :span="24">
-                <p><span class='label'>校验点描述：</span><span>action_name_01</span></p>
+                <p><span class='label'>校验点描述：</span><span>{{verifyInfo.desc}}</span></p>
               </el-col>
             </el-row>
             <el-row class="left-bottom">
               <!-- 图像 -->
-              <div v-if="selectVal === 'img'">
+              <div v-if="selectVal === 'Image'">
                 <el-col :span="24">
-                  <p><span class='label'>匹配结果：</span><span>action_name_01</span></p>
+                  <p><span class='label'>匹配结果：</span><span>{{verifyInfo.name}}</span></p>
                 </el-col>
                 <el-col :span="24">
                   <p><span class='label'>类型：</span><span>图像采集 </span><span> 校验范围</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>超时时间：</span><span>3000</span></p>
+                  <p><span class='label'>超时时间：</span><span>{{verifyInfo.timeout}}</span></p>
                 </el-col>
               </div>
               <!-- 文本 -->
-              <div v-if="selectVal === 'txt'">
+              <div v-if="selectVal === 'Text'">
                 <el-col :span="24">
-                  <p><span class='label'>文本内容：</span><span>3000</span></p>
+                  <p><span class='label'>文本内容：</span><span>{{verifyInfo.desc}}</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>匹配规则：</span><span>3000</span></p>
+                  <p><span class='label'>匹配规则：</span><span>{{verifyInfo.desc}}</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>匹配结果：</span><span>3000</span></p>
+                  <p><span class='label'>匹配结果：</span><span>{{verifyInfo.desc}}</span></p>
                 </el-col>
                 <el-col :span="24">
                   <p><span class='label'>类型：</span><span>图像采集 </span><span> 检验范围</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>超时时间：</span><span>3000</span></p>
+                  <p><span class='label'>超时时间：</span><span>{{verifyInfo.desc}}</span></p>
                 </el-col>
               </div>
               <!-- 页面 -->
-              <div v-if="selectVal === 'page'">
+              <div v-if="selectVal === 'U3'">
                 <el-col :span="24">
-                  <p><span class='label'>页面元素：</span><span>3000</span></p>
+                  <p><span class='label'>页面元素：</span><span>{{verifyInfo.element}}</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>页面内容：</span><span>3000</span></p>
+                  <p><span class='label'>页面内容：</span><span>{{verifyInfo.content}}</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>匹配结果：</span><span>3000</span></p>
+                  <p><span class='label'>匹配结果：</span><span>{{verifyInfo.regex_result}}</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>超时时间：</span><span>3000</span></p>
+                  <p><span class='label'>超时时间：</span><span>{{verifyInfo.timeout}}</span></p>
                 </el-col>
               </div>
             </el-row>
@@ -125,7 +125,7 @@ export default {
         name: '新建校验点'
       },
       screenLoading: true, // 屏幕未加载完成loading动画
-      selectVal: 'page', // 选中项
+      selectVal: 'U3', // 选中项
       verifyInfo: {},
       deviceId: 'android:',
       canvas: { // 画布
@@ -144,14 +144,25 @@ export default {
     this.imagePool = new ImagePool(100);
   },
   mounted() {
-    this.doConnect()
-    this.getCurrentScreen()
+    // this.doConnect()
+    // this.getCurrentScreen()
     this.canvas.bg = document.querySelector('#bgCanvas')
-    window.onresize = () => {
-      // this.resizeScreen()
-    }
+    this.getDetails()
   },
   methods: {
+    // 详情数据
+    getDetails() {
+      const uid = this.$route.query.detailsId
+      const url = `/verify/detail/?uid=${uid}`
+      this.$http.get(url).then(res => {
+        console.log(res)
+        if (res.status_code === 200) {
+          this.verifyInfo = res.data.result[0]
+        }
+        //
+
+      })
+    },
     // wh-连接手机
     doConnect() {
       const params = `platform=${'Android'}&deviceUrl=${''}`
@@ -287,6 +298,7 @@ export default {
         this.liveScreen = false;
       }
     },
+
     // 复制
     copy() {
       console.log('保存', this.verifyInfo)
