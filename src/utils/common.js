@@ -4,28 +4,26 @@
  * @Date: 2020-12-04 14:44:54
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-22 11:03:44
+ * @LastEditTime: 2021-01-29 09:44:51
  */
-// Copies a string to the clipboard. Must be called from within an
-// event handler such as click. May return false if it failed, but
-// this is not always possible. Browser support for Chrome 43+,
-// Firefox 42+, Safari 10+, Edge and IE 10+.
-// IE: The clipboard feature may be disabled by an administrator. By
-// default a prompt is shown the first time the clipboard is
-// used (per session).
+/**
+ * 将字符串复制到剪贴板。必须从事件处理程序(如单击)中调用。
+ * 如果失败，可能返回false，但这并不总是可能的。浏览器支持Chrome 43+，Firefox 42+， Safari 10+， Edge和IE 10+。
+ * IE:剪贴板功能可能被管理员禁用。默认情况下，在第一次使用剪贴板时(每次会话)会显示一个提示。
+*/
 export function copyToClipboard(text) {
   if (window.clipboardData && window.clipboardData.setData) {
-    // IE specific code path to prevent textarea being shown while dialog is visible.
+    // IE特定的代码路径，以防止文本区显示，而对话框是可见的。
     return clipboardData.setData('Text', text);
 
   } else if (document.queryCommandSupported && document.queryCommandSupported('copy')) {
     var textarea = document.createElement('textarea');
     textarea.textContent = text;
-    textarea.style.position = 'fixed'; // Prevent scrolling to bottom of page in MS Edge.
+    textarea.style.position = 'fixed'; // 在MS Edge中防止滚动到页面底部。
     document.body.appendChild(textarea);
     textarea.select();
     try {
-      return document.execCommand('copy'); // Security exception may be thrown by some browsers.
+      return document.execCommand('copy'); // 某些浏览器可能会抛出安全异常。
     } catch (ex) {
       console.warn('Copy to clipboard failed.', ex);
       return false;
@@ -49,7 +47,7 @@ ImagePool.prototype.next = function() {
     return image
   } else {
     if (this.counter >= this.size) {
-      // Reset for unlikely but theoretically possible overflow.
+      // 重置不太可能但理论上可能的溢出。
       this.counter = 0
     }
   }
@@ -57,7 +55,7 @@ ImagePool.prototype.next = function() {
   return this.images[this.counter++ % this.size]
 }
 
-// convert to blob data
+// 转换为blob数据
 export function b64toBlob(b64Data, contentType, sliceSize) {
   contentType = contentType || '';
   sliceSize = sliceSize || 512;

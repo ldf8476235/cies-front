@@ -4,11 +4,11 @@
  * @Date: 2021-01-22 10:21:56
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 11:21:36
+ * @LastEditTime: 2021-01-29 20:02:50
 -->
 <template>
   <div class="new-screen">
-    <Crumbs :crumbs='crumbs' @save='save'></Crumbs>
+    <Crumbs :crumbs='crumbs' @edit='edit' @copy='copy'></Crumbs>
     <div class="container">
       <div class="content">
         <el-row :gutter="20">
@@ -21,15 +21,15 @@
                       <span>动作信息</span>
                     </div>
                     <div class='action-base-info'>
-                      <p><span class='label'>动作名称：</span><span>action_name_1</span></p>
-                      <p><span class='label'>动作类型：</span><span>action_name_1</span></p>
-                      <p><span class='label'>所属项目：</span><span>action_name_1</span></p>
-                      <p><span class='label'>软件版本：</span><span>action_name_1</span></p>
-                      <p><span class='label'>超时时间：</span><span>action_name_1</span></p>
-                      <p><span class='label'>创建人：</span><span>action_name_1</span></p>
-                      <p><span class='label'>创建时间：</span><span>action_name_1</span></p>
-                      <p><span class='label'>更新时间：</span><span>action_name_1</span></p>
-                      <p><span class='label'>动作描述：</span><span>action_name_1</span></p>
+                      <p><span class='label'>动作名称：</span><span>{{actionInfo.name}}</span></p>
+                      <p><span class='label'>动作类型：</span><span>{{actionInfo.type}}</span></p>
+                      <p><span class='label'>所属项目：</span><span>{{actionInfo.project}}</span></p>
+                      <p><span class='label'>软件版本：</span><span>{{actionInfo.version}}</span></p>
+                      <p><span class='label'>超时时间：</span><span>{{actionInfo.timeout}}</span></p>
+                      <p><span class='label'>创建人：</span><span>{{actionInfo.builder}}</span></p>
+                      <p><span class='label'>创建时间：</span><span>{{actionInfo.time_create}}</span></p>
+                      <p><span class='label'>更新时间：</span><span>{{actionInfo.time_modify}}</span></p>
+                      <p><span class='label'>动作描述：</span><span>{{actionInfo.desc}}</span></p>
                     </div>
                   </el-card>
                 </el-col>
@@ -129,7 +129,7 @@
                                       <el-row>
                                         <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>区域：</span></el-col>
                                         <el-col :span='14'>
-                                          <span>{{citem.rect.x}},{{citem.rect.y}},{{citem.rect.width}},{{citem.rect.height}}</span>
+                                          <!-- <span>{{citem.rect.x}},{{citem.rect.y}},{{citem.rect.width}},{{citem.rect.height}}</span> -->
                                         </el-col>
                                       </el-row>
                                     </el-col>
@@ -307,6 +307,7 @@
 import CodeMirror from '../../../components/codemirror/Codemirror.vue'
 import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool } from '@/utils/common.js';
+import { GET } from '@/utils/api.js';
 export default {
 
   name: 'NewScreen',
@@ -315,6 +316,7 @@ export default {
     return {
       crumbs: {
         action: true,
+        details: true,
         name: '动作详情'
       },
       cmTheme: 'base16-light', // codeMirror主题
@@ -337,7 +339,7 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       actionInfo: {
-        actionType: 0
+        type: 'U3'
       },
       canvasStyle: { // 画布内联style
         opacity: 1,
@@ -406,14 +408,14 @@ export default {
   mounted() {
     this.canvas.bg = document.querySelector('#bgCanvas')
     this.deviceId = 'android:'
-    this.dumpHierarchy()
-    this.doConnect()
-    this.checkVersion()
-    this.getCurrentScreen()
+    // this.dumpHierarchy()
+    // this.doConnect()
+    // this.checkVersion()
+    // this.getCurrentScreen()
 
     // 编辑进入
-    const actionId = this.$route.query.actionId
-    if (actionId) {
+    const uid = this.$route.query.uid
+    if (uid) {
       this.editData()
     }
   },
@@ -425,12 +427,20 @@ export default {
   methods: {
     // 编辑
     editData() {
-      const actionData = this.$route.params.data
-      if (actionData) {
-        localStorage.setItem('actionData', JSON.stringify(actionData))
-      }
-      this.actionInfo = actionData || JSON.parse(localStorage.getItem('actionData'))
-      this.disposeActionSequence(this.actionInfo.actionData)
+      // const actionData = this.$route.params.data
+      // if (actionData) {
+      //   localStorage.setItem('actionData', JSON.stringify(actionData))
+      // }
+      // this.actionInfo = actionData || JSON.parse(localStorage.getItem('actionData'))
+      const uid = this.$route.query.uid
+      const url = `/action/detail/?uid=${uid}`
+      GET(url).then(res => {
+        console.log(res)
+        this.actionInfo = res.result[0]
+        this.generatedCode = this.actionInfo.script
+        this.disposeActionSequence(this.actionInfo.sequence)
+      })
+
     },
     // 点击按钮外部区域，隐藏元素
     onClickOutside() {
@@ -439,13 +449,14 @@ export default {
     // 处理动作序列数据
     disposeActionSequence(data) {
       const arr = []
-      // actionSequence
-      const len = data.length
-      for (let i = 0; i < len;) {
-        arr.push(data.slice(i, i += 10))
-      }
-      this.actionSequence = arr
 
+      // const sequence = JSON.parse(JSON.stringify(data))
+      console.log(data)
+      // const len = sequence.length
+      // for (let i = 0; i < len;) {
+      //   arr.push(sequence.slice(i, i += 10))
+      // }
+      // this.actionSequence = arr
     },
     // 元素节点点击事件
     itemClick(a, b) {
@@ -638,30 +649,9 @@ export default {
           return 'el-icon-s-promotion'
       }
     },
-    save() {
-      this.$refs.actionInfo.validate(valid => {
-        if (!valid) return
-        this.actionInfo.actionData = this.clickMobileApp
-        this.actionInfo.actionScript = this.generatedCode
-        console.log('保存', this.actionInfo)
-        let url = ''
-        if (this.$route.query.actionId) {
-          url = 'action/update'
-        } else {
-          url = 'action/add'
-        }
-        this.$http.post(url, this.actionInfo).then(res => {
-          if (res.code === 1) {
-            this.$message({
-              type: 'success',
-              message: '添加动作成功！'
-            })
-            this.$router.push({
-              path: '/action'
-            })
-          }
-        })
-      })
+    copy() {},
+    edit() {
+
 
     }
   }

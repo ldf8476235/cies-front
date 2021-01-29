@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 10:30:22
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-21 17:46:32
+ * @LastEditTime: 2021-01-29 14:32:03
 -->
 <template>
   <div class="case-details">
@@ -16,25 +16,25 @@
           <div class="caseInfo">
             <el-row class="">
               <el-col :span="12">
-                <p><span>用例名称：</span><span>case_name_1</span></p>
+                <p><span>用例名称：</span><span class="width-span">{{caseInfo.name}}</span></p>
               </el-col>
               <el-col :span="12">
-                <p><span>软件版本：</span><span>case_name_1</span></p>
+                <p><span>软件版本：</span><span class="width-span">{{caseInfo.version}}</span></p>
               </el-col>
               <el-col :span="12">
-                <p><span>所属项目：</span><span>case_name_1</span></p>
+                <p><span>所属项目：</span><span class="width-span">{{caseInfo.project}}</span></p>
               </el-col>
               <el-col :span="12">
-                <p><span>创建人：</span><span>case_name_1</span></p>
+                <p><span>创建人：</span><span class="width-span">{{caseInfo.builder}}</span></p>
               </el-col>
               <el-col :span="12">
-                <p><span>创建时间：</span><span>case_name_1</span></p>
+                <p><span>创建时间：</span><span class="width-span">{{caseInfo.time_create}}</span></p>
               </el-col>
               <el-col :span="12">
-                <p><span>更新时间：</span><span>case_name_1</span></p>
+                <p><span>更新时间：</span><span class="width-span">{{caseInfo.time_modify}}</span></p>
               </el-col>
               <el-col :span="12">
-                <p><span>用例描述：</span><span>case_name_1</span></p>
+                <p><span>用例描述：</span><span class="width-span">{{caseInfo.desc}}</span></p>
               </el-col>
             </el-row>
           </div>
@@ -42,7 +42,7 @@
             <div class="action-list-title">动作列表</div>
             <el-table
               width="100%"
-              :data="caseInfo.caseInfoTable"
+              :data="caseInfo.action"
               class="borderTop"
               >
               <el-table-column
@@ -59,23 +59,23 @@
               </el-table-column>
               <el-table-column label="动作名称">
                 <template slot-scope="scope">
-                  <span> {{scope.row.nodeName}}</span>
+                  <span> {{scope.row.name}}</span>
                 </template>
               </el-table-column>
               <el-table-column label="循环次数">
                 <template slot-scope="scope">
-                  <span> {{scope.row.loopTimes}}</span>
+                  <span> {{scope.row.loop_count}}12</span>
                 </template>
               </el-table-column>
               <el-table-column label="出错处理">
                 <template slot-scope="scope">
-                  <span> {{scope.row.loopTimes}}跳出</span>
+                  <span> {{scope.row.error}}跳出</span>
                 </template>
               </el-table-column>
 
               <el-table-column label="执行后等待">
                 <template slot-scope="scope">
-                  <span>{{scope.row.loopTimes}}无处理</span>
+                  <span>{{scope.row.execute_wait}}无处理</span>
                 </template>
               </el-table-column>
               <el-table-column label="执行位置">
@@ -92,6 +92,7 @@
 </template>
 
 <script>
+import { GET } from '@/utils/api.js';
 export default {
   name: 'CaseDetails',
   data() {
@@ -99,37 +100,45 @@ export default {
       crumbs: {
         action: true,
         details: true,
-        name: 'case_name_1'
+        name: ''
       },
       caseInfo: {
-        caseInfoTable: [
-          {
-            editNode: false,
-            editLoop: false,
-            nodeName: '节点名称1',
-            loopTimes: 10,
-            error: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134'
-          },
-          {
-            editNode: false,
-            editLoop: false,
-            nodeName: '节点名称2',
-            loopTimes: 10,
-            error: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134'
-          }
+        action: [
+          // {
+          //   editNode: false,
+          //   editLoop: false,
+          //   nodeName: '节点名称1',
+          //   loop_count: 10,
+          //   error: '123',
+          //   overtime: 'asdasd',
+          //   executeWait: 'aq2134'
+          // },
+          // {
+          //   editNode: false,
+          //   editLoop: false,
+          //   nodeName: '节点名称2',
+          //   loop_count: 10,
+          //   error: '123',
+          //   overtime: 'asdasd',
+          //   executeWait: 'aq2134'
+          // }
         ]
       }
     };
   },
-  computed: {
-  },
-  watch: {
+  mounted() {
+    this.getDetails()
   },
   methods: {
+    // 获取详情
+    getDetails() {
+      const uid = this.$route.query.uid
+      const url = `case/detail/?uid=${uid}`
+      GET(url).then(data => {
+        this.caseInfo = data.result[0]
+        this.crumbs.name = this.caseInfo.name
+      })
+    },
     // 复制
     copy() {
       console.log('复制')
@@ -176,6 +185,10 @@ export default {
           display: inline-block;
           width: 60px;
           text-align: right;
+        }
+        .width-span{
+          width: 80%;
+          text-align: left;
         }
       }
       .el-input {

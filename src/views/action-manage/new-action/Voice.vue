@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-19 11:25:19
+ * @LastEditTime: 2021-01-29 19:33:38
 -->
 <template>
   <div class="new-voice">
@@ -22,17 +22,17 @@
             <div class="voiceInfo">
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="动作名称：" prop="actionName">
+                  <el-form-item label="动作名称：" prop="name">
                     <el-input
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
-                      v-model.trim="voiceInfo.actionName"
+                      v-model.trim="voiceInfo.name"
                       placeholder="输入动作名称"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="actionProject">
-                    <el-select v-model="voiceInfo.actionProject" placeholder="选择所属项目">
+                  <el-form-item label="所属项目：" prop="project">
+                    <!-- <el-select v-model="voiceInfo.project" placeholder="选择所属项目">
                       <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -40,7 +40,12 @@
                         :value="item.value"
                       >
                       </el-option>
-                    </el-select>
+                    </el-select> -->
+                    <el-input
+                      :suffix-icon="loading ? 'el-icon-loading' : ''"
+                      v-model.trim="voiceInfo.name"
+                      placeholder="输入所属项目"
+                    ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
@@ -49,18 +54,18 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：" prop="actionVersion">
+                  <el-form-item label="软件版本：" prop="version">
                     <el-input
-                      v-model="voiceInfo.actionVersion"
+                      v-model="voiceInfo.version"
                       placeholder="输入软件版本"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="语料库：" prop="actionCorpus">
-                    <el-select v-model="voiceInfo.actionCorpus" placeholder="选择语料库">
+                  <el-form-item label="语料库：" prop="corpus">
+                    <el-select v-model="voiceInfo.corpus" placeholder="选择语料库">
                       <el-option
-                        v-for="item in options"
+                        v-for="item in corpusList"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value"
@@ -70,19 +75,19 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="超时时间：" prop="actionTimeout">
+                  <el-form-item label="超时时间：" prop="timeout">
                     <el-input
-                      v-model="voiceInfo.actionTimeout"
+                      v-model="voiceInfo.timeout"
                       placeholder="输入超时时长"
                     ></el-input>
                   </el-form-item>
                 </el-col>
 
                 <el-col :span="12">
-                  <el-form-item label="动作描述：" prop="actionDesc">
+                  <el-form-item label="动作描述：" prop="desc">
                     <el-input
                       type="textarea"
-                      v-model="voiceInfo.actionDesc"
+                      v-model="voiceInfo.desc"
                       placeholder="输入动作描述"
                     ></el-input>
                   </el-form-item>
@@ -98,7 +103,7 @@
               </el-row>
               <el-table
                 width="100%"
-                border
+               class="borderTop"
                 :data="voiceInfo.actionData"
                 >
                 <el-table-column
@@ -163,7 +168,7 @@
                       placement="bottom"
                       width="100"
                       trigger="click">
-                      <p @click="showFuncBtn(scope.row)">
+                      <p @click="insertVoice(scope.row)">
                         <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
                         <span>插入语音</span>
                       </p>
@@ -182,6 +187,20 @@
               </el-row>
             </div>
           </el-form>
+          <Dialog ref='dialog' :title='title' @confirm='confirm'>
+            <el-table slot='voice' :data="voiceList">
+              <el-table-column label="" align="center" width="40">
+                <template slot-scope="scope">
+                  <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.uid"></el-radio>
+                </template>
+              </el-table-column>
+              <el-table-column property="" label="序号" width="50" type="index"></el-table-column>
+              <el-table-column property="type" label="类型" width="50"></el-table-column>
+              <el-table-column property="name" label="动作名称"></el-table-column>
+              <el-table-column property="builder" label="创建人" width="100"></el-table-column>
+              <el-table-column property="time_create" label="创建时间" width="140"></el-table-column>
+            </el-table>
+          </Dialog>
         </div>
       </div>
     </div>
@@ -189,15 +208,21 @@
 </template>
 
 <script>
+import { GET, POST } from '@/utils/api.js';
+import Dialog from '@/components/config-dialog/Dialog.vue';
 export default {
   name: 'NewVoice',
+  components: {
+    Dialog
+  },
   data() {
     return {
       crumbs: {
         action: true,
         name: '新建动作'
       },
-      loading: true, // 任务名称动态验证动画
+      title: '语音列表',
+      loading: false, // 任务名称动态验证动画
       options: [
         {
           value: '选项1',
@@ -211,7 +236,8 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       voiceInfo: {
-        actionType: 1,
+        type: 'Voice',
+        corpus: 'corpus',
         actionData: [
           {
             voiceName: '节点名称1',
@@ -224,26 +250,35 @@ export default {
         ]
       },
       rulesCaseInfo: {
-        actionName: [
+        name: [
           { required: true, message: '请输入动作名称', trigger: 'blur' }
         ],
-        actionProject: [
+        project: [
           { required: true, message: '请选择所属项目', trigger: 'blur' }
         ],
-        actionVersion: [
+        version: [
           { required: true, message: '请输入软件版本', trigger: 'blur' }
         ],
-        actionTimeout: [
+        timeout: [
           { required: true, message: '请输入超时时长', trigger: 'blur' }
         ],
-        actionCorpus: [
+        corpus: [
           { required: true, message: '请选择语料库', trigger: 'blur' }
         ],
-        actionDesc: [
+        desc: [
           { required: true, message: '请输入动作描述', trigger: 'blur' }
         ],
         actionData: {}
-      }
+      },
+      corpusList: [// 语料库
+        {
+          label: 'corpus',
+          value: 'corpus'
+        }
+      ],
+      voiceList: [ // 语音列表
+
+      ]
     };
   },
   computed: {
@@ -251,33 +286,76 @@ export default {
   watch: {
   },
   methods: {
+    // 获取语音列表
+    getVoiceList() {
+      const url = ''
+      GET(url).then(res => {
+        this.voiceList = res.data
+      })
+    },
     inputBlur() {
 
     },
+    // 选择语音
+    radioItem(row) {
+      console.log(row)
+      this.radioData = row
+    },
     // 修改语音名称
     tabDblClick() {},
-    addVoiceRow() {},
+    addVoiceRow() {
+      this.$refs.dialog.dialogTableVisible = true
+      this.insertIndex = this.voiceInfo.actionData.length
+    },
+    // 插入语音
+    insertVoice() {
+
+    },
+    // 确认添加数据
+    confirm() {
+      console.log('确认添加数据')
+      console.log(this.insertIndex, this.radioData)
+      if (!this.radioData.name) {
+        this.$hintMsg('warning', '未选择动作')
+        return
+      }
+      const data = {
+        editLoop: false,
+        uid: this.radioData.uid,
+        name: this.radioData.name,
+        type: this.radioData.type,
+        timeout: 0,
+        errorDispose: '123',
+        overtime: 'asdasd',
+        executeWait: 'aq2134',
+        selectFlag: false
+      }
+      this.caseInfo.action.splice(this.insertIndex + 1, 0, data)
+      this.radio = ''
+    },
     save() {
       this.$refs.voiceInfo.validate(valid => {
         if (!valid) return
         console.log('保存', this.voiceInfo)
         const url = 'action/add'
-        this.$http.post(url, this.voiceInfo).then(res => {
-          console.log(res)
-          if (res.code === 1) {
-            this.$message({
-              type: 'success',
-              message: '添加动作成功！'
-            })
-            this.$router.push({
-              path: '/action'
-            })
-          } else if (res.code === 2) {
-            this.$message({
-              type: 'error',
-              message: res.msg
-            })
-          }
+        const methods = 'POST'
+        POST(url, methods, this.voiceInfo).then(res => {
+          this.$hintMsg('success', '添加动作成功！')
+          // console.log(res)
+          // if (res.code === 1) {
+          //   this.$message({
+          //     type: 'success',
+          //     message: '添加动作成功！'
+          //   })
+          //   this.$router.push({
+          //     path: '/action'
+          //   })
+          // } else if (res.code === 2) {
+          //   this.$message({
+          //     type: 'error',
+          //     message: res.msg
+          //   })
+          // }
         })
       })
     }

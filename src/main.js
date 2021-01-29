@@ -1,7 +1,7 @@
 /*
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2021-01-22 15:51:14
+ * @LastEditTime: 2021-01-29 14:16:10
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\main.js
@@ -11,7 +11,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 // 引入axios请求
-import axios from './axios/api.js'
+import axios from './axios/axios.js'
 Vue.prototype.$axios = axios
 // 引入全局基础样式
 import './assets/css/global.css'
@@ -51,9 +51,12 @@ window.JSHINT = jshint.JSHINT;
 // 引入流程图插件
 import jsPlumb from 'jsplumb'
 Vue.prototype.$jsPlumb = jsPlumb.jsPlumb
-
+// 引入常用的函数
+import { hintMsg } from '@/utils/utils.js'
+Vue.prototype.$hintMsg = hintMsg
 // 引入svg图标
 import './icon-svg/index.js'
+// import { from } from 'core-js/fn/array'
 // 注册一个全局自定义指令 `v-focus`
 Vue.directive('focus', {
   // 当被绑定的元素插入到 DOM 中时……

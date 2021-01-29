@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-25 16:10:26
+ * @LastEditTime: 2021-01-29 19:22:32
 -->
 <template>
   <div class="newTask">
@@ -22,25 +22,25 @@
             <div class="taskInfo">
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="任务名称：" prop="taskName">
+                  <el-form-item label="任务名称：" prop="name">
                     <el-input
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
-                      v-model.trim="taskInfo.taskName"
+                      v-model.trim="taskInfo.name"
                       placeholder="输入任务名称"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：" prop="taskVersion">
+                  <el-form-item label="软件版本：" prop="version">
                     <el-input
-                      v-model="taskInfo.taskVersion"
+                      v-model="taskInfo.version"
                       placeholder="输入软件版本"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="taskProject">
-                    <el-select v-model="taskInfo.taskProject" placeholder="选择所属项目">
+                  <el-form-item label="所属项目：" prop="project">
+                    <!-- <el-select v-model="taskInfo.project" placeholder="选择所属项目">
                       <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -48,12 +48,16 @@
                         :value="item.value"
                       >
                       </el-option>
-                    </el-select>
+                    </el-select> -->
+                    <el-input
+                      v-model="taskInfo.project"
+                      placeholder="输入所属项目"
+                    ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="指派人：" prop="taskAssign">
-                    <el-select v-model="taskInfo.taskAssign" placeholder="选择指派人">
+                  <el-form-item label="指派人：" prop="builder">
+                    <!-- <el-select v-model="taskInfo.taskAssign" placeholder="选择指派人">
                       <el-option
                         v-for="item in options"
                         :key="item.value"
@@ -61,14 +65,18 @@
                         :value="item.value"
                       >
                       </el-option>
-                    </el-select>
+                    </el-select> -->
+                    <el-input
+                      v-model="taskInfo.builder"
+                      placeholder="输入所属项目"
+                    ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="任务描述：">
+                  <el-form-item label="任务描述：" prop='desc'>
                     <el-input
                       type="textarea"
-                      v-model="taskInfo.taskDesc"
+                      v-model="taskInfo.desc"
                       placeholder="输入任务描述"
                     ></el-input>
                   </el-form-item>
@@ -86,7 +94,7 @@
                 width="100%"
                 class="borderStyle"
                 ref="refTable"
-                :data="taskInfo.taskCase"
+                :data="taskInfo.case_list"
                 row-key="id"
                 >
                 <el-table-column
@@ -128,7 +136,7 @@
                         </el-table-column>
                         <el-table-column label="用例组" prop="caseGroup">
                         </el-table-column>
-                        <el-table-column label="用例组" prop="loopTimes">
+                        <el-table-column label="用例组" prop="loop_count">
 
                         </el-table-column>
                         <el-table-column label="用例组" prop="error">
@@ -137,7 +145,7 @@
                         <el-table-column label="用例组" prop="caseGroup">
 
                         </el-table-column>
-                        <el-table-column label="用例组" prop="loopTimes">
+                        <el-table-column label="用例组" prop="loop_count">
 
                         </el-table-column>
                         <el-table-column label="操作" align="center" width="80">
@@ -166,8 +174,8 @@
                 <el-table-column label="用例组">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.caseGroup'"
-                      :rules="rulesTaskInfo.taskCase.caseGroup"
+                      :prop="'case_list.' + scope.$index + '.caseGroup'"
+                      :rules="rulesTaskInfo.case_list.caseGroup"
                       label-width="0px"
                       >
                       <span v-if="scope.row.editCaseGroup">
@@ -185,8 +193,8 @@
                 <el-table-column label="用例">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.case'"
-                      :rules="rulesTaskInfo.taskCase.case"
+                      :prop="'case_list.' + scope.$index + '.name'"
+                      :rules="rulesTaskInfo.case_list.name"
                       label-width="0px"
                     >
                       <span v-if="scope.row.editCase">
@@ -197,40 +205,40 @@
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.case}} </span>
+                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.name}} </span>
                     </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="循环次数">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.loopTimes'"
-                      :rules="rulesTaskInfo.taskCase.loopTimes"
+                      :prop="'case_list.' + scope.$index + '.loop_count'"
+                      :rules="rulesTaskInfo.case_list.loop_count"
                       label-width="0px"
                     >
                       <span v-if="scope.row.editLoop">
                         <el-input
                           ref="inputBlur"
-                          v-model="scope.row.loopTimes"
+                          v-model="scope.row.loop_count"
                           placeholder=""
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}} </span>
+                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loop_count}} </span>
                     </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="出错处理">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.error'"
-                      :rules="rulesTaskInfo.taskCase.error"
+                      :prop="'case_list.' + scope.$index + '.error'"
+                      :rules="rulesTaskInfo.case_list.error"
                       label-width="0px"
                     >
                       <span v-if="true">
-                        <el-select v-model="selectVal" placeholder="请选择">
+                        <el-select v-model="scope.row.error" placeholder="请选择">
                           <el-option
-                            v-for="item in options"
+                            v-for="item in errorList"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
@@ -245,13 +253,13 @@
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.executeWait'"
-                      :rules="rulesTaskInfo.taskCase.executeWait"
+                      :prop="'case_list.' + scope.$index + '.executeWait'"
+                      :rules="rulesTaskInfo.case_list.executeWait"
                       label-width="0px"
                     >
-                      <el-select v-model="selectVal" placeholder="请选择">
+                      <el-select v-model="scope.row.executeWait" placeholder="请选择">
                         <el-option
-                          v-for="item in options"
+                          v-for="item in executeWaitList"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value"
@@ -288,9 +296,9 @@
               </el-table>
               <el-row class="add-node">
                 <el-col>
-                  <el-button type="" @click="addCaseGroup">
+                  <!-- <el-button type="" @click="addCaseGroup">
                     <i class="el-icon-plus"></i> 添加用例组
-                  </el-button>
+                  </el-button> -->
                   <el-button type="" @click="addCase">
                     <i class="el-icon-plus"></i> 添加用例
                   </el-button>
@@ -298,47 +306,18 @@
               </el-row>
             </div>
           </el-form>
-          <el-dialog title="配置环境" :visible.sync="dialogTableVisible">
-            <el-input v-model="keyword" placeholder='输入关键字'>
-              <el-button slot="append" @click="seach" icon="el-icon-search"></el-button>
-            </el-input>
-            <el-table :data="environmentList">
-              <el-table-column  width="30">
+          <Dialog ref='dialog' :title='title' @confirm='confirm'>
+            <el-table slot='environment' :data="caseList">
+              <el-table-column label="" align="center" width="30">
                 <template slot-scope="scope">
-                  <el-radio v-model="radio" :label="scope.$index">{{''}}</el-radio>
+                  <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.uid"></el-radio>
                 </template>
               </el-table-column>
               <el-table-column property="date" label="序号" type="index" width="50"></el-table-column>
-              <el-table-column property="date" label="动作名称" width="200"></el-table-column>
-              <el-table-column property="name" label="创建人" width="100"></el-table-column>
-              <el-table-column property="address" label="创建时间"></el-table-column>
-              <el-table-column property="address" label="软件版本"></el-table-column>
-            </el-table>
-            <div slot="footer" class="dialog-footer">
-              <el-button @click="dialogTableVisible = false">取 消</el-button>
-              <el-button type="primary" @click="dialogTableVisible = false">确 定</el-button>
-            </div>
-            <PageUtil
-              ref="pageutil"
-              :total="total"
-              :pageSize="pageSize"
-              :currPage="currPage"
-              @handleSizeChange='handleSizeChange'
-              @handleCurrChange='handleCurrChange'
-            ></PageUtil>
-          </el-dialog>
-          <Dialog :title='title'>
-            <el-table slot='environment' :data="environmentList">
-              <el-table-column  width="30">
-                <template slot-scope="scope">
-                  <el-radio v-model="radio" :label="scope.$index">{{''}}</el-radio>
-                </template>
-              </el-table-column>
-              <el-table-column property="date" label="序号" type="index" width="50"></el-table-column>
-              <el-table-column property="date" label="动作名称" width="200"></el-table-column>
-              <el-table-column property="name" label="创建人" width="100"></el-table-column>
-              <el-table-column property="address" label="创建时间"></el-table-column>
-              <el-table-column property="address" label="软件版本"></el-table-column>
+              <el-table-column property="name" label="用例名称" width="200"></el-table-column>
+              <el-table-column property="builder" label="创建人" width="100"></el-table-column>
+              <el-table-column property="time_create" label="创建时间"></el-table-column>
+              <el-table-column property="verison" label="软件版本"></el-table-column>
             </el-table>
           </Dialog>
         </div>
@@ -350,6 +329,7 @@
 <script>
 import Dialog from '@/components/config-dialog/Dialog.vue';
 import Sortable from 'sortablejs';
+import { GET, POST } from '@/utils/api.js';
 export default {
   name: 'NewTask',
   components: {
@@ -361,7 +341,7 @@ export default {
         action: true,
         name: '新建任务'
       },
-      title: '新建任务',
+      title: '用例列表',
       total: 0,
       pageSize: 10,
       currPage: 1,
@@ -379,71 +359,78 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       taskInfo: {
-        'taskAssign': '',
-        'taskDesc': '',
-        'taskId': 0,
-        'taskName': '',
-        'taskProject': '',
-        'taskVersion': '',
-        taskCase: [
-          {
-            id: '1',
-            editCaseGroup: false,
-            editLoop: false,
-            caseGroup: '节点名称1',
-            loopTimes: 11,
-            error: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134',
-            childrens: [
-              {
-                id: '101',
-                editCaseGroup: false,
-                editLoop: false,
-                caseGroup: '',
-                loopTimes: 11,
-                error: '123',
-                overtime: 'asdasd',
-                executeWait: 'aq2134'
-              },
-              {
-                id: '102',
-                editCaseGroup: false,
-                editLoop: false,
-                caseGroup: '',
-                loopTimes: 12,
-                error: '1qwe',
-                overtime: 'asdasd',
-                executeWait: 'aq2134'
-              }
-            ]
-          }
+
+        case_list: [
+          // {
+          //   id: '1',
+          //   editCaseGroup: false,
+          //   editLoop: false,
+          //   caseGroup: '节点名称1',
+          //   loop_count: 11,
+          //   error: '123',
+          //   overtime: 'asdasd',
+          //   executeWait: 'aq2134',
+          //   childrens: [
+          //     {
+          //       id: '101',
+          //       editCaseGroup: false,
+          //       editLoop: false,
+          //       caseGroup: '',
+          //       loop_count: 11,
+          //       error: '123',
+          //       overtime: 'asdasd',
+          //       executeWait: 'aq2134'
+          //     },
+          //     {
+          //       id: '102',
+          //       editCaseGroup: false,
+          //       editLoop: false,
+          //       caseGroup: '',
+          //       loop_count: 12,
+          //       error: '1qwe',
+          //       overtime: 'asdasd',
+          //       executeWait: 'aq2134'
+          //     }
+          //   ]
+          // }
         ]
       },
       rulesTaskInfo: {
-        taskName: [
+        name: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
         ],
-        taskAssign: [
+        builder: [
           { required: true, message: '请选择指派人', trigger: 'blur' }
         ],
-        taskProject: [
+        project: [
           { required: true, message: '请选择所属项目', trigger: 'blur' }
         ],
-        taskVersion: [
+        version: [
           { required: true, message: '请输入软件版本', trigger: 'blur' }
         ],
-        taskDesc: [
+        desc: [
           { required: true, message: '请输入任务描述', trigger: 'blur' }
         ],
-        taskCase: {}
+        case_list: {}
       },
       iconFlag: true, // 折叠图标标识
       iconIndex: null,
       dialogTableVisible: false,
-      environmentList: [{}, {}],
+      caseList: [{}, {}],
       radio: '1',
-      keyword: '' // 环境配置搜索关键字
+      keyword: '', // 环境配置搜索关键字
+      executeWaitList: [
+        {
+          lable: '--',
+          value: '--'
+        }
+      ],
+      errorList: [
+        {
+          label: '无处理',
+          value: '无处理'
+        }
+      ]
 
     }
   },
@@ -453,8 +440,48 @@ export default {
     if (queryId) {
       this.edit()
     }
+    this.getCaseList(this.currPage, this.pageSize)
   },
   methods: {
+    // 获取用例列表
+    getCaseList(page, size) {
+      const url = `case/list/?page=${page}&count=${size}`
+      GET(url).then(res => {
+        this.caseList = res.result
+        this.total = res.count
+      })
+    },
+    // 选择动作
+    radioItem(row) {
+      console.log(row)
+      this.radioData = row
+    },
+    // 取消插入动作
+    cancelAddAction() {
+      this.radio = ''
+    },
+    // 确认添加数据
+    confirm() {
+      console.log('确认添加数据')
+      console.log(this.insertIndex, this.radioData)
+      if (!this.radioData.name) {
+        this.$hintMsg('warning', '未选择动作')
+        return
+      }
+      const data = {
+        editLoop: false,
+        uid: this.radioData.uid,
+        name: this.radioData.name,
+        // type: this.radioData.type,
+        loop_count: 1,
+        timeout: 0,
+        error: '无处理',
+        executeWait: '--',
+        selectFlag: false
+      }
+      this.taskInfo.case_list.splice(this.insertIndex + 1, 0, data)
+      this.radio = ''
+    },
     // 获取环境列表
     getEnvironmentList() {},
     seach() {
@@ -476,24 +503,26 @@ export default {
     },
     // 删除用例组
     delCaseGroup(index) {
-      this.taskInfo.taskCase.splice(index, 1)
+      this.taskInfo.case_list.splice(index, 1)
     },
     // 添加用例
     addCase(index) {
-      console.log(index)
-      if (typeof index === 'number') {
-        this.taskInfo.taskCase[index].childrens.push(
-          {
-            case: '子用例',
-            loopTimes: '用例'
-          }
-        )
-      } else {
-        this.taskInfo.taskCase.push({
-          case: '用例',
-          loopTimes: '用例'
-        })
-      }
+      // console.log(index)
+      // if (typeof index === 'number') {
+      //   this.taskInfo.case_list[index].childrens.push(
+      //     {
+      //       case: '子用例',
+      //       loop_count: '用例'
+      //     }
+      //   )
+      // } else {
+      //   this.taskInfo.case_list.push({
+      //     case: '用例',
+      //     loop_count: '用例'
+      //   })
+      // }
+      this.$refs.dialog.dialogTableVisible = true
+      this.insertIndex = this.taskInfo.case_list.length
 
     },
     // 添加用例组
@@ -506,9 +535,9 @@ export default {
         id: Math.random() + new Date().getTime()
       }
       if (typeof index === 'number') {
-        this.taskInfo.taskCase.splice(index + 1, 0, data)
+        this.taskInfo.case_list.splice(index + 1, 0, data)
       } else {
-        this.taskInfo.taskCase.push(data)
+        this.taskInfo.case_list.push(data)
       }
     },
     // 拖动事件
@@ -549,7 +578,7 @@ export default {
           // 开始拖拽的时候
           onStart: function(evt) {
             console.log('evt:')
-            self.taskInfo.taskCase.forEach((item) => {
+            self.taskInfo.case_list.forEach((item) => {
               self.$refs.refTable.toggleRowExpansion(item, false)
             })
             self.iconFlag = true
@@ -559,9 +588,9 @@ export default {
             if (newIndex === oldIndex) return
             console.log(newIndex, oldIndex)
             // 修改data中的数组，
-            const targetRow = self.taskInfo.taskCase.splice(oldIndex, 1)[0]
-            self.taskInfo.taskCase.splice(newIndex, 0, targetRow)
-            console.log(self.taskInfo.taskCase)
+            const targetRow = self.taskInfo.case_list.splice(oldIndex, 1)[0]
+            self.taskInfo.case_list.splice(newIndex, 0, targetRow)
+            console.log(self.taskInfo.case_list)
           }
         })
       })
@@ -586,14 +615,14 @@ export default {
           type: 'warning'
         });
       } else {
-        const upDate = this.taskInfo.taskCase[index];
-        this.taskInfo.taskCase.unshift(upDate)
-        this.taskInfo.taskCase.splice(index + 1, 1);
+        const upDate = this.taskInfo.case_list[index];
+        this.taskInfo.case_list.unshift(upDate)
+        this.taskInfo.case_list.splice(index + 1, 1);
       }
     },
     // 移动至底部
     downMove(index) {
-      const len = this.taskInfo.taskCase.length - 1
+      const len = this.taskInfo.case_list.length - 1
       if (index === len) {
         this.$message({
           message: '处于最低部，不能继续下移',
@@ -601,9 +630,9 @@ export default {
         });
       } else {
         console.log(index)
-        const upDate = this.taskInfo.taskCase[index];
-        this.taskInfo.taskCase.splice(index, 1);
-        this.taskInfo.taskCase.push(upDate)
+        const upDate = this.taskInfo.case_list[index];
+        this.taskInfo.case_list.splice(index, 1);
+        this.taskInfo.case_list.push(upDate)
       }
     },
     // 添加节点
@@ -677,36 +706,31 @@ export default {
       }
     },
     save() {
-      const data = {
-        // 'taskAssign': 'string',
-        // 'taskCase': [
-        //   {}
-        // ],
-        // 'taskDesc': 'string',
-        // 'taskId': 0,
-        // 'taskName': 'string',
-        // 'taskProject': 'string',
-        // 'taskVersion': 'string'
-      }
+      const data = { }
       this.$refs.taskInfo.validate((valid) => {
         console.log(this.taskInfo)
+        const arr = []
+        this.taskInfo.case_list.forEach(item => {
+          const obj = {
+            case: '',
+            env: ''
+          }
+          arr.push(obj)
+
+        })
+        this.taskInfo.case_list = arr
         if (valid) {
-          let url = ''
+          let url = 'task/add'
+          let method = 'POST'
           const queryId = this.$route.query.editId
           if (queryId) {
-            url = 'task/update'
-          } else {
-            url = 'task/add'
+            url = 'task/edit'
+            method = 'PUT'
           }
-          this.$http.post(url, this.taskInfo).then(res => {
+          POST(url, method, this.taskInfo).then(res => {
             console.log(res)
-            if (res.code === 1) {
-              this.$message({
-                type: 'success',
-                message: '添加任务成功！'
-              })
-              this.$router.push('/task')
-            }
+            this.$hintMsg('success', res)
+            this.$router.push('/task')
           })
         }
 

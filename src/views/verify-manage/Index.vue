@@ -4,14 +4,14 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-28 17:59:36
+ * @LastEditTime: 2021-01-29 16:16:52
 -->
 <template>
   <div class="verify">
     <Crumbs :crumbs='crumbs'></Crumbs>
     <div class="container">
       <div class="content">
-        <Func ref='func' :options='options'  :txt='text'>
+        <Func ref='func' :options='options' :txt='text' @deleteBatch='deleteBatch'>
           <el-form slot='verify' :inline='true' label-position="top" :model="seachInfo" class="demo-form-inline">
             <el-form-item style='width:150px;' label="校验点名称">
               <el-input  v-model="seachInfo.user" placeholder="输入动作名称"></el-input>
@@ -62,7 +62,11 @@
           </el-dropdown>
         </Func>
         <div class="tableContent">
-          <el-table :data="verifyList" class='borderTop' style="width: 100%">
+          <el-table
+            :data="verifyList"
+            class='borderTop'
+            style="width: 100%"
+            @selection-change="handleSelectionChange">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
             <el-table-column label="类型" width="50">
@@ -94,7 +98,7 @@
                     </p>
                   <p @click='edit(scope.row)'><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
                   <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
-                  <p><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
+                  <p @click='del(scope.row)'><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
                   <div slot="reference">
                       <svg-icon data_iconName='icon-more'></svg-icon>
                     </div>
@@ -116,6 +120,7 @@
 
 <script>
 import Func from '@/components/seach-func-header/Func.vue'
+import { delHint } from '@/utils/utils.js'
 export default {
   name: 'Action',
   components: {
@@ -146,7 +151,8 @@ export default {
       inputKey: '', // 搜索输入项
       tabIndex: 1,
       verifyList: [{ type: 'image' }, { type: 'other' }], // 动作列表
-      seachInfo: {} // 高级检索条件
+      seachInfo: {}, // 高级检索条件
+      selectData: [] // 选择的数据
 
     };
   },
@@ -163,6 +169,10 @@ export default {
     // 确认搜索
     confirm() {
       console.log(this.seachInfo)
+    },
+    // 选择数据
+    handleSelectionChange(val) {
+      this.selectData = val;
     },
     // 获取检验点列表
     getVerifyList(page, size) {
@@ -188,6 +198,50 @@ export default {
         default:
           break;
       }
+    },
+    // 批量删除数据
+    deleteBatch() {
+      const url = 'verify/del'
+      if (this.selectData.length === 0) {
+        this.$hintMsg('warning', '请先选择任何数据！')
+        return
+      }
+      const idList = this.selectData.map(item => {
+        return item.uid
+      })
+      const data = {
+        uid: idList
+      }
+      delHint(this).then(res => {
+        this.$http.delete(url, { data }).then(respone => {
+          console.log(respone)
+          if (respone.status_code === 200) {
+            this.$hintMsg('success', '批量删除成功')
+            this.getActionList(this.currPage, this.pageSize)
+          }
+        })
+      }).catch(err => {
+        this.$hintMsg('info', err)
+      })
+
+    },
+    // 删除单个数据
+    del(row) {
+      const url = 'verify/del/'
+      const data = {
+        uid: [row.uid]
+      }
+      delHint(this).then(async(res) => {
+        const respone = await this.$http.delete(url, { data })
+        if (respone.status_code === 200) {
+          this.$hintMsg('success', res)
+          this.getActionList(this.currPage, this.pageSize)
+        }
+      }).catch(err => {
+        this.$hintMsg('info', err)
+      })
+
+
     },
     // 编辑
     edit(row) {

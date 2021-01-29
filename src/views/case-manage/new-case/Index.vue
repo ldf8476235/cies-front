@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-19 11:05:16
+ * @LastEditTime: 2021-01-29 18:47:45
 -->
 <template>
   <div class="new-case">
@@ -18,45 +18,39 @@
             :model="caseInfo"
             :rules="rulesCaseInfo"
             label-width="100px"
-
-          >
+            >
             <div class="caseInfo">
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label="用例名称：" prop="caseName">
+                  <el-form-item label="用例名称：" prop="name">
                     <el-input
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
-                      v-model.trim="caseInfo.caseName"
+                      v-model.trim="caseInfo.name"
                       placeholder="输入用例名称"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：" prop="caseVersion">
+                  <el-form-item label="软件版本：" prop="version">
                     <el-input
-                      v-model="caseInfo.caseVersion"
+                      v-model="caseInfo.version"
                       placeholder="输入软件版本"
                     ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="caseProject">
-                    <el-select v-model="caseInfo.caseProject" placeholder="选择所属项目">
-                      <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      >
-                      </el-option>
-                    </el-select>
+                  <el-form-item label="所属项目：" prop="project">
+                    <el-input
+                      v-model="caseInfo.project"
+                      placeholder="请输入所属项目"
+                    ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="用例描述：" prop="caseDesc">
+                  <el-form-item label="用例描述：" prop="desc">
                     <el-input
                       type="textarea"
-                      v-model="caseInfo.caseDesc"
+                      v-model="caseInfo.desc"
                       placeholder="输入用例描述"
                     ></el-input>
                   </el-form-item>
@@ -72,8 +66,8 @@
               </el-row>
               <el-table
                 width="100%"
-                border
-                :data="caseInfo.caseAction"
+                class='borderTop'
+                :data="caseInfo.action"
                 ref="tableCase"
                 row-key="id"
                 >
@@ -99,34 +93,40 @@
                 <el-table-column
                   label="动作类型"
                   width="100">
-                  <template>
-                    <svg-icon data_iconName="icon-gesture" className="icon-gesture"/>
+                  <template slot-scope = 'scope'>
+                    <svg-icon v-if="scope.row.type ==='U3'" data_iconName="icon-gesture" />
+                    <svg-icon v-if="scope.row.type ==='Voice'" data_iconName="icon-voice" />
+                    <svg-icon v-if="scope.row.type ==='Shell'" data_iconName="icon-script-off" />
                   </template>
                 </el-table-column>
-                <el-table-column label="动作名称">
+                <el-table-column label="名称">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'caseAction.' + scope.$index + '.actionName'"
-                      :rules="rulesCaseInfo.caseAction.name"
+                      :prop="'action.' + scope.$index + '.name'"
+                      :rules="rulesCaseInfo.action.name"
                       label-width="0px"
-                    >
-                      <!-- <span v-if="scope.row.editNode">
-                        <el-input
-                          ref="inputBlur"
-                          v-model="scope.row.actionName"
-                          placeholder=""
-                          @blur="inputBlur(scope.row,scope.column)"
-                        ></el-input>
-                      </span> -->
-                      <span > {{scope.row.actionName}} </span>
+                      >
+                      <span v-if="scope.row.function === 'verify'">检验点： {{scope.row.name}} </span>
+                      <span v-if="scope.row.function === 'action'">动作： {{scope.row.name}} </span>
                     </el-form-item>
                   </template>
                 </el-table-column>
+                <!-- <el-table-column label="校验点名称">
+                  <template slot-scope="scope">
+                    <el-form-item
+                      :prop="'action.' + scope.$index + '.name'"
+                      :rules="rulesCaseInfo.action.name"
+                      label-width="0px"
+                      >
+                      <span > {{scope.row.name}} </span>
+                    </el-form-item>
+                  </template>
+                </el-table-column> -->
                 <el-table-column label="循环次数">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'caseAction.' + scope.$index + '.loopTimes'"
-                      :rules="rulesCaseInfo.caseAction.loopCount"
+                      :prop="'action.' + scope.$index + '.loopTimes'"
+                      :rules="rulesCaseInfo.action.loopCount"
                       label-width="0px"
                     >
                       <span v-if="scope.row.editLoop">
@@ -137,15 +137,15 @@
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}} </span>
+                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}} 10</span>
                     </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="出错处理">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'caseAction.' + scope.$index + '.errorDispose'"
-                      :rules="rulesCaseInfo.caseAction.errorDispose"
+                      :prop="'action.' + scope.$index + '.errorDispose'"
+                      :rules="rulesCaseInfo.action.errorDispose"
                       label-width="0px"
                     >
                       <span v-if="true">
@@ -159,7 +159,6 @@
                           </el-option>
                         </el-select>
                       </span>
-                      <!-- <span v-else> {{scope.row.error}} </span> -->
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -167,20 +166,19 @@
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'caseAction.' + scope.$index + '.executeWait'"
-                      :rules="rulesCaseInfo.caseAction.executeWait"
+                      :prop="'action.' + scope.$index + '.executeWait'"
+                      :rules="rulesCaseInfo.action.executeWait"
                       label-width="0px"
                     >
-                      <el-select v-model="selectVal" placeholder="请选择">
+                      <el-select v-model="scope.row.executeWait" placeholder="请选择">
                         <el-option
-                          v-for="item in options"
+                          v-for="item in executeWaitList"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value"
                         >
                         </el-option>
                       </el-select>
-                      <!-- <span> {{scope.row.executeWait}} </span> -->
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -198,7 +196,6 @@
                       <p><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
                       <p><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
                       <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
-                      <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
                       <div slot="reference">
                         <svg-icon data_iconName='icon-more'></svg-icon>
                       </div>
@@ -208,36 +205,40 @@
               </el-table>
               <el-row class="add-node">
                 <el-col>
-                  <el-button type="" @click="addCaseRow">
+                  <el-button type="" @click="addAction">
                     <i class="el-icon-plus"></i> 添加动作</el-button>
+                     <el-button type="" @click="addVerify">
+                    <i class="el-icon-plus"></i> 添加检验点</el-button>
                 </el-col>
               </el-row>
             </div>
           </el-form>
-          <el-dialog title="动作列表" :visible.sync="dialogTableVisible">
-            <el-table :data="actionList" border>
+          <Dialog ref='dialog' :title='title' @confirm='confirm'>
+            <el-table v-if="slotType === 'caseAction'" slot='caseAction' :data="actionList">
               <el-table-column label="" align="center" width="40">
                 <template slot-scope="scope">
-                  <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.actionId"></el-radio>
+                  <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.uid"></el-radio>
                 </template>
               </el-table-column>
-              <el-table-column property="" label="序号" width="50" type="index"></el-table-column>
-              <el-table-column property="actionType" label="类型" width="90"></el-table-column>
-              <el-table-column property="actionName" label="动作名称"></el-table-column>
-              <el-table-column property="createUser" label="创建人" width="150"></el-table-column>
-              <el-table-column property="date" label="创建时间" width="100"></el-table-column>
+              <el-table-column label="序号" width="50" type="index"></el-table-column>
+              <el-table-column property="type" label="类型" width="50"></el-table-column>
+              <el-table-column property="name" label="动作名称"></el-table-column>
+              <el-table-column property="builder" label="创建人" width="100"></el-table-column>
+              <el-table-column property="time_create" label="创建时间" width="140"></el-table-column>
             </el-table>
-            <PageUtil
-              ref="pageutil"
-              :total="total"
-              :pageSize="pageSize"
-              :currPage="currPage"
-            ></PageUtil>
-            <span slot="footer" class="dialog-footer">
-              <el-button @click="cancelAddAction">取 消</el-button>
-              <el-button type="primary" @click="addAction">确 定</el-button>
-            </span>
-          </el-dialog>
+            <el-table  v-if="slotType === 'caseVerify'"  slot='caseVerify' :data="verifyList">
+              <el-table-column label="" align="center" width="40">
+                <template slot-scope="scope">
+                  <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.uid"></el-radio>
+                </template>
+              </el-table-column>
+              <el-table-column label="序号" width="50" type="index"></el-table-column>
+              <el-table-column property="type" label="类型" width="50"></el-table-column>
+              <el-table-column property="name" label="校验点名称"></el-table-column>
+              <el-table-column property="builder" label="创建人" width="100"></el-table-column>
+              <el-table-column property="time_create" label="创建时间" width="140"></el-table-column>
+            </el-table>
+          </Dialog>
         </div>
       </div>
     </div>
@@ -246,14 +247,21 @@
 
 <script>
 import Sortable from 'sortablejs';
+import Dialog from '@/components/config-dialog/Dialog.vue';
+import { GET, POST } from '@/utils/api.js';
 export default {
   name: 'NewCase',
+  components: {
+    Dialog
+  },
   data() {
     return {
       crumbs: {
         action: true,
         name: '新建用例'
       },
+      title: '',
+      slotType: '',
       total: 0,
       pageSize: 10,
       currPage: 1,
@@ -271,110 +279,148 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       caseInfo: {
-        'caseCreator': '',
-        'caseDesc': '',
-        'caseName': '',
-        'caseProject': '',
-        'caseVersion': '',
-        'caseAction': [
-          {
-            id: '01',
-            editLoop: false,
-            actionName: '节点名称1',
-            actionType: 'screen',
-            loopTimes: 11,
-            errorDispose: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134',
-            selectFlag: false
-          },
-          {
-            id: '02',
-            editLoop: false,
-            actionName: '节点名称2',
-            actionType: 'screen',
-            loopTimes: 10,
-            errorDispose: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134',
-            selectFlag: false
-          }
+        // 'caseCreator': '',
+        // 'caseDesc': '',
+        // 'caseName': '',
+        // 'caseProject': '',
+        // 'caseVersion': '',
+        'action': [
+          // {
+          //   id: '01',
+          //   editLoop: false,
+          //   actionName: '节点名称1',
+          //   actionType: 'screen',
+          //   loopTimes: 11,
+          //   errorDispose: '123',
+          //   overtime: 'asdasd',
+          //   executeWait: 'aq2134',
+          //   selectFlag: false
+          // },
+          // {
+          //   id: '02',
+          //   editLoop: false,
+          //   actionName: '节点名称2',
+          //   actionType: 'screen',
+          //   loopTimes: 10,
+          //   errorDispose: '123',
+          //   overtime: 'asdasd',
+          //   executeWait: 'aq2134',
+          //   selectFlag: false
+          // }
         ]
       },
       rulesCaseInfo: {
-        caseName: [
+        name: [
           { required: true, message: '请输入用例名称', trigger: 'blur' }
         ],
-        caseVersion: [
+        version: [
           { required: true, message: '请输入软件版本', trigger: 'blur' }
         ],
-        caseProject: [
+        project: [
           { required: true, message: '请选择所属项目', trigger: 'blur' }
         ],
-        caseDesc: [
+        desc: [
           { required: true, message: '请输入用例描述', trigger: 'blur' }
         ],
-        caseAction: {}
+        action: {}
       },
 
       isIndeterminate: false, // 半选
       checkAll: false, // 全选
-      dialogTableVisible: false,
       actionList: [
-        { actionId: '1',
-          actionType: 'screen1',
-          actionName: 'name1',
-          createUser: 'user',
-          date: '2012-01-01'
-        },
-        { actionId: '2',
-          actionType: 'screen2',
-          actionName: 'name2',
-          createUser: 'user',
-          date: '2012-02-01'
-        }
+        // { uid: '1',
+        //   type: 'screen1',
+        //   name: 'name1',
+        //   builder: 'user',
+        //   date: '2012-01-01'
+        // },
+        // { uid: '2',
+        //   type: 'screen2',
+        //   name: 'name2',
+        //   builder: 'user',
+        //   date: '2012-02-01'
+        // }
       ],
-      radio: '' // 单选
+      verifyList: [
+
+      ],
+      radio: '', // 单选
+      radioData: {}, // 添加动作radio
+      executeWaitList: [
+        {
+          lable: '--',
+          value: '--'
+        }
+      ]
     };
   },
   mounted() {
     this.drag()
-    const queryId = this.$route.query.id
+    const queryId = this.$route.query.uid
     if (queryId) {
       this.editInto()
     }
+    this.getActionList(this.currPage, this.pageSize)
+    this.getVerifyList(this.currPage, this.pageSize)
   },
   methods: {
+    // 获取动作列表
+    getActionList(page, count) {
+      const url = `action/list/?page=${page}&count=${count}`
+      this.$http.get(url).then(res => {
+        console.log(res)
+        if (res.status_code === 200) {
+          this.actionList = res.data.result
+          this.total = res.data.count
+        }
+      })
+    },
+    // 获取动作列表
+    getVerifyList(page, count) {
+      const url = `verify/list/?page=${page}&count=${count}`
+      this.$http.get(url).then(res => {
+        console.log(res)
+        if (res.status_code === 200) {
+          this.verifyList = res.data.result
+          this.total = res.data.count
+        }
+      })
+    },
+
     // 编辑进入
     editInto() {
-      console.log(this.$route.params.data)
-      const data = this.$route.params.data
-      if (data) {
-        localStorage.setItem('edit', JSON.stringify(this.$route.params.data))
-      }
-      this.caseInfo = data || JSON.parse(localStorage.getItem('edit'))
+      const uid = this.$route.query.uid
+      const url = `case/detail/?uid=${uid}`
+      GET(url).then(res => {
+        this.caseInfo = res.result[0]
+      })
     },
     // 取消插入动作
     cancelAddAction() {
       this.radio = ''
     },
     // 确认添加数据
-    addAction() {
+    confirm() {
       console.log('确认添加数据')
-      this.radioData
-      console.log(this.insertIndex)
+      console.log(this.insertIndex, this.radioData)
+      if (!this.radioData.name) {
+        this.$hintMsg('warning', '未选择动作')
+        return
+      }
       const data = {
         editLoop: false,
-        actionName: this.radioData.actionName,
-        actionType: this.radioData.actionType,
-        loopTimes: 0,
-        errorDispose: '123',
+        uid: this.radioData.uid,
+        name: this.radioData.name,
+        function: this.radioData.function,
+        type: this.radioData.type,
+        timeout: 0,
+        errorDispose: 'PASS',
         overtime: 'asdasd',
-        executeWait: 'aq2134',
+        executeWait: '--',
         selectFlag: false
       }
-      this.caseInfo.caseAction.splice(this.insertIndex + 1, 0, data)
-      this.dialogTableVisible = false
+      console.log(data)
+      this.caseInfo.action.splice(this.insertIndex + 1, 0, data)
       this.radio = ''
     },
     // 选择动作
@@ -385,16 +431,15 @@ export default {
     // 插入动作
     insertAction(index) {
       this.insertIndex = index
-      this.dialogTableVisible = true
-
+      this.$refs.dialog.dialogTableVisible = true
     },
     // 每项选择
     selectRow(row) {
       this.$nextTick(() => {
-        const isAll = this.caseInfo.caseAction.every(item => {
+        const isAll = this.caseInfo.action.every(item => {
           return item.selectFlag === true
         })
-        const noAll = this.caseInfo.caseAction.every(item => {
+        const noAll = this.caseInfo.action.every(item => {
           return item.selectFlag === false
         })
         if (isAll) {
@@ -413,12 +458,12 @@ export default {
     // 全选/全不选
     handleCheckAllChange(flag) {
       if (flag) {
-        this.caseInfo.caseAction.forEach(item => {
+        this.caseInfo.action.forEach(item => {
           item.selectFlag = true
         })
         this.isIndeterminate = false
       } else {
-        this.caseInfo.caseAction.forEach(item => {
+        this.caseInfo.action.forEach(item => {
           item.selectFlag = false
         })
         this.isIndeterminate = false
@@ -436,9 +481,9 @@ export default {
           onEnd({ newIndex, oldIndex }) {
             console.log(newIndex, oldIndex)
             // 修改data中的数组，
-            const targetRow = self.caseInfo.caseAction.splice(oldIndex, 1)[0]
-            self.caseInfo.caseAction.splice(newIndex, 0, targetRow)
-            console.log(self.caseInfo.caseAction)
+            const targetRow = self.caseInfo.action.splice(oldIndex, 1)[0]
+            self.caseInfo.action.splice(newIndex, 0, targetRow)
+            console.log(self.caseInfo.action)
           }
         })
       })
@@ -484,36 +529,58 @@ export default {
           return
       }
     },
-    addCaseRow() {
-      this.dialogTableVisible = true
-      this.insertIndex = this.caseInfo.caseAction.length
+    // 添加动作
+    addAction() {
+      this.slotType = 'caseAction'
+      this.title = '动作列表'
+      this.$refs.dialog.dialogTableVisible = true
+      this.insertIndex = this.caseInfo.action.length
+    },
+    // 添加检验点
+    addVerify() {
+      this.slotType = 'caseVerify'
+      this.title = '校验点列表'
+      this.$refs.dialog.dialogTableVisible = true
+      this.insertIndex = this.caseInfo.action.length
     },
     save() {
       this.$refs.caseInfo.validate(valid => {
         if (valid) {
           let url = '/case/add'
-          if (this.caseInfo.caseId) {
-            url = '/case/update'
+          let method = 'POST'
+          if (this.caseInfo.uid) {
+            url = '/case/edit/'
+            method = 'PUT'
           }
+          this.caseInfo.builder = '啊啊啊admin'
           console.log('保存', this.caseInfo)
-          this.$http.post(url, this.caseInfo).then(res => {
-            console.log(res)
-            if (res.code === 1) {
-              this.$message({
-                type: 'success',
-                message: res.msg
-              })
-              this.$router.push('/case')
-            } else if (res.code === 0) {
-              this.$message({
-                type: 'warning',
-                message: res.msg
-              })
+          // 临时action:['assd123123']
+          const arr = []
+          this.caseInfo.action.forEach(item => {
+            console.log(item)
+            let obj = {}
+            if (item.function === 'action') {
+              obj = {
+                function: 'action',
+                uid: item.uid
+              }
+            } else if (item.function === 'verify') {
+              obj = {
+                function: 'verify',
+                uid: item.uid
+              }
             }
+            arr.push(obj)
+          })
+          this.caseInfo.action = arr
+          POST(url, method, this.caseInfo).then(res => {
+            this.$hintMsg('success', res)
+            this.$router.push('/case')
+          }).catch(err => {
+            this.$hintMsg('error', err)
           })
         }
       })
-
     }
   }
 };

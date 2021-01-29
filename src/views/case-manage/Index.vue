@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-01-28 10:09:53
+ * @LastEditTime: 2021-01-29 14:33:14
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -118,6 +118,7 @@
 
 <script>
 import Func from '@/components/seach-func-header/Func.vue'
+import { delHint } from '@/utils/utils.js'
 export default {
   name: 'Case',
   components: {
@@ -183,53 +184,43 @@ export default {
     // 批量删除
     deleteBatch() {
       if (this.delArr.length === 0) {
-        this.$message({
-          type: 'warning',
-          message: '未选择删除数据！'
-        })
+        this.$hintMsg('warning', '请先选择任何数据！')
         return
       }
       const data = {
         uid: this.delArr
       }
-      this.$http.delete(`case/del/`, { data }).then(res => {
-        console.log(res)
-        if (res.status_code === 200) {
-          this.$message({
-            type: 'success',
-            message: '删除成功'
-          })
-          this.getCaseList(this.currPage, this.pageSize)
-        }
+      delHint(this).then(res => {
+        this.$http.delete(`case/del/`, { data }).then(respone => {
+          console.log(respone)
+          if (respone.status_code === 200) {
+
+            this.$hintMsg('success', res)
+            this.getCaseList(this.currPage, this.pageSize)
+          }
+        })
+      }).catch(err => {
+        this.$hintMsg('info', err)
       })
+
     },
     // 删除用例
     delCase(row) {
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
+      delHint(this).then((res) => {
         const url = 'case/del/'
         const data = {
           uid: [row.uid]
         }
         console.log(data)
-        this.$http.delete(url, { data }).then(res => {
-          console.log(res)
-          if (res.status_code === 200) {
-            this.$message({
-              type: 'success',
-              message: '删除成功'
-            })
+        this.$http.delete(url, { data }).then(respone => {
+          console.log(respone)
+          if (respone.status_code === 200) {
+            this.$hintMsg('success', res)
             this.getCaseList(this.currPage, this.pageSize)
           }
         })
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消'
-        })
+      }).catch((err) => {
+        this.$hintMsg('info', err)
       })
 
     },
@@ -244,7 +235,7 @@ export default {
         {
           name: 'CaseDetails',
           query: {
-            editId: row.taskId
+            uid: row.uid
           },
           params: {
             data: row
@@ -258,7 +249,7 @@ export default {
       this.$router.push({
         name: 'NewCase',
         query: {
-          id: row.caseId
+          uid: row.uid
         },
         params: {
           data: row

@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2021-01-27 13:53:41
+ * @LastEditTime: 2021-01-29 20:00:19
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -11,7 +11,7 @@
     <Crumbs :crumbs='crumbs'></Crumbs>
     <div class="container">
       <div class="content">
-        <Func ref='func' :options='options' :txt='text'>
+        <Func ref='func' :options='options' :txt='text' @deleteBatch='deleteBatch'>
           <el-form slot='actionForm' :inline='true' label-position="top" :model="seachInfo" class="demo-form-inline">
             <el-form-item style='width:150px;' label="动作名称">
               <el-input  v-model="seachInfo.user" placeholder="输入动作名称"></el-input>
@@ -72,33 +72,33 @@
             <el-table-column label="类型" width="50">
               <template slot-scope="scope">
                 <div >
-                  <svg-icon v-if="scope.row.actionType === 0" data_iconName="icon-gesture" className="icon"/>
-                  <svg-icon v-if="scope.row.actionType === 1" data_iconName="icon-voice" className="icon"/>
-                  <svg-icon v-if="scope.row.actionType === 2" data_iconName="icon-code" className="icon"/>
+                  <svg-icon v-if="scope.row.type === 'U3'" data_iconName="icon-gesture" className="icon"/>
+                  <svg-icon v-if="scope.row.type === 'Voice'" data_iconName="icon-voice" className="icon"/>
+                  <svg-icon v-if="scope.row.type ==='Shell'" data_iconName="icon-code" className="icon"/>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="actionName" label="动作名称" width="180">
+            <el-table-column prop="name" label="动作名称" width="180">
             </el-table-column>
-            <el-table-column prop="name" label="引用" min-width="80">
+            <el-table-column prop="mount" label="引用" min-width="80">
               <template slot-scope="scope">
                 <div >
+                  4
                   <!-- {{scope.row.actionCite.length}} -->
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="actionProject" label="所属项目" width="180">
+            <el-table-column prop="project" label="所属项目" width="180">
             </el-table-column>
-            <el-table-column prop="actionCreator" label="创建人" width="180">
+            <el-table-column prop="builder" label="创建人" width="180">
             </el-table-column>
-            <el-table-column prop="actionVersion" label="软件版本" width="140">
+            <el-table-column prop="version" label="软件版本" width="140">
             </el-table-column>
-            <el-table-column prop="createTime" label="创建时间" width="140">
+            <el-table-column prop="time_create" label="创建时间" width="160">
             </el-table-column>
-            <el-table-column prop="updateTime" label="更新时间" width="140">
+            <el-table-column prop="time_modify" label="更新时间" width="160">
             </el-table-column>
-
-            <el-table-column prop="name" label="操作" width="60">
+            <el-table-column label="操作" width="60">
               <template slot-scope="scope">
                 <el-popover
                   placement="bottom"
@@ -134,7 +134,9 @@
 </template>
 
 <script>
-import { b64toBlob, ImagePool } from '@/utils/common.js';
+import { b64toBlob, ImagePool } from '@/utils/common.js'
+import { delHint } from '@/utils/utils.js'
+import { GET } from '@/utils/api.js'
 import Func from '@/components/seach-func-header/Func.vue'
 export default {
   name: 'Action',
@@ -164,7 +166,9 @@ export default {
       selectVal: '', // 选中项
       inputKey: '', // 搜索输入项
       tabIndex: 1,
-      actionList: [{ type: 'screen' }, { type: 'voice' }, { type: 'script' }], // 动作列表
+      actionList: [ // 动作列表
+        // { type: 'U3' }, { type: 'Voice' }, { type: 'Shell' }
+      ],
       selectData: [], // 选中的数据
       seachInfo: {},
       text: '新建校验点'
@@ -173,7 +177,7 @@ export default {
   },
   created() {
     this.deviceId = 'android:'
-    this.getCurrentScreen()
+    // this.getCurrentScreen()
     this.imagePool = new ImagePool(100)
   },
   mounted() {
@@ -200,13 +204,13 @@ export default {
       const type = row.type
       let name
       switch (type) {
-        case 'screen':
+        case 'U3':
           name = 'ScreenDetails'
           break;
-        case 'voice':
+        case 'Voice':
           name = 'VoiceDetails'
           break;
-        case 'script':
+        case 'Shell':
           name = 'ScriptDetails'
           break;
         default:
@@ -215,7 +219,7 @@ export default {
       this.$router.push({
         name: name,
         query: {
-          editId: row.taskId
+          uid: row.uid
         },
         params: {
           data: row
@@ -225,11 +229,11 @@ export default {
     // 编辑
     edit(row) {
       console.log(row)
-      if (row.actionType === 0) {
+      if (row.type === 'screen') {
         this.$router.push({
           name: 'NewScreen',
           query: {
-            actionId: row.actionId
+            uid: row.uid
           },
           params: {
             data: row
@@ -238,50 +242,56 @@ export default {
       }
     },
     // 批量删除数据
-    delBatch() {
-      const url = 'action/batchDelete'
+    deleteBatch() {
+      const url = 'action/del'
       if (this.selectData.length === 0) {
-        this.$message({
-          type: 'warning',
-          message: '请先选择任何数据！'
-        })
+        this.$hintMsg('warning', '请先选择任何数据！')
         return
       }
       const idList = this.selectData.map(item => {
-        return item.actionId
+        return item.uid
       })
-      this.$http.post(url, idList).then(res => {
-        console.log(res)
-        if (res.code === 1) {
-          this.$message({
-            type: 'success',
-            message: '批量删除成功!'
-          })
-          this.getActionList(this.currPage, this.pageSize)
-        }
+      const data = {
+        uid: idList
+      }
+      delHint(this).then(res => {
+        this.$http.delete(url, { data }).then(respone => {
+          console.log(respone)
+          if (respone.status_code === 200) {
+            this.$hintMsg('success', '批量删除成功')
+            this.getActionList(this.currPage, this.pageSize)
+          }
+        })
+      }).catch(err => {
+        this.$hintMsg('info', err)
       })
+
     },
     // 删除单个数据
-    async del(row) {
-      const url = 'action/delete/' + row.actionId
-      const res = await this.$http.delete(url)
-      if (res.code === 1) {
-        this.$message({
-          type: 'success',
-          message: '删除成功！'
-        })
-        this.getActionList(this.currPage, this.pageSize)
+    del(row) {
+      const url = 'action/del/'
+      const data = {
+        uid: [row.uid]
       }
+      delHint(this).then(async(res) => {
+        const respone = await this.$http.delete(url, { data })
+        if (respone.status_code === 200) {
+          this.$hintMsg('success', res)
+          this.getActionList(this.currPage, this.pageSize)
+        }
+      }).catch(err => {
+        this.$hintMsg('info', err)
+      })
+
+
     },
     // 获取动作列表
     getActionList(page, size) {
-      const url = `action/list?page=${page}&limit=${size}`
-      this.$http.get(url).then(res => {
+      const url = `action/list?page=${page}&count=${size}`
+      GET(url).then(res => {
         console.log(res)
-        if (res.code === 1) {
-          this.actionList = res.data.list
-          this.total = res.data.totalCount
-        }
+        this.actionList = res.result
+        this.total = res.totalCount
       })
     },
     // 新建任务

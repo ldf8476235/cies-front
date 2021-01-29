@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-28 18:30:07
+ * @LastEditTime: 2021-01-29 19:50:23
 -->
 <template>
   <div class="new-verify">
@@ -337,7 +337,7 @@ export default {
       verifyInfo: {
         type: 'U3',
         content: '',
-        element: "d(text='')",
+        element: 'text',
         regex_result: 'exists',
         timeout: '0'
       },
@@ -394,15 +394,15 @@ export default {
       pageElementSelect: [// 页面元素选择框
         {
           label: 'xpath',
-          value: `d.xpath('')`
+          value: `xpath`
         },
         {
           label: 'text',
-          value: "d(text='')"
+          value: 'text'
         },
         {
           label: 'resourceId',
-          value: "d(resourceId='')"
+          value: 'resourceId'
         }
       ],
       connect: false,
@@ -519,11 +519,11 @@ export default {
       const regResult = this.verifyInfo.regex_result
       const timeout = this.verifyInfo.timeout
       let codeComplate
-      if (ele === "d.xpath('')") {
+      if (ele === 'xpath') {
         codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + regResult + ')'
-      } else if (ele === "d(text='')") {
+      } else if (ele === 'text') {
         codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + regResult + '(' + timeout + '))'
-      } else if (ele === "d(resourceId='')") {
+      } else if (ele === 'resourceId') {
         console.log(ele, code)
         if (ele === code) {
           this.testResult = 'FAIL'
@@ -643,11 +643,11 @@ export default {
         })
         return
       }
-      if (e === "d.xpath('')") {
+      if (e === 'xpath') {
         this.verifyInfo.content = this.generateNodeSelectorCode(this.nodeSelected) // `d.xpath('${this.elemXPathLite}')`
-      } else if (e === "d(text='')") {
+      } else if (e === 'text') {
         this.verifyInfo.content = this.generateNodeSelectorCode(this.nodeSelected)
-      } else if (e === "d(resourceId='')") {
+      } else if (e === 'resourceId') {
         this.verifyInfo.content = this.generateNodeSelectorCode(this.nodeSelected)
       }
     },
@@ -709,14 +709,13 @@ export default {
     },
     generateNodeSelectorCode(node) {
       console.log(node)
-      if (this.verifyInfo.element === "d.xpath('')") {
+      if (this.verifyInfo.element === 'xpath') {
         return `d.xpath('${this.elemXPathLite}')`
       }
-      if (this.verifyInfo.element === "d(resourceId='')") {
+      if (this.verifyInfo.element === 'resourceId') {
         return `d(resourceId='${node.resourceId}')`
       }
       const kwargs = this.generateNodeSelectorKwargs(node)
-      console.log('kwargs', kwargs)
       if (kwargs._count === 1) {
         const array = [];
         for (const [key, value] of Object.entries(kwargs)) {
@@ -724,6 +723,10 @@ export default {
             continue;
           }
           array.push(this._combineKeyValue(key, value))
+        }
+        console.log(array)
+        if (array[0].indexOf('resourceId') !== -1) {
+          this.verifyInfo.element = 'resourceId'
         }
         return `d(${array.join(', ')})`
       }

@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-01-25 10:14:54
+ * @LastEditTime: 2021-01-29 15:20:04
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -76,17 +76,17 @@
           <el-table :data="taskList" class='borderTop'>
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="taskName" label="任务名称" width="180">
+            <el-table-column prop="name" label="任务名称" width="180">
             </el-table-column>
-            <el-table-column prop="taskProject" label="所属项目" min-width="180">
+            <el-table-column prop="project" label="所属项目" min-width="180">
             </el-table-column>
-            <el-table-column prop="taskAssign" label="创建人" width="180">
+            <el-table-column prop="builder" label="创建人" width="180">
             </el-table-column>
-            <el-table-column prop="taskVersion" label="软件版本" width="100">
+            <el-table-column prop="version" label="软件版本" width="100">
             </el-table-column>
-            <el-table-column prop="createTime" label="创建时间" width="150">
+            <el-table-column prop="time_create" label="创建时间" width="150">
             </el-table-column>
-            <el-table-column prop="createTime" label="更新时间" width="150">
+            <el-table-column prop="time_modify" label="更新时间" width="150">
               2020-01-01 10:30:00
             </el-table-column>
             <el-table-column prop="taskStatus" label="状态" width="120">
@@ -168,6 +168,7 @@
 <script>
 import Dialog from '@/components/config-dialog/Dialog.vue';
 import Func from '@/components/seach-func-header/Func.vue'
+import { GET, POST } from '@/utils/api.js';
 export default {
   name: 'Task',
   components: {
@@ -237,13 +238,12 @@ export default {
     },
     // 获取所有任务
     getTaskList(page, size) {
-      const url = `task/list/?page=${page}&limit=${size}`
-      this.$http.get(url).then(res => {
+
+      const url = `task/list/?page=${page}&count=${size}`
+      GET(url).then(res => {
         console.log(res)
-        if (res.code === 1) {
-          this.taskList = res.data.list
-          this.total = res.data.totalCount
-        }
+        this.taskList = res.result
+        this.total = res.count
       })
     },
     // 详情

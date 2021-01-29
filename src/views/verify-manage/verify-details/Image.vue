@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 14:22:34
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-28 17:56:23
+ * @LastEditTime: 2021-01-29 10:57:33
 -->
 <template>
   <div class="new-verify">
@@ -124,7 +124,7 @@ export default {
         action: true,
         name: '新建校验点'
       },
-      screenLoading: true, // 屏幕未加载完成loading动画
+      screenLoading: false, // 屏幕未加载完成loading动画
       selectVal: 'U3', // 选中项
       verifyInfo: {},
       deviceId: 'android:',
@@ -344,7 +344,7 @@ export default {
       border-left: 1px solid #ddd;
       .screen{
         // width: 100%;
-        // height: 330px;
+        height: 500px;
         margin: 0 auto;
         position: relative;
         overflow-x: hidden;

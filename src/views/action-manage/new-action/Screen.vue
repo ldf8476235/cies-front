@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-28 10:55:04
+ * @LastEditTime: 2021-01-29 20:04:07
 -->
 <template>
   <div class="new-screen">
@@ -421,7 +421,7 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       actionInfo: {
-        type: 'screen'
+        type: 'U3'
       },
       rulesActionInfo: {
         name: [
@@ -522,8 +522,8 @@ export default {
     this.initPythonWebSocket()
     this.getHasDevice()
     // 编辑进入
-    const actionId = this.$route.query.actionId
-    if (actionId) {
+    const uid = this.$route.query.uid
+    if (uid) {
       this.editData()
     }
   },
@@ -611,7 +611,7 @@ export default {
         localStorage.setItem('actionData', JSON.stringify(actionData))
       }
       this.actionInfo = actionData || JSON.parse(localStorage.getItem('actionData'))
-      this.disposeActionSequence(this.actionInfo.actionData)
+      this.disposeActionSequence(this.actionInfo.sequence)
     },
     // 点击按钮外部区域，隐藏元素
     onClickOutside() {
@@ -725,8 +725,8 @@ export default {
       ws.onmessage = (message) => {
         const data = JSON.parse(message.data)
         console.log('message:', data)
-        const lineNumber = null
-        const timeUsed = null
+        // const lineNumber = null
+        // const timeUsed = null
         // 用蓝色的breakpoint标记已经运行过的代码
         // 用另外的breakpoint标记当前运行中的代码
         // 代码行号:lineno 从0开始
@@ -1434,14 +1434,22 @@ export default {
         this.actionInfo.sequence = this.clickMobileApp
         this.actionInfo.script = this.generatedCode
         this.actionInfo.builder = 'admin'
+        this.actionInfo.settings = ''
         console.log('保存', this.actionInfo)
         let url = ''
+        let methods = ''
         if (this.$route.query.actionId) {
-          url = 'action/update'
+          url = 'action/edit'
+          methods = 'PUT'
         } else {
           url = 'action/add'
+          methods = 'POST'
         }
-        this.$http.post(url, this.actionInfo).then(res => {
+        this.$http({
+          method: methods,
+          url: url,
+          data: this.actionInfo
+        }).then(res => {
           if (res.status_code === 200) {
             this.$message({
               type: 'success',
