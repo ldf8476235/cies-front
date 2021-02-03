@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 14:04:05
+ * @LastEditTime: 2021-02-03 14:10:06
 -->
 <template>
   <div class="new-screen">
@@ -536,8 +536,8 @@ export default {
       // screenDiv.style.height = (window.innerHeight - 310) + 'px' // '430px'
       this.resizeScreen(this.img)
     }
-    const arr = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
-    this.disposeActionSequence(arr)
+    // const arr = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
+    // this.disposeActionSequence(arr)
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
@@ -1436,7 +1436,7 @@ export default {
     font-size: 12px;
   }
   .row{
-    height: 85%;
+    height: 90%;
     .el-col {
       padding-right: 0px;
     }
