@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 10:21:45
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 14:00:34
+ * @LastEditTime: 2021-02-01 11:11:31
 -->
 <template>
   <div class="new-voice">
@@ -15,31 +15,31 @@
         <div class="formData">
           <el-row class="voiceInfo">
             <el-col :span="12">
-              <p><span class='label'>动作名称：</span><span>action_name_01</span></p>
+              <p><span class='label'>动作名称：</span><span>{{voiceInfo.name}}</span></p>
             </el-col>
             <el-col :span="12">
-              <p><span class='label'>所属项目：</span><span>action_name_01</span></p>
+              <p><span class='label'>所属项目：</span><span>{{voiceInfo.project}}</span></p>
             </el-col>
             <el-col :span="12">
-              <p><span class='label'>动作类型：</span><span>action_name_01</span></p>
+              <p><span class='label'>动作类型：</span><span>{{voiceInfo.type}}</span></p>
             </el-col>
             <el-col :span="12">
-              <p><span class='label'>软件版本：</span><span>action_name_01</span></p>
+              <p><span class='label'>软件版本：</span><span>{{voiceInfo.version}}</span></p>
             </el-col>
             <el-col :span="12">
-              <p><span class='label'>创建人：</span><span>action_name_01</span></p>
+              <p><span class='label'>创建人：</span><span>{{voiceInfo.builder}}</span></p>
             </el-col>
             <el-col :span="12">
-              <p><span class='label'>超时时间：</span><span>action_name_01</span></p>
+              <p><span class='label'>超时时间：</span><span>{{voiceInfo.timeout}}</span></p>
             </el-col>
             <el-col :span="12">
-              <p><span class='label'>创建时间：</span><span>action_name_01</span></p>
+              <p><span class='label'>创建时间：</span><span>{{voiceInfo.time_create}}</span></p>
             </el-col>
             <el-col :span="12">
-              <p><span class='label'>更新时间：</span><span>action_name_01</span></p>
+              <p><span class='label'>更新时间：</span><span>{{voiceInfo.time_modify}}</span></p>
             </el-col>
             <el-col :span="12">
-              <p><span class='label'>动作描述：</span><span>action_name_01</span></p>
+              <p><span class='label'>动作描述：</span><span>{{voiceInfo.desc}}</span></p>
             </el-col>
           </el-row>
           <div class="taskCase">
@@ -51,7 +51,7 @@
             <el-table
               width="100%"
               class='borderTop'
-              :data="voiceInfo.actionData"
+              :data="voiceInfo.settings"
               >
               <el-table-column
                 type="index"
@@ -61,12 +61,12 @@
               </el-table-column>
               <el-table-column label="语音名称"  width='180'>
                 <template slot-scope="scope">
-                  语音名称
+                  {{scope.row.name}}
                 </template>
               </el-table-column>
               <el-table-column label="执行后等待">
                 <template slot-scope="scope">
-                  执行后等待
+                  10
                 </template>
               </el-table-column>
             </el-table>
@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import { GET } from '@/utils/api.js';
 export default {
   name: 'NewVoice',
   data() {
@@ -88,8 +89,8 @@ export default {
         name: '新建动作'
       },
       voiceInfo: {
-        actionType: 1,
-        actionData: [
+        type: 1,
+        settings: [
           {
             voiceName: '节点名称1',
             executeWait: 'aq2134'
@@ -103,11 +104,19 @@ export default {
     };
   },
   mounted() {
-    setTimeout(() => {
-      this.crumbs.name = 'action_name_1'
-    }, 200);
+    this.getDetails()
   },
   methods: {
+    // 获取详情
+    getDetails() {
+      const uid = this.$route.query.uid
+      const url = `action/detail/?uid=${uid}`
+      GET(url).then(res => {
+        console.log(res)
+        this.voiceInfo = res.result[0]
+        this.crumbs.name = this.voiceInfo.name
+      })
+    },
     copy() {
 
     },

@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 19:22:32
+ * @LastEditTime: 2021-02-01 18:46:36
 -->
 <template>
   <div class="newTask">
@@ -68,7 +68,7 @@
                     </el-select> -->
                     <el-input
                       v-model="taskInfo.builder"
-                      placeholder="输入所属项目"
+                      placeholder="输入指派人"
                     ></el-input>
                   </el-form-item>
                 </el-col>
@@ -436,8 +436,8 @@ export default {
   },
   mounted() {
     this.drag()
-    const queryId = this.$route.query.editId
-    if (queryId) {
+    const uid = this.$route.query.uid
+    if (uid) {
       this.edit()
     }
     this.getCaseList(this.currPage, this.pageSize)
@@ -495,11 +495,19 @@ export default {
     },
     // 编辑
     edit() {
-      const data = this.$route.params.data
-      if (data) {
-        localStorage.setItem('editData', JSON.stringify(data))
-      }
-      this.taskInfo = data || JSON.parse(localStorage.getItem('editData'))
+      // const data = this.$route.params.data
+      // if (data) {
+      //   localStorage.setItem('editData', JSON.stringify(data))
+      // }
+      // this.taskInfo = data || JSON.parse(localStorage.getItem('editData'))
+      const uid = this.$route.query.uid
+      const url = `task/detail/?uid=${uid}`
+      GET(url).then(res => {
+        console.log(res)
+        this.taskInfo = res.result[0]
+      }).catch(err => {
+        this.$hintMsg('error', err)
+      })
     },
     // 删除用例组
     delCaseGroup(index) {
@@ -712,18 +720,17 @@ export default {
         const arr = []
         this.taskInfo.case_list.forEach(item => {
           const obj = {
-            case: '',
-            env: ''
+            case: item.uid,
+            env: []
           }
           arr.push(obj)
-
         })
         this.taskInfo.case_list = arr
         if (valid) {
           let url = 'task/add'
           let method = 'POST'
-          const queryId = this.$route.query.editId
-          if (queryId) {
+          const uid = this.$route.query.uid
+          if (uid) {
             url = 'task/edit'
             method = 'PUT'
           }

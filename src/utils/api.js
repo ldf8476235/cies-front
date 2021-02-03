@@ -4,7 +4,7 @@
  * @Date: 2021-01-29 14:15:24
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 15:12:08
+ * @LastEditTime: 2021-02-01 13:38:42
  */
 import http from '../axios/request'
 // GET
@@ -27,10 +27,28 @@ export function GET(url) {
 
 // POST/PUT
 export function POST(url, method, params) {
-  console.log(url, method, params)
+  // console.log(url, method, params)
   return new Promise((resolve, reject) => {
     http({
       method: method,
+      url: url,
+      data: params
+    }).then(res => {
+      if (res.status_code === 200) {
+        resolve(res.data)
+      } else {
+        reject(res.msg)
+      }
+    }).catch(err => {
+      console.log(err)
+    })
+  })
+}
+// DELETE
+export function DELETE(url, params) {
+  return new Promise((resolve, reject) => {
+    http({
+      method: 'DELETE',
       url: url,
       data: params
     }).then(res => {

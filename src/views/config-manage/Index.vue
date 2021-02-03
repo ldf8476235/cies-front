@@ -4,7 +4,7 @@
  * @Date: 2021-01-25 15:44:01
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-27 14:29:26
+ * @LastEditTime: 2021-02-02 18:06:29
 -->
 <template>
   <div class="environment">
@@ -115,22 +115,23 @@
         ></PageUtil>
         <!-- 新增编辑配置 -->
         <el-dialog width='30%' title="新建配置" :visible.sync="dialogFormVisible">
-          <el-form :model="configInfo" label-position="top">
-            <el-form-item label="配置名称">
+          <el-form ref='formConfig' :model="configInfo" label-position="top" :rules='ruleConfigInfo'>
+            <el-form-item label="配置名称" prop='name'>
               <el-input v-model="configInfo.name" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="创建人">
-              <el-select v-model="configInfo.region" placeholder="请选择活动区域">
+            <el-form-item label="创建人" prop='builder'>
+              <!-- <el-select v-model="configInfo.region" placeholder="请选择活动区域">
                 <el-option label="区域一" value="shanghai"></el-option>
                 <el-option label="区域二" value="beijing"></el-option>
-              </el-select>
+              </el-select> -->
+              <el-input v-model="configInfo.builder" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="配置描述">
-              <el-input type='textarea' v-model="configInfo.name" autocomplete="off"></el-input>
+            <el-form-item label="配置描述" prop='desc'>
+              <el-input type='textarea' v-model="configInfo.desc" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="配置文件">
+            <el-form-item label="配置文件" prop='file_name'>
               <input type='file' style='display:none;' accept='audio/wav' ref='file' id='file' @change= "changeFile" >
-              <el-input style='width:70%;' disabled v-model="configInfo.name" autocomplete="off"></el-input>
+              <el-input style='width:70%;' disabled v-model="configInfo.file_name" autocomplete="off"></el-input>
               <el-button style="margin-left: 10px;" type="" @click="scan">浏览</el-button>
               <el-button><i class='el-icon-caret-right'></i></el-button>
               <el-progress :percentage="percentage" :format="format"></el-progress>
@@ -138,7 +139,7 @@
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+            <el-button type="primary" @click="save">确 定</el-button>
           </div>
         </el-dialog>
       </div>
@@ -148,6 +149,7 @@
 
 <script>
 import Func from '@/components/seach-func-header/Func.vue'
+import { GET, POST } from '@/utils/api.js';
 import SparkMD5 from 'spark-md5'
 export default {
   name: 'Environment',
@@ -160,7 +162,7 @@ export default {
         action: false,
         name: '配置管理'
       },
-      text: '新建环境',
+      text: '新建配置',
       total: 0,
       pageSize: 10,
       currPage: 1,
@@ -178,10 +180,22 @@ export default {
       seachInfo: { // 高级检索信息
 
       },
-      dialogFormVisible: true,
-      configInfo: { name: '' },
-      fileList: [
-        { name: 'food.jpeg', url: '' }],
+      dialogFormVisible: false,
+      configInfo: { name: '', path: '', file_name: '' },
+      ruleConfigInfo: {
+        name: [
+          { required: true, message: '请输入配置名称', trigger: 'blur' }
+        ],
+        builder: [
+          { required: true, message: '请输入创建人', trigger: 'blur' }
+        ],
+        desc: [
+          { required: true, message: '请输入描述信息', trigger: 'blur' }
+        ],
+        file_name: [
+          { required: true, message: '请先上传文件', trigger: 'blur' }
+        ]
+      },
       percentage: 0 // 上传进度
     };
   },
@@ -192,9 +206,9 @@ export default {
     },
     async changeFile() {
       const files = document.getElementById('file').files
-      this.configInfo.name = files[0].name
+
+      console.log(document.getElementById('file').value)
       this.uploadFile(files)
-      // console.log('await')
     },
     uploadFile(files) {
       var _this = this
@@ -210,22 +224,22 @@ export default {
       //   document.getElementById('file').value = null
       //   return
       // }
-      // 这里需要用到File的slice( )方法，以下是兼容写法
+      // 这里需要用到File的slice()方法，以下是兼容写法
       var blobSlice =
           File.prototype.slice ||
           File.prototype.mozSlice ||
           File.prototype.webkitSlice
       var file = files[0]
-      var chunkSize = 5 * 1024 * 1024 // 以每片5MB大小来逐次读取
+      var chunkSize = 2 * 1024 * 1024 // 以每片1MB大小来逐次读取
       var fileSize = file.size
+      _this.configInfo.size = fileSize
       var chunks = Math.ceil(fileSize / chunkSize) // 总片数
       var currentChunk = 0
       var spark = new SparkMD5() // 创建SparkMD5的实例
       var fileReader = new FileReader()
       fileReader.onload = async function(e) {
-        // console.log('Read chunk number' + (currentChunk + 1) + ' of  chunks ', e.target.result)
+        console.log('Read chunk number' + (currentChunk + 1) + ' of  chunks ', e.target.result)
         spark.appendBinary(e.target.result) // append array buffer
-        console.log(spark)
         currentChunk += 1
         if (currentChunk < chunks) {
           loadNext()
@@ -234,13 +248,21 @@ export default {
           console.log('Finished loading!')
           const fileMD5 = spark.end()
           console.log('str', fileMD5)
-          for (let i = 0; i < chunks; i++) {
-            const reslut = await upload(i, fileMD5);
-            console.log(reslut)
-            if (reslut.rate === 1) {
-              merge(file.name, fileMD5)
+          const checkResult = await checkFileMD5(file.name, fileMD5)
+          console.log(checkResult)
+          if (checkResult === 0) {
+            for (let i = 0; i < chunks; i++) {
+              const result = await upload(i, fileMD5);
+              console.log(result)
+              if (result.rate === 1) {
+                merge(file.name, fileMD5)
+              }
+              _this.percentage = Number((result.rate * 100).toFixed(0))
             }
-            _this.percentage = Number((reslut.rate * 100).toFixed(2))
+          } else {
+
+            _this.$hintMsg('error', '此文件已存在')
+            document.getElementById('file').value = ''
           }
         }
       }
@@ -251,35 +273,58 @@ export default {
       function loadNext() {
         var start = currentChunk * chunkSize
         var end = start + chunkSize >= file.size ? file.size : start + chunkSize
-        fileReader.readAsBinaryString(blobSlice.call(file, start, end))
+        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end))
       }
       running = true
       loadNext()
+      // 校验文件是否存在
+      function checkFileMD5(name, md5) {
+        return new Promise((reslove) => {
+          const url = `settings/check/?uid=${md5}&name=${name}`
+          GET(url).then(res => {
+            console.log(res)
+            reslove(res)
+          })
+        })
+
+      }
+      // 上传方法
       function upload(currentChunk, fileMD5) {
         return new Promise((reslove, reject) => {
           const end = (currentChunk + 1) * chunkSize >= fileSize ? fileSize : (currentChunk + 1) * chunkSize;
           const form = new FormData();
           const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
-          // console.log(file, blobSlice.call(file, currentChunk * chunkSize, end))
           form.append('file', blobSlice.call(file, currentChunk * chunkSize, end));
           form.append('uid', fileMD5);
           form.append('voice_name', file.name);
           form.append('chunk', currentChunk);
           form.append('total_chunk', chunks);
           form.append('file_size', fileSize);
-          console.log('form:', currentChunk, blobSlice.call(file, currentChunk * chunkSize, end))
-          _this.$http.post('/settings/upload/', form).then(res => {
+          // console.log(form)
+          _this.$http({
+            url: '/settings/upload/',
+            method: 'POST',
+            data: form
+            // headers: {
+            //   // 文件上传要设置的我就不细说了
+            //   'Content-Type': 'multipart/form-data;charset=utf-8'
+            // }
+          }).then(res => {
+            // console.log(res)
             reslove(res)
           })
         })
       }
+      // 合并
       function merge(name, md5) {
         const data = {
           'voice_name': name,
           'uid': md5
         }
-        _this.$http.post('/settings/merge/', data).then(res => {
+        POST('/settings/merge/', 'POST', data).then(res => {
           console.log(res)
+          _this.configInfo.file_name = res.name
+          _this.configInfo.path = res.path
         })
       }
     },
@@ -311,14 +356,31 @@ export default {
     deleteBatch() {},
     // 新增环境
     goNewEnvironment() {
-
+      this.dialogFormVisible = true
     },
     // 选择列表
     handleSelectionChange() {},
     // 编辑
     edit() {},
     copy() {},
-    del() {}
+    del() {},
+    save() {
+      this.$refs.formConfig.validate(valid => {
+        if (!valid) return
+        const url = 'settings/add/'
+        console.log(this.configInfo)
+        POST(url, 'POST', this.configInfo).then(res => {
+          console.log(res)
+          this.$refs.formConfig.resetFields()
+          document.getElementById('file').value = ''
+          this.percentage = 0
+
+          this.dialogFormVisible = false
+
+        })
+      })
+
+    }
   }
 };
 </script>

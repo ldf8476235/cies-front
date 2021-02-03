@@ -4,7 +4,7 @@
  * @Date: 2020-12-04 13:30:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-05 10:59:34
+ * @LastEditTime: 2021-02-01 15:52:50
  */
 import axios from 'axios'
 // import NProgress from 'nprogress'
@@ -15,7 +15,7 @@ let BASE_URL
 if (process.env.NODE_ENV == 'development') {
   BASE_URL = ''
 } else if (process.env.NODE_ENV == 'production') {
-  BASE_URL = 'http://www.ecordia_test.com/api/v1/'
+  BASE_URL = ''
 }
 const service = axios.create({
   baseURL: BASE_URL, // api的base_url,

@@ -4,7 +4,7 @@
  * @Date: 2020-12-08 17:58:52
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2020-12-08 18:29:43
+ * @LastEditTime: 2021-02-01 15:10:00
  */
 import Vue from 'vue'
 import svgIcon from './Index.vue'
@@ -19,4 +19,4 @@ const req = require.context('./iconsvg', false, /\.svg$/)
    第二个参数是：false => 是否检索子目录,
    第三个参数是: /\.svg$/ => 匹配文件的正则
   */
-requireAll(req);
+requireAll(req)

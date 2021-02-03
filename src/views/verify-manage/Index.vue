@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 16:16:52
+ * @LastEditTime: 2021-02-02 15:55:40
 -->
 <template>
   <div class="verify">
@@ -70,8 +70,13 @@
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
             <el-table-column label="类型" width="50">
-              <template>
-                <svg-icon data_iconName="icon-gesture" className="icon"/>
+              <template slot-scope='scope'>
+                <svg-icon v-if="scope.row.type === 'Image'" data_iconName="icon-gesture" />
+                <svg-icon v-else-if="scope.row.type === 'U3'" data_iconName="icon-gesture" />
+                <svg-icon v-else-if="scope.row.type === 'Text'" data_iconName="icon-gesture" />
+                <svg-icon v-else-if="scope.row.type === 'Voice'" data_iconName="icon-gesture" />
+                <svg-icon v-else-if="scope.row.type === 'Log'" data_iconName="icon-gesture" />
+                <svg-icon v-else data_iconName="icon-gesture" />
               </template>
             </el-table-column>
             <el-table-column prop="name" label="检验点名称" min-width="180">
@@ -150,7 +155,7 @@ export default {
       selectVal: '', // 选中项
       inputKey: '', // 搜索输入项
       tabIndex: 1,
-      verifyList: [{ type: 'image' }, { type: 'other' }], // 动作列表
+      verifyList: [], // 动作列表
       seachInfo: {}, // 高级检索条件
       selectData: [] // 选择的数据
 
@@ -217,7 +222,7 @@ export default {
           console.log(respone)
           if (respone.status_code === 200) {
             this.$hintMsg('success', '批量删除成功')
-            this.getActionList(this.currPage, this.pageSize)
+            this.getVerifyList(this.currPage, this.pageSize)
           }
         })
       }).catch(err => {
@@ -235,7 +240,8 @@ export default {
         const respone = await this.$http.delete(url, { data })
         if (respone.status_code === 200) {
           this.$hintMsg('success', res)
-          this.getActionList(this.currPage, this.pageSize)
+          console.log(this)
+          this.getVerifyList(this.currPage, this.pageSize)
         }
       }).catch(err => {
         this.$hintMsg('info', err)

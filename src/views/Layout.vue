@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-18 09:50:18
- * @LastEditTime: 2021-01-25 15:53:01
+ * @LastEditTime: 2021-02-01 17:17:04
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\views\Layout.vue
@@ -111,13 +111,13 @@ export default {
           icon: 'icon-device-off'
           // children: [],
         },
-        {
-          id: '005',
-          name: '脚本管理',
-          path: '/script',
-          icon: 'icon-script-on'
-          // children: [],
-        },
+        // {
+        // id: '005',
+        // name: '脚本管理',
+        // path: '/script',
+        // icon: 'icon-script-on'
+        // children: [],
+        // },
         {
           id: '011',
           name: '配置管理',

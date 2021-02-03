@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:38:03
- * @LastEditTime: 2020-12-01 09:55:05
+ * @LastEditTime: 2021-02-01 17:00:47
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\user-manage\Index.vue
@@ -270,7 +270,7 @@ export default {
     setTimeout(() => {
       this.getRoleList();
     }, 500);
-  },
+  }
 };
 </script>
 <style lang='less' scoped>
@@ -282,6 +282,7 @@ export default {
 }
   .content {
     padding: 20px;
+    box-sizing: border-box;
   }
   .funcTop {
     display: flex;

@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-01-29 15:20:04
+ * @LastEditTime: 2021-02-02 14:50:36
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -13,7 +13,7 @@
     </div>
     <div class="container">
       <div class="content">
-        <Func ref='func' :options='options' @goNew='goNewTask' :txt='text'>
+        <Func ref='func' :options='options' @goNew='goNewTask' @deleteBatch='deleteBatch' :txt='text'>
           <el-form slot='task' :inline='true' label-position="top" :model="seachInfo" class="demo-form-inline">
             <el-form-item style='width:150px;' label="任务名称">
               <el-input  v-model="seachInfo.name" placeholder="输入任务名称"></el-input>
@@ -73,8 +73,15 @@
           </el-form>
         </Func>
         <div class="tableContent">
-          <el-table :data="taskList" class='borderTop'>
-            <el-table-column type="selection" align="center" width="55">
+          <el-table
+            :data="taskList"
+            class='borderTop'
+            @selection-change="handleSelectionChange">
+            <el-table-column
+              type="selection"
+              align="center"
+              width="55"
+              >
             </el-table-column>
             <el-table-column prop="name" label="任务名称" width="180">
             </el-table-column>
@@ -103,10 +110,10 @@
               </template>
             </el-table-column>
             <el-table-column prop="taskStatus" label="" width="80">
-              <template>
+              <template slot-scope='scope'>
                 <div v-if='true'  class='execute bg-color'>
-                  <svg-icon v-if='true' data_iconName='icon-start' className='colorFFF'></svg-icon>
-                  <svg-icon v-else data_iconName='icon-retry'></svg-icon>
+                  <svg-icon v-if='!scope.row.executeFlag' data_iconName='icon-start' className='colorFFF' @click.native='execute(scope.row)'></svg-icon>
+                  <svg-icon v-else data_iconName='icon-retry' className='colorFFF' @click.native='reExecute(scope.row)'></svg-icon>
                 </div>
                 <div v-else class='execute'>
                   <svg-icon v-if='true' data_iconName='icon-start'></svg-icon>
@@ -132,7 +139,7 @@
                   <p><svg-icon data_iconName="icon-copy" /><span>复制</span></p>
                   <p><svg-icon data_iconName="icon-log" /><span>日志</span></p>
                   <p><svg-icon data_iconName="icon-report" /><span>报告</span></p>
-                  <p @click='del(scope.row.taskId)'><svg-icon data_iconName="icon-delete" /><span>删除</span></p>
+                  <p @click='del(scope.row.uid)'><svg-icon data_iconName="icon-delete" /><span>删除</span></p>
                   <div slot="reference">
                     <svg-icon data_iconName='icon-more'></svg-icon>
                   </div>
@@ -168,7 +175,8 @@
 <script>
 import Dialog from '@/components/config-dialog/Dialog.vue';
 import Func from '@/components/seach-func-header/Func.vue'
-import { GET, POST } from '@/utils/api.js';
+import { GET, DELETE } from '@/utils/api.js';
+import { delHint } from '@/utils/utils.js';
 export default {
   name: 'Task',
   components: {
@@ -195,20 +203,42 @@ export default {
       ],
       selectVal: '', // 选中项
       inputKey: '', // 搜索输入项
-      taskList: [{}], // 任务列表
+      taskList: [], // 任务列表
       seachInfo: { // 高级搜索条件
 
       },
       dialogTableVisible: true,
-      executeDeviceList: [{}, {}],
+      executeDeviceList: [],
       radio: '', // 选择执行机
-      keyword: ''
+      keyword: '',
+      selectData: [ // 选中数据
+
+      ]
     };
   },
   mounted() {
     this.getTaskList(this.currPage, this.pageSize)
   },
   methods: {
+    // 选择数据
+    handleSelectionChange(val) {
+      console.log(val)
+      this.selectData = val;
+    },
+    // 执行
+    execute(row) {
+      const url = `task/run_task/?uid=${row.uid}`
+      GET(url).then(res => {
+        this.$set(row, 'executeFlag', true)
+        this.$hintMsg('success', res)
+      }).catch(err => {
+        this.$hintMsg('error', err)
+      })
+    },
+    // 重新执行
+    reExecute() {
+
+    },
     // 执行机搜索关键字
     seach() {
     },
@@ -238,7 +268,6 @@ export default {
     },
     // 获取所有任务
     getTaskList(page, size) {
-
       const url = `task/list/?page=${page}&count=${size}`
       GET(url).then(res => {
         console.log(res)
@@ -253,7 +282,7 @@ export default {
         {
           name: 'TaskDetails',
           query: {
-            editId: row.taskId
+            uid: row.uid
           },
           params: {
             data: row
@@ -267,7 +296,7 @@ export default {
         {
           name: 'NewTask',
           query: {
-            editId: row.taskId
+            uid: row.uid
           },
           params: {
             data: row
@@ -275,18 +304,49 @@ export default {
         }
       )
     },
+    // 批量删除数据
+    deleteBatch() {
+      const url = 'task/del'
+      if (this.selectData.length === 0) {
+        this.$hintMsg('warning', '请先选择任何数据！')
+        return
+      }
+      const idList = this.selectData.map(item => {
+        return item.uid
+      })
+      const data = {
+        uid: idList
+      }
+      delHint(this).then(res => {
+        DELETE(url, data).then(respone => {
+          console.log(respone)
+          // if (respone.status_code === 200) {
+          this.$hintMsg('success', '批量删除成功')
+          this.getActionList(this.currPage, this.pageSize)
+          // }
+        })
+      }).catch(err => {
+        this.$hintMsg('info', err)
+      })
+
+    },
     // 单个删除任务
     del(id) {
-      const url = `task/delete/${id}`
-      this.$http.delete(url).then(res => {
-        if (res.code === 1) {
+      const url = `task/del/`
+      const data = {
+        uid: [id]
+      }
+      delHint(this).then(res => {
+        DELETE(url, data).then(respone => {
+          this.$hintMsg('success', respone)
           this.getTaskList(this.currPage, this.pageSize)
-          this.$message({
-            type: 'success',
-            message: '删除成功！'
-          })
-        }
+        }).catch(err => {
+          this.$hintMsg('error', err)
+        })
+      }).catch(err => {
+        this.$hintMsg('info', err)
       })
+
     },
     // 新建任务
     goNewTask() {

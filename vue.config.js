@@ -4,7 +4,7 @@
  * @Date: 2020-11-30 17:12:31
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-26 13:50:10
+ * @LastEditTime: 2021-02-02 16:16:27
  */
 module.exports = {
   publicPath: './',
@@ -36,7 +36,7 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': { // 代理api
-        target: 'http://192.168.210.130:8000/api/', // 'http://localhost:17310/api/', // 服务器api地址 http://192.168.210.130:8000/api/
+        target: 'http://192.168.210.130:5000/api/', // 'http://localhost:17310/api/', // 服务器api地址 http://192.168.210.130:8000/api/
         changeOrigin: true, // 是否跨域
         ws: true, // proxy websockets
         // port: 17310,

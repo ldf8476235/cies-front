@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:38:03
- * @LastEditTime: 2020-12-01 09:55:05
+ * @LastEditTime: 2021-02-01 17:00:11
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\user-manage\Index.vue
@@ -34,7 +34,7 @@
             :row-key="getRowKeys"
             tooltip-effect="dark"
             @selection-change="selectHandler"
-          >
+            >
             <el-table-column type="selection" :reserve-selection="true"  :span="1">
             </el-table-column>
             <el-table-column prop="roleName" label="角色名称" :span="10">
@@ -65,13 +65,13 @@
           :before-close="handleClose"
           left>
           <el-form
-:model="roleForm"
-status-icon
-ref="roleForm"
-label-width="80px"
-                  class="demo-ruleForm"
-size="mini"
-label-position="top">
+            :model="roleForm"
+            status-icon
+            ref="roleForm"
+            label-width="80px"
+            class="demo-ruleForm"
+            size="mini"
+            label-position="top">
             <el-form-item label="角色名称" prop="roleName">
               <el-input v-model="roleForm.roleName" placeholder="请输入角色名称" autocomplete="off" maxlength="30" :disabled="title=='编辑角色'"></el-input>
             </el-form-item>
@@ -94,12 +94,12 @@ label-position="top">
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
-                    <el-button @click="handleClose" class="footer-button">取 消</el-button>
-                    <el-button
-type="primary"
-@click="submit('roleForm')"
-                              class="footer-button footer-no">确 定</el-button>
-                  </span>
+            <el-button @click="handleClose" class="footer-button">取 消</el-button>
+            <el-button
+              type="primary"
+              @click="submit('roleForm')"
+              class="footer-button footer-no">确 定</el-button>
+          </span>
         </el-dialog>
         <PageUtil
           ref="pageutil"
@@ -209,7 +209,7 @@ export default {
             roleName: '',
             roleType: [],
             roleDesc: ''
-          },
+          }
           done();
         })
         .catch(_ => {});
@@ -282,6 +282,7 @@ export default {
 .role {
   .content {
     padding: 20px;
+    box-sizing: border-box;
   }
   .funcTop {
     display: flex;

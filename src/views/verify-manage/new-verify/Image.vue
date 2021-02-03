@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 19:50:23
+ * @LastEditTime: 2021-02-02 16:32:22
 -->
 <template>
   <div class="new-verify">
@@ -24,6 +24,7 @@
                 <el-row class="left">
                   <el-col :span="24">
                     <el-form-item label="链接设备：" prop="device_name">
+                      <el-input style="width:40%;margin-right:10px;" v-model="deviceUrl"></el-input>
                       <el-dropdown @command='linkDevice'>
                       <el-button type="">
                         链接设备<i class="el-icon-arrow-down el-icon--right"></i>
@@ -34,6 +35,7 @@
                         </el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
+                    <el-button style="margin-left:10px;" @click='refreshDeviceScreen'>刷新</el-button>
                     </el-form-item>
                   </el-col>
 
@@ -285,6 +287,7 @@
 
 <script>
 import { b64toBlob, ImagePool } from '@/utils/common.js';
+import { POST } from '@/utils/api.js';
 export default {
   name: '',
   data() {
@@ -338,7 +341,7 @@ export default {
         type: 'U3',
         content: '',
         element: 'text',
-        regex_result: 'exists',
+        regex_result: 'PASS',
         timeout: '0'
       },
       rulesCaseInfo: {
@@ -408,8 +411,12 @@ export default {
       connect: false,
       regResuslt: [ // 匹配结果
         {
-          label: 'exists',
-          value: 'exists'
+          label: 'PASS',
+          value: 'PASS'
+        },
+        {
+          label: 'FAIL',
+          value: 'FAIL'
         }
       ],
       pyshell: {
@@ -424,7 +431,8 @@ export default {
         }
       },
       baseCode: '',
-      testResult: ''
+      testResult: '',
+      deviceUrl: '' // 链接设备的IP
     };
   },
   created() {
@@ -435,6 +443,10 @@ export default {
     this.initPythonWebSocket()
     this.canvas.bg = document.querySelector('#bgCanvas')
     this.canvas.fg = document.querySelector('#fgCanvas')
+  },
+  destroyed() {
+    this.screenWebSocket && this.screenWebSocket.close()
+    this.destroy = true
   },
   computed: {
     nodes: function() {
@@ -510,28 +522,34 @@ export default {
     }
   },
   methods: {
+    // 刷新屏幕
+    refreshDeviceScreen() {
+      this.dumpHierarchy()
+    },
     // 测试页面
     testPage() {
       const node = this.nodeSelected
       node.action = 'tap'
       var code = this.verifyInfo.content
       const ele = this.verifyInfo.element
-      const regResult = this.verifyInfo.regex_result
+      // const regResult = this.verifyInfo.regex_result
       const timeout = this.verifyInfo.timeout
       let codeComplate
+      // this.loadLiveHierarchy()
+      // this.nodeSelected = null
+      // this.nodeHovered = null
       if (ele === 'xpath') {
-        codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + regResult + ')'
+        codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + 'exists' + ')'
       } else if (ele === 'text') {
-        codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + regResult + '(' + timeout + '))'
+        codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + 'exists' + '(' + timeout + '))'
       } else if (ele === 'resourceId') {
         console.log(ele, code)
-        if (ele === code) {
+        if (code === "d(resourceId='')") {
           this.testResult = 'FAIL'
           return
         }
-        codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + regResult + '(' + timeout + '))'
+        codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + 'exists' + '(' + timeout + '))'
       }
-
       console.log(codeComplate)
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
@@ -562,7 +580,7 @@ export default {
       this.pyshell.running = false
       this.pyshell.restarting = false
 
-      const ws = this.pyshell.ws = new WebSocket('ws://192.168.210.130:8000/ws/v1/python')
+      const ws = this.pyshell.ws = new WebSocket('ws://192.168.210.130:5000/ws/v1/python')
       ws.onopen = () => {
         this.pyshell.wsOpen = true
         console.log('python:连接成功')
@@ -570,10 +588,19 @@ export default {
       }
       ws.onmessage = (message) => {
         const data = JSON.parse(message.data)
-        console.log('message:', data)
-        if (data.value === 'True') {
-          this.testResult = 'PASS'
+        // console.log('message:', data)
+        if (data.method === 'output') {
+          console.log('message:', data.method, data.value)
+          // if (!data.value) {
+          if ((data.value === 'True' && this.verifyInfo.regex_result === 'PASS') || (data.value === 'False' && this.verifyInfo.regex_result === 'FAIL')) {
+            this.testResult = 'PASS'
+          } else if ((data.value === 'False' && this.verifyInfo.regex_result === 'PASS') || (data.value === 'True' && this.verifyInfo.regex_result === 'FAIL')) {
+            this.testResult = 'FAIL'
+          }
+          // }
+
         }
+
         const lineNumber = null
         const timeUsed = null
         // 用蓝色的breakpoint标记已经运行过的代码
@@ -927,7 +954,11 @@ export default {
     loadLiveHierarchy() {
       // 选中后不在实时计算元素(app)边框
       if (this.nodeHovered || this.nodeSelected) {
-        setTimeout(this.loadLiveHierarchy, 500)
+        this.dumpHierarchy()
+        // setTimeout(this.loadLiveHierarchy, 500)
+        return
+      }
+      if (this.destroy) {
         return
       }
       this.dumpHierarchy()
@@ -950,6 +981,7 @@ export default {
         console.log('screen websocket connected')
       };
       ws.onmessage = function(message) {
+        console.log(message)
         var blob = new Blob([message.data], {
           type: 'image/jpeg'
         })
@@ -1496,15 +1528,18 @@ export default {
           })
           return
         }
-        this.$http.post('verify/add', this.verifyInfo).then(res => {
+        let url = 'verify/add'
+        let method = 'POST'
+        if (this.verifyInfo.uid) {
+          url = 'verify/edit'
+          method = 'PUT'
+        }
+        POST(url, method, this.verifyInfo).then(res => {
           console.log(res)
-          if (res.status_code === 200) {
-            this.$message({
-              type: 'success',
-              message: '添加成功'
-            })
-            this.$router.push('/verify')
-          }
+          this.$hintMsg('success', res)
+          this.$router.push('/verify')
+        }).catch(err => {
+          this.$hintMsg('error', err)
         })
       })
 

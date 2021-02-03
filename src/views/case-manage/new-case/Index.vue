@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 18:47:45
+ * @LastEditTime: 2021-02-01 18:45:46
 -->
 <template>
   <div class="new-case">
@@ -221,7 +221,13 @@
                 </template>
               </el-table-column>
               <el-table-column label="序号" width="50" type="index"></el-table-column>
-              <el-table-column property="type" label="类型" width="50"></el-table-column>
+              <el-table-column property="type" label="类型" width="50">
+                <template slot-scope='scope'>
+                  <svg-icon v-if="scope.row.type ==='U3'" data_iconName="icon-gesture" />
+                  <svg-icon v-if="scope.row.type ==='Voice'" data_iconName="icon-voice" />
+                  <svg-icon v-if="scope.row.type ==='Shell'" data_iconName="icon-script-off" />
+                </template>
+              </el-table-column>
               <el-table-column property="name" label="动作名称"></el-table-column>
               <el-table-column property="builder" label="创建人" width="100"></el-table-column>
               <el-table-column property="time_create" label="创建时间" width="140"></el-table-column>
@@ -233,7 +239,13 @@
                 </template>
               </el-table-column>
               <el-table-column label="序号" width="50" type="index"></el-table-column>
-              <el-table-column property="type" label="类型" width="50"></el-table-column>
+              <el-table-column property="type" label="类型" width="50">
+                <template slot-scope='scope'>
+                  <svg-icon v-if="scope.row.type ==='U3'" data_iconName="icon-gesture" />
+                  <svg-icon v-if="scope.row.type ==='Voice'" data_iconName="icon-voice" />
+                  <svg-icon v-if="scope.row.type ==='Shell'" data_iconName="icon-script-off" />
+                </template>
+              </el-table-column>
               <el-table-column property="name" label="校验点名称"></el-table-column>
               <el-table-column property="builder" label="创建人" width="100"></el-table-column>
               <el-table-column property="time_create" label="创建时间" width="140"></el-table-column>

@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 19:33:38
+ * @LastEditTime: 2021-02-02 18:30:14
 -->
 <template>
   <div class="new-voice">
@@ -43,7 +43,7 @@
                     </el-select> -->
                     <el-input
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
-                      v-model.trim="voiceInfo.name"
+                      v-model.trim="voiceInfo.project"
                       placeholder="输入所属项目"
                     ></el-input>
                   </el-form-item>
@@ -104,7 +104,7 @@
               <el-table
                 width="100%"
                class="borderTop"
-                :data="voiceInfo.actionData"
+                :data="voiceInfo.settings"
                 >
                 <el-table-column
                   type="selection"
@@ -120,45 +120,37 @@
                 <el-table-column label="语音名称"  width='180'>
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'actionData.' + scope.$index + '.voiceName'"
-                      :rules="rulesCaseInfo.actionData.name"
+                      :prop="'settings.' + scope.$index + '.voiceName'"
+                      :rules="rulesCaseInfo.settings.name"
                       label-width="0px"
                     >
-                      <span v-if="scope.row.editNode">
+                      <!-- <span v-if="scope.row.editNode">
                         <el-input
                           ref="inputBlur"
                           v-model="scope.row.voiceName"
                           placeholder=""
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
-                      </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.voiceName}} </span>
+                      </span> -->
+                      <span > {{scope.row.name}} </span>
                     </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'actionData.' + scope.$index + '.executeWait'"
-                      :rules="rulesCaseInfo.actionData.device_function"
+                      :prop="'settings.' + scope.$index + '.executeWait'"
+                      :rules="rulesCaseInfo.settings.device_function"
                       label-width="0px"
-                    >
-                      <!-- <el-select v-model="selectVal" placeholder="请选择">
-                        <el-option
-                          v-for="item in options"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value"
-                        >
-                        </el-option>
-                      </el-select> -->
-                      <el-input
+                      >
+                      <!-- <el-input
                           style="width:30%;"
                           ref="inputBlur"
                           v-model="scope.row.executeWait"
                           placeholder=""
                           @blur="inputBlur(scope.row,scope.column)"
-                        ></el-input>
+                        ></el-input> -->
+                        10
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -189,14 +181,13 @@
           </el-form>
           <Dialog ref='dialog' :title='title' @confirm='confirm'>
             <el-table slot='voice' :data="voiceList">
-              <el-table-column label="" align="center" width="40">
+              <el-table-column label="" align="center" width="30">
                 <template slot-scope="scope">
-                  <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.uid"></el-radio>
+                  <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.uid">{{''}}</el-radio>
                 </template>
               </el-table-column>
               <el-table-column property="" label="序号" width="50" type="index"></el-table-column>
-              <el-table-column property="type" label="类型" width="50"></el-table-column>
-              <el-table-column property="name" label="动作名称"></el-table-column>
+              <el-table-column property="file_name" label="语料名称"></el-table-column>
               <el-table-column property="builder" label="创建人" width="100"></el-table-column>
               <el-table-column property="time_create" label="创建时间" width="140"></el-table-column>
             </el-table>
@@ -222,6 +213,9 @@ export default {
         name: '新建动作'
       },
       title: '语音列表',
+      total: 0,
+      pageSize: 10,
+      currPage: 1,
       loading: false, // 任务名称动态验证动画
       options: [
         {
@@ -238,15 +232,8 @@ export default {
       voiceInfo: {
         type: 'Voice',
         corpus: 'corpus',
-        actionData: [
-          {
-            voiceName: '节点名称1',
-            executeWait: 'aq2134'
-          },
-          {
-            voiceName: '节点名称2',
-            executeWait: 'aq2134'
-          }
+        executeWait: '10',
+        settings: [
         ]
       },
       rulesCaseInfo: {
@@ -268,7 +255,7 @@ export default {
         desc: [
           { required: true, message: '请输入动作描述', trigger: 'blur' }
         ],
-        actionData: {}
+        settings: {}
       },
       corpusList: [// 语料库
         {
@@ -278,19 +265,37 @@ export default {
       ],
       voiceList: [ // 语音列表
 
-      ]
+      ],
+      radio: '',
+      radioData: { // 选择语音的数据
+
+      }
     };
   },
-  computed: {
-  },
-  watch: {
+  mounted() {
+    this.getVoiceList(this.currPage, this.pageSize)
+    const uid = this.$route.query.uid
+    if (uid) {
+      this.getEditData()
+    }
   },
   methods: {
-    // 获取语音列表
-    getVoiceList() {
-      const url = ''
+    // 获取编辑的数据
+    getEditData() {
+      const uid = this.$route.query.uid
+      const url = `action/detail/?uid=${uid}`
       GET(url).then(res => {
-        this.voiceList = res.data
+        console.log(res)
+        this.voiceInfo = res.result[0]
+        this.crumbs.name = this.voiceInfo.name
+      })
+    },
+    // 获取语音列表
+    getVoiceList(page, size) {
+      const url = `/settings/list/?page=${page}&count=${size}`
+      GET(url).then(res => {
+        this.voiceList = res.result
+        this.total = res.count
       })
     },
     inputBlur() {
@@ -301,11 +306,9 @@ export default {
       console.log(row)
       this.radioData = row
     },
-    // 修改语音名称
-    tabDblClick() {},
     addVoiceRow() {
       this.$refs.dialog.dialogTableVisible = true
-      this.insertIndex = this.voiceInfo.actionData.length
+      this.insertIndex = this.voiceInfo.settings.length
     },
     // 插入语音
     insertVoice() {
@@ -320,42 +323,39 @@ export default {
         return
       }
       const data = {
-        editLoop: false,
         uid: this.radioData.uid,
         name: this.radioData.name,
         type: this.radioData.type,
         timeout: 0,
-        errorDispose: '123',
-        overtime: 'asdasd',
-        executeWait: 'aq2134',
-        selectFlag: false
+        executeWait: '10'
       }
-      this.caseInfo.action.splice(this.insertIndex + 1, 0, data)
+      this.voiceInfo.settings.splice(this.insertIndex + 1, 0, data)
       this.radio = ''
     },
     save() {
       this.$refs.voiceInfo.validate(valid => {
         if (!valid) return
+
+        let url = 'action/add'
+        let methods = 'POST'
+        const uid = this.$route.query.uid
+
+        if (uid) {
+          methods = 'PUT'
+          url = 'action/edit'
+        } else {
+          this.voiceInfo.builder = 'voiceAdmin'
+        }
+        const arr = this.voiceInfo.settings.map(item => {
+          return item.uid ? item.uid : item
+        })
+        this.voiceInfo.settings = arr
         console.log('保存', this.voiceInfo)
-        const url = 'action/add'
-        const methods = 'POST'
         POST(url, methods, this.voiceInfo).then(res => {
           this.$hintMsg('success', '添加动作成功！')
-          // console.log(res)
-          // if (res.code === 1) {
-          //   this.$message({
-          //     type: 'success',
-          //     message: '添加动作成功！'
-          //   })
-          //   this.$router.push({
-          //     path: '/action'
-          //   })
-          // } else if (res.code === 2) {
-          //   this.$message({
-          //     type: 'error',
-          //     message: res.msg
-          //   })
-          // }
+          this.$router.push('/action')
+        }).catch(err => {
+          this.$hintMsg('error', err)
         })
       })
     }

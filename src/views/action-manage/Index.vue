@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2021-01-29 20:00:19
+ * @LastEditTime: 2021-02-01 11:14:45
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -229,17 +229,23 @@ export default {
     // 编辑
     edit(row) {
       console.log(row)
-      if (row.type === 'screen') {
-        this.$router.push({
-          name: 'NewScreen',
-          query: {
-            uid: row.uid
-          },
-          params: {
-            data: row
-          }
-        })
+      let name = ''
+      if (row.type === 'U3') {
+        name = 'NewScreen'
+      } else if (row.type === 'Voice') {
+        name = 'NewVoice'
+      } else if (row.type === 'Shell') {
+        name = 'NewScript'
       }
+      this.$router.push({
+        name: name,
+        query: {
+          uid: row.uid
+        },
+        params: {
+          data: row
+        }
+      })
     },
     // 批量删除数据
     deleteBatch() {

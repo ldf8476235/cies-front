@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 20:04:07
+ * @LastEditTime: 2021-02-02 14:22:20
 -->
 <template>
   <div class="new-screen">
@@ -110,6 +110,7 @@
                           <el-button type="">导出</el-button>
                           <el-button type="">清空</el-button>
                           <el-button @click='preview' type="">预览</el-button>
+                          <el-button type='info' @click='refreshDeviceScreen'>刷新</el-button>
                         </div>
                       </div>
                       <div class="action-sequence-content">
@@ -529,7 +530,8 @@ export default {
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
-    this.loadLiveHierarchy = null
+    this.destroy = true
+    // this.loadLiveHierarchy = null
   },
   computed: {
     nodes: {
@@ -586,7 +588,10 @@ export default {
     }
   },
   methods: {
-
+    // 刷新屏幕
+    refreshDeviceScreen() {
+      this.dumpHierarchy()
+    },
     // 获取现有设备
     getHasDevice() {
       this.$http.get('/device/screen/phones/').then(res => {
@@ -653,6 +658,11 @@ export default {
     },
     preview() {
       const codeComplate = this.editor.getValue()
+      if (!codeComplate) {
+        this.$hintMsg('warning', '请先链接设备！')
+        return
+      }
+      console.log(codeComplate)
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
     },
@@ -669,6 +679,9 @@ export default {
       console.log(codeComplate)
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
+      this.nodeSelected = null
+      this.nodeHovered = null
+      this.loadLiveHierarchy()
     },
     doSendKeys(text) {
       if (!text) {
@@ -688,6 +701,8 @@ export default {
       if (!this.deviceId) {
         return this.doConnect().then(() => {
           this.runPythonWithConnect(code)
+        }).catch(err => {
+          console.warn(err)
         })
       }
       // this.pyshell.lineno.offset = 0
@@ -716,7 +731,7 @@ export default {
       this.pyshell.running = false
       this.pyshell.restarting = false
 
-      const ws = this.pyshell.ws = new WebSocket('ws://192.168.210.130:8000/ws/v1/python')
+      const ws = this.pyshell.ws = new WebSocket('ws://192.168.210.233:5000/ws/v1/python')
       ws.onopen = () => {
         this.pyshell.wsOpen = true
         console.log('python:连接成功')
@@ -876,12 +891,12 @@ export default {
         // leak huge amounts of memory when the developer tools are
         // open, probably to save the resources for inspection. When
         // the developer tools are closed no memory is leaked.
-        // img.onload = img.onerror = null
-        // img.src = BLANK_IMG
-        // img = null
-        // blob = null
-        // URL.revokeObjectURL(url)
-        // url = null
+        img.onload = img.onerror = null
+        img.src = BLANK_IMG
+        img = null
+        blob = null
+        URL.revokeObjectURL(url)
+        url = null
         // dtd.resolve();
       }
 
@@ -907,7 +922,6 @@ export default {
         this.packageName = res.packageName;
         this.drawAllNodeFromSource(res.jsonHierarchy);
         this.activeMouseControl()
-        // this.nodeSelected = null;
       })
     },
     // wh-绘制所有安卓屏幕所有节点
@@ -982,7 +996,6 @@ export default {
           return;
         }
       }
-      // this.$nextTick(() => {
       var screenDiv = this.$refs.screen // document.getElementById('screen');
       this.lastScreenSize = {
         canvas: {
@@ -1000,18 +1013,6 @@ export default {
         width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', // 'inherit',
         height: Math.floor(screenDiv.clientHeight) + 'px' // '100%',
       })
-      // })
-      // if (canvasRatio > screenRatio) {
-      //   Object.assign(this.canvasStyle, {
-      //     width: Math.floor(screenDiv.clientWidth) + 'px', //'100%',
-      //     height: Math.floor(screenDiv.clientWidth / canvasRatio) + 'px', // 'inherit',
-      //   })
-      // } else {
-      //   // Object.assign(this.canvasStyle, {
-      //   //   width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', //'inherit',
-      //   //   height: Math.floor(screenDiv.clientHeight) + 'px', //'100%',
-      //   // })
-      // }
     },
     drawRefresh() {
       this.drawAllNode()
@@ -1127,6 +1128,9 @@ export default {
         setTimeout(this.loadLiveHierarchy, 500)
         return
       }
+      if (this.destroy) {
+        return
+      }
       this.dumpHierarchy()
         .then(() => {
           this.loadLiveHierarchy()
@@ -1150,7 +1154,7 @@ export default {
         var blob = new Blob([message.data], {
           type: 'image/jpeg'
         })
-        var img = self.imagePool.next();
+        var img = self.imagePool.next()
         img.onload = function() {
           canvas.width = img.width
           canvas.height = img.height

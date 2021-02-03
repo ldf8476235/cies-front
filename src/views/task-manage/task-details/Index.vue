@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 14:04:56
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-22 14:21:46
+ * @LastEditTime: 2021-02-01 18:14:53
 -->
 <template>
   <div class="case-details">
@@ -22,58 +22,25 @@
             <div class="taskInfo">
               <el-row class="">
                 <el-col :span="12">
-                  <el-form-item v-if="editFlag"  label="用例名称：" prop="device_name">
-                    <el-input
-                      disabled
-                      :suffix-icon="loading ? 'el-icon-loading' : ''"
-                      v-model.trim="taskInfo.device_name"
-                      placeholder="请输入"
-                    ></el-input>
-                  </el-form-item>
-                  <p v-else><span>任务名称：</span><span>case_name_1</span></p>
+                  <p ><span>任务名称：</span><span class="width-span">{{taskInfo.name}}</span></p>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item v-if="editFlag" label="软件版本：">
-                    <el-input
-                      v-model="taskInfo.device_sn"
-                      placeholder=""
-                    ></el-input>
-                  </el-form-item>
-                  <p v-else><span>软件版本：</span><span>case_name_1</span></p>
+                  <p><span>软件版本：</span><span class="width-span">{{taskInfo.version}}</span></p>
                 </el-col>
                 <el-col :span="12">
-
-                  <el-form-item v-if="editFlag" label="所属项目：" prop="device_space">
-                    <el-select v-model="selectVal" placeholder="请选择">
-                      <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      >
-                      </el-option>
-                    </el-select>
-                  </el-form-item>
-                  <p v-else ><span>所属项目：</span><span>case_name_1</span></p>
+                  <p><span>所属项目：</span><span  class="width-span">{{taskInfo.project}}</span></p>
                 </el-col>
                 <el-col :span="12">
-                  <p><span>指派人：</span><span>case_name_1</span></p>
+                  <p><span>指派人：</span><span class="width-span">{{taskInfo.builder}}</span></p>
                 </el-col>
                 <el-col :span="12">
-                  <p><span>创建时间：</span><span>case_name_1</span></p>
+                  <p><span>创建时间：</span><span class="width-span">{{taskInfo.time_create}}</span></p>
                 </el-col>
                 <el-col :span="12">
-                  <p><span>更新时间：</span><span>case_name_1</span></p>
+                  <p><span>更新时间：</span><span class="width-span">{{taskInfo.time_modify}}</span></p>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item v-if="editFlag" label="用例描述：">
-                    <el-input
-                      type="textarea"
-                      v-model="taskInfo.device_desc"
-                      placeholder="请输入"
-                    ></el-input>
-                  </el-form-item>
-                  <p  v-else ><span>任务描述：</span><span>case_name_1</span></p>
+                  <p><span>任务描述：</span><span class="width-span">{{taskInfo.desc}}</span></p>
                 </el-col>
               </el-row>
             </div>
@@ -89,7 +56,7 @@
                 width="100%"
                 class="borderStyle"
                 ref="refTable"
-                :data="taskInfo.taskCase"
+                :data="taskInfo.case_list"
                 row-key="id"
                 >
                 <el-table-column
@@ -168,7 +135,7 @@
                 </el-table-column>
                 <el-table-column label="用例组">
                   <template slot-scope="scope">
-                    <el-form-item
+                    <!-- <el-form-item
                       :prop="'taskCase.' + scope.$index + '.caseGroup'"
                       :rules="rulesTaskInfo.taskCase.caseGroup"
                       label-width="0px"
@@ -181,13 +148,14 @@
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.caseGroup}} </span>
-                    </el-form-item>
+
+                    </el-form-item> -->
+                    <span @click="tabDblClick(scope.row,scope.column)" > {{scope.row.caseGroup}} </span>
                   </template>
                 </el-table-column>
                 <el-table-column label="用例">
                   <template slot-scope="scope">
-                    <el-form-item
+                    <!-- <el-form-item
                       :prop="'taskCase.' + scope.$index + '.case'"
                       :rules="rulesTaskInfo.taskCase.case"
                       label-width="0px"
@@ -200,13 +168,14 @@
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.case}} </span>
-                    </el-form-item>
+
+                    </el-form-item> -->
+                    <span @click="tabDblClick(scope.row,scope.column)" > {{scope.row.name}} </span>
                   </template>
                 </el-table-column>
                 <el-table-column label="循环次数">
                   <template slot-scope="scope">
-                    <el-form-item
+                    <!-- <el-form-item
                       :prop="'taskCase.' + scope.$index + '.loopTimes'"
                       :rules="rulesTaskInfo.taskCase.loopTimes"
                       label-width="0px"
@@ -219,13 +188,14 @@
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}} </span>
-                    </el-form-item>
+
+                    </el-form-item> -->
+                    <span @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}}10 </span>
                   </template>
                 </el-table-column>
                 <el-table-column label="出错处理">
                   <template slot-scope="scope">
-                    <el-form-item
+                    <!-- <el-form-item
                       :prop="'taskCase.' + scope.$index + '.error'"
                       :rules="rulesTaskInfo.taskCase.error"
                       label-width="0px"
@@ -239,13 +209,14 @@
                             >
                           </el-option>
                         </el-select>
-                        <span v-else>跳出</span>
-                    </el-form-item>
+
+                    </el-form-item> -->
+                    <span >跳出</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
-                    <el-form-item
+                    <!-- <el-form-item
                       :prop="'taskCase.' + scope.$index + '.executeWait'"
                       :rules="rulesTaskInfo.taskCase.executeWait"
                       label-width="0px"
@@ -259,13 +230,14 @@
                           >
                         </el-option>
                       </el-select>
-                      <span v-else>无处理</span>
-                    </el-form-item>
+
+                    </el-form-item> -->
+                    <span>无处理</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="执行位置">
                   <template slot-scope="scope">
-                    <el-form-item
+                    <!-- <el-form-item
 
                       :prop="'taskCase.' + scope.$index + '.executeWait'"
                       :rules="rulesTaskInfo.taskCase.executeWait"
@@ -280,9 +252,8 @@
                           >
                         </el-option>
                       </el-select>
-                      <span v-else>被测设备</span>
-                    </el-form-item>
-
+                    </el-form-item> -->
+                    <span>被测设备</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="操作" align="center" width="80">
@@ -293,17 +264,13 @@
                       trigger="click">
                       <p @click="addCaseGroup(scope.$index)">
                         <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
-                        <span>添加用例组</span>
+                        <span>日志</span>
                       </p>
                       <p @click="addCase(scope.$index)">
                         <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
-                        <span>添加用例</span>
+                        <span>报告</span>
                       </p>
-                      <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>添加子用例</span></p>
-                      <p><svg-icon data_iconName="icon-configure" className="icon-gesture"/><span>配置环境</span></p>
-                      <p @click="upMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
-                      <p @click="downMove(scope.$index,scope.row)"><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
-                      <p @click="delCaseGroup(scope.$index)"><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
+
                       <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
                     </el-popover>
                   </template>
@@ -319,6 +286,7 @@
 
 <script>
 import Sortable from 'sortablejs';
+import { GET } from '@/utils/api.js';
 export default {
   name: 'CaseDetails',
   data() {
@@ -326,7 +294,7 @@ export default {
       crumbs: {
         action: true,
         details: true,
-        name: 'case_name_1'
+        name: ''
       },
       editFlag: false,
       loading: false, // 任务名称动态验证动画
@@ -343,46 +311,46 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       taskInfo: {
-        'taskAssign': '',
-        'taskDesc': '',
-        'taskId': 0,
-        'taskName': '',
-        'taskProject': '',
-        'taskVersion': '',
-        taskCase: [
-          {
-            id: '1',
-            editCaseGroup: false,
-            editLoop: false,
-            caseGroup: '节点名称1',
-            loopTimes: 11,
-            error: '123',
-            overtime: 'asdasd',
-            executeWait: 'aq2134',
-            childrens: [
-              {
-                id: '101',
-                editCaseGroup: false,
-                editLoop: false,
-                caseGroup: '',
-                loopTimes: 11,
-                error: '123',
-                overtime: 'asdasd',
-                executeWait: 'aq2134'
-              },
-              {
-                id: '102',
-                editCaseGroup: false,
-                editLoop: false,
-                caseGroup: '',
-                loopTimes: 12,
-                error: '1qwe',
-                overtime: 'asdasd',
-                executeWait: 'aq2134'
-              }
-            ]
-          }
-        ]
+        // 'taskAssign': '',
+        // 'taskDesc': '',
+        // 'taskId': 0,
+        // 'taskName': '',
+        // 'taskProject': '',
+        // 'taskVersion': '',
+        // taskCase: [
+        //   {
+        //     id: '1',
+        //     editCaseGroup: false,
+        //     editLoop: false,
+        //     caseGroup: '节点名称1',
+        //     loopTimes: 11,
+        //     error: '123',
+        //     overtime: 'asdasd',
+        //     executeWait: 'aq2134',
+        //     childrens: [
+        //       {
+        //         id: '101',
+        //         editCaseGroup: false,
+        //         editLoop: false,
+        //         caseGroup: '',
+        //         loopTimes: 11,
+        //         error: '123',
+        //         overtime: 'asdasd',
+        //         executeWait: 'aq2134'
+        //       },
+        //       {
+        //         id: '102',
+        //         editCaseGroup: false,
+        //         editLoop: false,
+        //         caseGroup: '',
+        //         loopTimes: 12,
+        //         error: '1qwe',
+        //         overtime: 'asdasd',
+        //         executeWait: 'aq2134'
+        //       }
+        //     ]
+        //   }
+        // ]
       },
       rulesTaskInfo: {
         taskName: [
@@ -405,11 +373,21 @@ export default {
       iconFlag: true // 折叠图标标识
     };
   },
-  computed: {
-  },
-  watch: {
+  mounted() {
+    this.getDetails()
   },
   methods: {
+    getDetails() {
+      const uid = this.$route.query.uid
+      const url = `task/detail/?uid=${uid}`
+      GET(url).then(res => {
+        console.log(res)
+        this.taskInfo = res.result[0]
+        this.crumbs.name = this.taskInfo.name
+      }).catch(err => {
+        this.$hintMsg('error', err)
+      })
+    },
     // 展开
     expand(row, index) {
       console.log(row, index)
@@ -488,14 +466,9 @@ export default {
           text-align: right;
         }
       }
-      .el-input {
-        width: 50%;
-      }
-      .el-select {
-        width: 50%;
-      }
-      .el-textarea {
-        width: 50%;
+      .width-span{
+        width: 80%;
+        text-align: left;
       }
     }
     .taskCase {
