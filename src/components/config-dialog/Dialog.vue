@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 17:53:18
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 19:27:39
+ * @LastEditTime: 2021-02-03 17:49:50
 -->
 <template>
   <div>
@@ -64,13 +64,11 @@ export default {
     // 当前页条数
     handleSizeChange(size) {
       this.pageSize = size
-      this.getTaskList(this.currPage, size)
     },
     // 当前页面
     handleCurrChange(page) {
       this.currPage = page
       console.log(this.currPage)
-      this.getTaskList(page, this.pageSize)
     }
   }
 };

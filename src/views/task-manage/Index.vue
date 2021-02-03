@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-03 17:32:59
+ * @LastEditTime: 2021-02-03 18:26:57
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -148,15 +148,15 @@
             </el-table-column>
           </el-table>
         </div>
-        <Dialog ref='dialog' :title='title' @confirm='confirmDevice'>
+        <Dialog ref='dialog' :title='title' @confirm='confirmActuator'>
           <el-table slot='executeDevice' :data="executeDeviceList">
             <el-table-column label="" align="center" width="30">
                 <template slot-scope="scope">
                   <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.uid">{{''}}</el-radio>
                 </template>
               </el-table-column>
-            <el-table-column property="date" label="序号" type="index" width="50"></el-table-column>
-            <el-table-column property="date" label="执行机"></el-table-column>
+            <el-table-column property="index" label="序号" type="index" width="50"></el-table-column>
+            <el-table-column property="actuator_name" label="执行机"></el-table-column>
           </el-table>
         </Dialog>
         <PageUtil
@@ -177,6 +177,8 @@ import Dialog from '@/components/config-dialog/Dialog.vue';
 import Func from '@/components/seach-func-header/Func.vue'
 import { GET, DELETE } from '@/utils/api.js';
 import { delHint } from '@/utils/utils.js';
+// 引入常量
+import { WS_URL } from '@/axios/C_L.js';
 export default {
   name: 'Task',
   components: {
@@ -213,25 +215,71 @@ export default {
       keyword: '',
       selectData: [ // 选中数据
 
-      ]
+      ],
+      radioData: { // 选择执行机
+
+      }
     };
   },
   mounted() {
     this.getTaskList(this.currPage, this.pageSize)
+    this.getActuatorList(1, 10)
+    this.startWebSocket()
+  },
+  destroyed() {
+    this.ws.close()
   },
   methods: {
+    // 任务管理页面加载websocket开启
+    startWebSocket() {
+      const _this = this
+      const url = 'ws://' + WS_URL + '/ws/device'
+      const ws = new WebSocket(url)
+      this.ws = ws
+      ws.onopen = function() {
+        console.log('websocket链接成功')
+      }
+      ws.onmessage = function(message) {
+        const data = JSON.parse(JSON.parse(message.data))
+        console.log(data)
+        if (data.call_flag) {
+          _this.$hintMsg('success', data.call_msg)
+        } else {
+          _this.$hintMsg('error', data.call_msg)
+        }
+
+      }
+      ws.onclose = function() {
+        console.log('websocket链接关闭')
+      }
+      ws.onerror = function() {
+        console.log('ws链接出错')
+      }
+
+    },
+    // 获取执行机
+    getActuatorList(page, size) {
+      const url = `/device/list/?page=${page}&count=${size}`
+      GET(url).then(res => {
+        this.executeDeviceList = res.result
+      })
+    },
     // 选择执行机
     radioItem(row) {
       console.log(row)
       this.radioData = row
     },
     // 确认执行文件
-    confirmDevice() {
-      console.log('确认添加数据')
+    confirmActuator() {
+      console.log('确认添加数据', this.radioData)
+      if (!this.radioData.uid) {
+        this.$hintMsg('warning', '未选择执行机')
+        return
+      }
       const url = `task/run_task/?uid=${this.row.uid}&actuator=${this.radioData.uid}`
       GET(url).then(res => {
         this.$set(this.row, 'executeFlag', true)
-        this.$hintMsg('success', res)
+        // this.$hintMsg('success', res)
       }).catch(err => {
         this.$hintMsg('error', err)
       })

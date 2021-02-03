@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 15:59:19
+ * @LastEditTime: 2021-02-03 17:41:25
 -->
 <template>
   <div class="new-verify">
@@ -449,7 +449,11 @@ export default {
       // screenDiv.style.height = (window.innerHeight - 210) + 'px' // '430px'
       this.resizeScreen(this.img)
     }
-    this.editData()
+    const uid = this.$route.query.uid
+    if (uid) {
+      this.editData(uid)
+    }
+
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
@@ -530,8 +534,7 @@ export default {
     }
   },
   methods: {
-    editData() {
-      const uid = this.$route.query.uid
+    editData(uid) {
       const url = `/verify/detail/?uid=${uid}`
       GET(url).then(res => {
         this.verifyInfo = res.result[0]
