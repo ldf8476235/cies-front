@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 10:21:56
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-01 10:11:36
+ * @LastEditTime: 2021-02-03 15:24:06
 -->
 <template>
   <div class="new-screen">
@@ -62,7 +62,7 @@
                         </p>
 
                         <div class="action-btn">
-                          <el-dropdown split-button type="">
+                          <el-dropdown v-if='false' split-button type="">
                             链接设备
                             <el-dropdown-menu slot="dropdown">
                               <el-dropdown-item>黄金糕</el-dropdown-item>
@@ -399,7 +399,7 @@ export default {
         }
       },
       clickMobileApp: [], // 收集点击手机app数据
-      screenLoading: true // 屏幕未加载完成loading动画
+      screenLoading: false // 屏幕未加载完成loading动画
     };
   },
   created() {
@@ -427,11 +427,6 @@ export default {
   methods: {
     // 编辑
     editData() {
-      // const actionData = this.$route.params.data
-      // if (actionData) {
-      //   localStorage.setItem('actionData', JSON.stringify(actionData))
-      // }
-      // this.actionInfo = actionData || JSON.parse(localStorage.getItem('actionData'))
       const uid = this.$route.query.uid
       const url = `/action/detail/?uid=${uid}`
       GET(url).then(res => {
@@ -449,14 +444,12 @@ export default {
     // 处理动作序列数据
     disposeActionSequence(data) {
       const arr = []
-
-      // const sequence = JSON.parse(JSON.stringify(data))
       console.log(data)
-      // const len = sequence.length
-      // for (let i = 0; i < len;) {
-      //   arr.push(sequence.slice(i, i += 10))
-      // }
-      // this.actionSequence = arr
+      const len = data.length
+      for (let i = 0; i < len;) {
+        arr.push(data.slice(i, i += 10))
+      }
+      this.actionSequence = arr
     },
     // 元素节点点击事件
     itemClick(a, b) {
@@ -651,7 +644,13 @@ export default {
     },
     copy() {},
     edit() {
-
+      const uid = this.$route.query.uid
+      this.$router.push({
+        path: '/action/newscreen',
+        query: {
+          uid
+        }
+      })
 
     }
   }

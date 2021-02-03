@@ -4,7 +4,7 @@
  * @Date: 2021-01-29 14:15:24
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-01 13:38:42
+ * @LastEditTime: 2021-02-03 15:35:57
  */
 import http from '../axios/request'
 // GET
@@ -20,7 +20,7 @@ export function GET(url) {
         reject(res.msg)
       }
     }).catch(err => {
-      console.log(err)
+      console.log('GET--:', err)
     })
   })
 }
@@ -40,7 +40,7 @@ export function POST(url, method, params) {
         reject(res.msg)
       }
     }).catch(err => {
-      console.log(err)
+      console.log('POST--:', err)
     })
   })
 }
@@ -58,7 +58,7 @@ export function DELETE(url, params) {
         reject(res.msg)
       }
     }).catch(err => {
-      console.log(err)
+      console.log('DELETE--:', err)
     })
   })
 }

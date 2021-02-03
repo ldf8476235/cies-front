@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 14:10:06
+ * @LastEditTime: 2021-02-03 17:28:21
 -->
 <template>
   <div class="new-screen">
@@ -52,10 +52,10 @@
                           </el-form-item>
 
 
-                          <el-form-item label="超时时长：" prop='timeout'>
+                          <el-form-item label="超时时间：" prop='timeout'>
                             <el-input
                               v-model="actionInfo.timeout"
-                              placeholder="输入超时时长"
+                              placeholder="输入超时时间（秒/s）"
                             ></el-input>
                           </el-form-item>
                           <el-form-item label="动作描述：" prop='desc'>
@@ -380,6 +380,7 @@ import 'codemirror/addon/hint/show-hint';
 
 import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool } from '@/utils/common.js';
+import { GET } from '@/utils/api';
 export default {
 
   name: 'NewScreen',
@@ -528,7 +529,7 @@ export default {
     // 编辑进入
     const uid = this.$route.query.uid
     if (uid) {
-      this.editData()
+      this.editData(uid)
     }
     window.onresize = () => {
       // console.log('aaa', window.innerHeight)
@@ -542,6 +543,7 @@ export default {
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
     this.destroy = true
+    window.onresize = null
     // this.loadLiveHierarchy = null
   },
   computed: {
@@ -622,13 +624,15 @@ export default {
       this.doConnect()
     },
     // 编辑
-    editData() {
-      const actionData = this.$route.params.data
-      if (actionData) {
-        localStorage.setItem('actionData', JSON.stringify(actionData))
-      }
-      this.actionInfo = actionData || JSON.parse(localStorage.getItem('actionData'))
-      this.disposeActionSequence(this.actionInfo.sequence)
+    editData(uid) {
+      const url = `action/detail/?uid=${uid}`
+      GET(url).then(res => {
+        this.actionInfo = res.result[0]
+        this.editor.setValue(this.actionInfo.script)
+        this.disposeActionSequence(this.actionInfo.sequence)
+      }).catch(err => {
+        console.log(err)
+      })
     },
     // 点击按钮外部区域，隐藏元素
     onClickOutside() {
@@ -637,7 +641,6 @@ export default {
     // 处理动作序列数据
     disposeActionSequence(data) {
       const arr = []
-      // actionSequence
       const len = data.length
       for (let i = 0; i < len;) {
         arr.push(data.slice(i, i += 10))
@@ -911,7 +914,7 @@ export default {
         if (['Layout'].includes(node.type)) {
           return;
         }
-        self.drawNode(node, 'black', true);
+        self.drawNode(node, '#ff8901', true);
       })
     },
     // wh-绘制app位置边框
@@ -953,8 +956,8 @@ export default {
         screenDiv.style.width = Math.floor(330 * r) + 'px'
         screenDiv.style.height = '330px'
       } else {
-        screenDiv.style.width = Math.floor((window.innerHeight - 310) * r) + 'px'
-        screenDiv.style.height = (window.innerHeight - 310) + 'px' // '500px'
+        screenDiv.style.width = Math.floor((window.innerHeight - 270) * r) + 'px'
+        screenDiv.style.height = (window.innerHeight - 270) + 'px' // '500px'
       }
     },
     drawRefresh() {
@@ -1385,7 +1388,7 @@ export default {
         console.log('保存', this.actionInfo)
         let url = ''
         let methods = ''
-        if (this.$route.query.actionId) {
+        if (this.$route.query.uid) {
           url = 'action/edit'
           methods = 'PUT'
         } else {

@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 10:30:22
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 14:32:03
+ * @LastEditTime: 2021-02-03 14:50:38
 -->
 <template>
   <div class="case-details">
@@ -145,15 +145,12 @@ export default {
     },
     // 编辑
     edit() {
-      const row = this.caseInfo
+      const uid = this.$route.query.uid
       this.$router.push(
         {
-          name: 'NewCase',
+          path: '/case/newcase',
           query: {
-            editId: row.taskId
-          },
-          params: {
-            data: row
+            uid
           }
         }
       )

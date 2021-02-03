@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 13:55:42
+ * @LastEditTime: 2021-02-03 15:59:19
 -->
 <template>
   <div class="new-verify">
@@ -287,13 +287,13 @@
 
 <script>
 import { b64toBlob, ImagePool } from '@/utils/common.js';
-import { POST } from '@/utils/api.js';
+import { GET, POST } from '@/utils/api.js';
 export default {
   name: '',
   data() {
     var timeout = (rule, value, callback) => {
       console.log(Number(value), value)
-      if (!value) {
+      if (value === '') {
         return callback(new Error('请输入超时时长'))
       } else if (Number(value) + '' === 'NaN') {
         callback(new Error('请输入数字'))
@@ -449,10 +449,12 @@ export default {
       // screenDiv.style.height = (window.innerHeight - 210) + 'px' // '430px'
       this.resizeScreen(this.img)
     }
+    this.editData()
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
     this.destroy = true
+    window.onresize = null
   },
   computed: {
     nodes: function() {
@@ -528,6 +530,15 @@ export default {
     }
   },
   methods: {
+    editData() {
+      const uid = this.$route.query.uid
+      const url = `/verify/detail/?uid=${uid}`
+      GET(url).then(res => {
+        this.verifyInfo = res.result[0]
+      }).catch(err => {
+        this.$hintMsg('error', err)
+      })
+    },
     // 刷新屏幕
     refreshDeviceScreen() {
       this.dumpHierarchy()
@@ -535,7 +546,13 @@ export default {
     // 测试页面
     testPage() {
       const node = this.nodeSelected
-      node.action = 'tap'
+      // console.log(node)
+      if (node) {
+        node.action = 'tap'
+      }
+      if (!this.baseCode) {
+        this.$hintMsg('warning', '请先链接设备')
+      }
       var code = this.verifyInfo.content
       const ele = this.verifyInfo.element
       // const regResult = this.verifyInfo.regex_result
@@ -1492,7 +1509,7 @@ export default {
       this.verifyInfo.builder = 'admin'
       this.$refs.verifyInfo.validate(valid => {
         if (!valid) return
-        if (this.testResult === 'FAIL' || !this.testResult) {
+        if (!this.testResult) {
           this.$message({
             type: 'error',
             message: '测试结果有误，请检查页面元素类型'

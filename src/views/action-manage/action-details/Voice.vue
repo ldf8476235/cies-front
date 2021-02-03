@@ -4,11 +4,11 @@
  * @Date: 2021-01-22 10:21:45
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-01 11:11:31
+ * @LastEditTime: 2021-02-03 14:53:29
 -->
 <template>
   <div class="new-voice">
-    <Crumbs :crumbs='crumbs' @copy='copy'></Crumbs>
+    <Crumbs :crumbs='crumbs' @copy='copy' @edit='edit'></Crumbs>
     <div class="container">
       <div class="content">
         <div class="title">动作信息</div>
@@ -121,7 +121,13 @@ export default {
 
     },
     edit() {
-
+      const uid = this.$route.query.uid
+      this.$router.push({
+        path: '/action/newvoice',
+        query: {
+          uid
+        }
+      })
     }
   }
 };

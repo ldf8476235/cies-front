@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 14:22:34
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 10:57:33
+ * @LastEditTime: 2021-02-03 15:43:15
 -->
 <template>
   <div class="new-verify">
@@ -122,6 +122,7 @@ export default {
     return {
       crumbs: {
         action: true,
+        details: true,
         name: '新建校验点'
       },
       screenLoading: false, // 屏幕未加载完成loading动画
@@ -144,15 +145,13 @@ export default {
     this.imagePool = new ImagePool(100);
   },
   mounted() {
-    // this.doConnect()
-    // this.getCurrentScreen()
     this.canvas.bg = document.querySelector('#bgCanvas')
     this.getDetails()
   },
   methods: {
     // 详情数据
     getDetails() {
-      const uid = this.$route.query.detailsId
+      const uid = this.$route.query.uid
       const url = `/verify/detail/?uid=${uid}`
       this.$http.get(url).then(res => {
         console.log(res)
@@ -305,7 +304,13 @@ export default {
     },
     // 编辑
     edit() {
-
+      const uid = this.$route.query.uid
+      this.$router.push({
+        path: '/verify/newimage',
+        query: {
+          uid
+        }
+      })
     }
   }
 };

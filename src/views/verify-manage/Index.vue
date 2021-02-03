@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-02 15:55:40
+ * @LastEditTime: 2021-02-03 15:40:24
 -->
 <template>
   <div class="verify">
@@ -268,7 +268,7 @@ export default {
       this.$router.push({
         name: name,
         query: {
-          detailsId: row.uid,
+          uid: row.uid,
           type: type
         },
         params: {
@@ -296,7 +296,7 @@ export default {
       this.$router.push({
         name: name,
         query: {
-          detailsId: row.uid,
+          uid: row.uid,
           type: type
         },
         params: {

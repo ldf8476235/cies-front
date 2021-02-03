@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-01 18:46:36
+ * @LastEditTime: 2021-02-03 14:47:58
 -->
 <template>
   <div class="newTask">
@@ -224,7 +224,7 @@
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loop_count}} </span>
+                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loop_count}}10 </span>
                     </el-form-item>
                   </template>
                 </el-table-column>

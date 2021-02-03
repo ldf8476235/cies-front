@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 14:04:56
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-01 18:14:53
+ * @LastEditTime: 2021-02-03 14:46:57
 -->
 <template>
   <div class="case-details">
@@ -13,12 +13,6 @@
       <div class="content">
         <div class="title">任务信息</div>
         <div class="formData">
-          <el-form
-            ref="taskInfo"
-            :model="taskInfo"
-            :rules="rulesTaskInfo"
-            label-width="100px"
-          >
             <div class="taskInfo">
               <el-row class="">
                 <el-col :span="12">
@@ -45,13 +39,7 @@
               </el-row>
             </div>
             <div class="taskCase">
-              <el-row v-if="editFlag" class="text-title">
-                <p>
-                  已选择 <span> 1 </span>个节点<span> 2 </span>用例
-                  <span class="del-color">删除</span>
-                </p>
-              </el-row>
-              <div v-else class="action-list-title">用例列表</div>
+              <div class="action-list-title">用例列表</div>
               <el-table
                 width="100%"
                 class="borderStyle"
@@ -63,10 +51,6 @@
                   width="100">
                   <template slot-scope="scope">
                     <div class="func">
-                      <el-checkbox v-if="editFlag" @change="selectRow(scope.row)"></el-checkbox>
-                      <div class="drag" v-if="editFlag">
-                        <svg-icon data_iconName = 'icon-grab'></svg-icon>
-                      </div>
                       <div @click="expand(scope.row,scope.$index)">
                         <svg-icon v-if="iconFlag || iconIndex !== scope.$index" data_iconName = 'icon-start'></svg-icon>
                         <svg-icon v-else data_iconName = 'icon-arrow-down'></svg-icon>
@@ -86,10 +70,7 @@
                           width="100">
                           <template slot-scope="scope">
                             <div class="func">
-                              <el-checkbox v-if="editFlag" @change="selectRow(scope.row)"></el-checkbox>
-                              <div v-if="editFlag" draggable="true" @dragstart="dragClick(scope.row)" class="childDrag">
-                                <svg-icon data_iconName = 'icon-grab'></svg-icon>
-                              </div>
+
                               <div>
                                 <svg-icon data_iconName = 'icon-subset'></svg-icon>
                               </div>
@@ -135,124 +116,31 @@
                 </el-table-column>
                 <el-table-column label="用例组">
                   <template slot-scope="scope">
-                    <!-- <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.caseGroup'"
-                      :rules="rulesTaskInfo.taskCase.caseGroup"
-                      label-width="0px"
-                      >
-                      <span v-if="scope.row.editCaseGroup">
-                        <el-input
-                          ref="inputBlur"
-                          v-model="scope.row.caseGroup"
-                          placeholder=""
-                          @blur="inputBlur(scope.row,scope.column)"
-                        ></el-input>
-                      </span>
-
-                    </el-form-item> -->
                     <span @click="tabDblClick(scope.row,scope.column)" > {{scope.row.caseGroup}} </span>
                   </template>
                 </el-table-column>
                 <el-table-column label="用例">
                   <template slot-scope="scope">
-                    <!-- <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.case'"
-                      :rules="rulesTaskInfo.taskCase.case"
-                      label-width="0px"
-                    >
-                      <span v-if="scope.row.editCase">
-                        <el-input
-                          ref="inputBlur"
-                          v-model="scope.row.case"
-                          placeholder=""
-                          @blur="inputBlur(scope.row,scope.column)"
-                        ></el-input>
-                      </span>
-
-                    </el-form-item> -->
                     <span @click="tabDblClick(scope.row,scope.column)" > {{scope.row.name}} </span>
                   </template>
                 </el-table-column>
                 <el-table-column label="循环次数">
                   <template slot-scope="scope">
-                    <!-- <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.loopTimes'"
-                      :rules="rulesTaskInfo.taskCase.loopTimes"
-                      label-width="0px"
-                    >
-                      <span v-if="scope.row.editLoop">
-                        <el-input
-                          ref="inputBlur"
-                          v-model="scope.row.loopTimes"
-                          placeholder=""
-                          @blur="inputBlur(scope.row,scope.column)"
-                        ></el-input>
-                      </span>
-
-                    </el-form-item> -->
                     <span @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}}10 </span>
                   </template>
                 </el-table-column>
                 <el-table-column label="出错处理">
                   <template slot-scope="scope">
-                    <!-- <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.error'"
-                      :rules="rulesTaskInfo.taskCase.error"
-                      label-width="0px"
-                    >
-                        <el-select v-if="editFlag" v-model="selectVal" placeholder="请选择">
-                          <el-option
-                            v-for="item in options"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                            >
-                          </el-option>
-                        </el-select>
-
-                    </el-form-item> -->
                     <span >跳出</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
-                    <!-- <el-form-item
-                      :prop="'taskCase.' + scope.$index + '.executeWait'"
-                      :rules="rulesTaskInfo.taskCase.executeWait"
-                      label-width="0px"
-                      >
-                      <el-select v-if="editFlag" v-model="selectVal" placeholder="请选择">
-                        <el-option
-                          v-for="item in options"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value"
-                          >
-                        </el-option>
-                      </el-select>
-
-                    </el-form-item> -->
                     <span>无处理</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="执行位置">
                   <template slot-scope="scope">
-                    <!-- <el-form-item
-
-                      :prop="'taskCase.' + scope.$index + '.executeWait'"
-                      :rules="rulesTaskInfo.taskCase.executeWait"
-                      label-width="0px"
-                      >
-                      <el-select v-if="editFlag" v-model="selectVal" placeholder="请选择">
-                        <el-option
-                          v-for="item in options"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value"
-                          >
-                        </el-option>
-                      </el-select>
-                    </el-form-item> -->
                     <span>被测设备</span>
                   </template>
                 </el-table-column>
@@ -277,7 +165,6 @@
                 </el-table-column>
               </el-table>
             </div>
-          </el-form>
         </div>
       </div>
     </div>
@@ -311,64 +198,6 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       taskInfo: {
-        // 'taskAssign': '',
-        // 'taskDesc': '',
-        // 'taskId': 0,
-        // 'taskName': '',
-        // 'taskProject': '',
-        // 'taskVersion': '',
-        // taskCase: [
-        //   {
-        //     id: '1',
-        //     editCaseGroup: false,
-        //     editLoop: false,
-        //     caseGroup: '节点名称1',
-        //     loopTimes: 11,
-        //     error: '123',
-        //     overtime: 'asdasd',
-        //     executeWait: 'aq2134',
-        //     childrens: [
-        //       {
-        //         id: '101',
-        //         editCaseGroup: false,
-        //         editLoop: false,
-        //         caseGroup: '',
-        //         loopTimes: 11,
-        //         error: '123',
-        //         overtime: 'asdasd',
-        //         executeWait: 'aq2134'
-        //       },
-        //       {
-        //         id: '102',
-        //         editCaseGroup: false,
-        //         editLoop: false,
-        //         caseGroup: '',
-        //         loopTimes: 12,
-        //         error: '1qwe',
-        //         overtime: 'asdasd',
-        //         executeWait: 'aq2134'
-        //       }
-        //     ]
-        //   }
-        // ]
-      },
-      rulesTaskInfo: {
-        taskName: [
-          { required: true, message: '请输入任务名称', trigger: 'blur' }
-        ],
-        taskAssign: [
-          { required: true, message: '请选择指派人', trigger: 'blur' }
-        ],
-        taskProject: [
-          { required: true, message: '请选择所属项目', trigger: 'blur' }
-        ],
-        taskVersion: [
-          { required: true, message: '请输入软件版本', trigger: 'blur' }
-        ],
-        taskDesc: [
-          { required: true, message: '请输入任务描述', trigger: 'blur' }
-        ],
-        taskCase: {}
       },
       iconFlag: true // 折叠图标标识
     };
@@ -424,9 +253,15 @@ export default {
     },
     // 编辑
     edit() {
-      // this.editFlag = true
-      // this.crumbs.details = false
+      const uid = this.$route.query.uid
       console.log('编辑')
+      this.$router.push({
+        path: '/task/newtask',
+        query: {
+          uid
+        }
+      })
+
     },
     // 取消
     cancel() {

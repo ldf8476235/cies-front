@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-02 14:50:36
+ * @LastEditTime: 2021-02-03 17:32:59
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -67,7 +67,7 @@
                   >
                   <el-button slot="reference" size="mini" style='border: 1px solid #DCDFE6;'>取消</el-button>
                 </el-popconfirm>
-                <el-button type="primary" size="mini" @click="confirm">确定</el-button>
+                <el-button type="primary" size="mini" @click="confirmSearch">确定</el-button>
               </div>
             </el-form-item>
           </el-form>
@@ -148,13 +148,13 @@
             </el-table-column>
           </el-table>
         </div>
-        <Dialog :title='title'>
+        <Dialog ref='dialog' :title='title' @confirm='confirmDevice'>
           <el-table slot='executeDevice' :data="executeDeviceList">
-            <el-table-column  width="30">
-              <template slot-scope="scope">
-                <el-radio v-model="radio" :label="scope.$index">{{''}}</el-radio>
-              </template>
-            </el-table-column>
+            <el-table-column label="" align="center" width="30">
+                <template slot-scope="scope">
+                  <el-radio @change="radioItem(scope.row)" v-model="radio" :label="scope.row.uid">{{''}}</el-radio>
+                </template>
+              </el-table-column>
             <el-table-column property="date" label="序号" type="index" width="50"></el-table-column>
             <el-table-column property="date" label="执行机"></el-table-column>
           </el-table>
@@ -220,6 +220,23 @@ export default {
     this.getTaskList(this.currPage, this.pageSize)
   },
   methods: {
+    // 选择执行机
+    radioItem(row) {
+      console.log(row)
+      this.radioData = row
+    },
+    // 确认执行文件
+    confirmDevice() {
+      console.log('确认添加数据')
+      const url = `task/run_task/?uid=${this.row.uid}&actuator=${this.radioData.uid}`
+      GET(url).then(res => {
+        this.$set(this.row, 'executeFlag', true)
+        this.$hintMsg('success', res)
+      }).catch(err => {
+        this.$hintMsg('error', err)
+      })
+
+    },
     // 选择数据
     handleSelectionChange(val) {
       console.log(val)
@@ -227,13 +244,8 @@ export default {
     },
     // 执行
     execute(row) {
-      const url = `task/run_task/?uid=${row.uid}`
-      GET(url).then(res => {
-        this.$set(row, 'executeFlag', true)
-        this.$hintMsg('success', res)
-      }).catch(err => {
-        this.$hintMsg('error', err)
-      })
+      this.row = row
+      this.$refs.dialog.dialogTableVisible = true
     },
     // 重新执行
     reExecute() {
@@ -254,7 +266,7 @@ export default {
       this.$refs.func.visible = false
     },
     // 确认搜索
-    confirm() {
+    confirmSearch() {
       console.log(this.seachInfo)
       const arr = []
       for (const key in this.seachInfo) {
