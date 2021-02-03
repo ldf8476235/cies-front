@@ -4,14 +4,14 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-02 14:22:20
+ * @LastEditTime: 2021-02-03 14:04:05
 -->
 <template>
   <div class="new-screen">
     <Crumbs :crumbs='crumbs' @save='save'></Crumbs>
     <div class="container">
       <div class="content">
-        <el-row :gutter="20">
+        <el-row :gutter="20" class='row'>
           <el-col class="left" :span="18">
             <div class="gutter">
               <el-row :gutter="20">
@@ -102,9 +102,15 @@
                               链接设备<i class="el-icon-arrow-down el-icon--right"></i>
                             </el-button>
                             <el-dropdown-menu slot="dropdown">
-                              <el-dropdown-item v-for='(item,index) in hasDeviceList' :key='index' :command="item.device_ip">
-                                {{item.device_name}} : {{item.device_ip}}
+                              <template v-if='hasDeviceList.length > 0'>
+                                <el-dropdown-item v-for='(item,index) in hasDeviceList' :key='index' :command="item.device_ip">
+                                  {{item.device_name}} : {{item.device_ip}}
+                                </el-dropdown-item>
+                              </template>
+                              <el-dropdown-item v-else command="no">
+                                无在线设备
                               </el-dropdown-item>
+
                             </el-dropdown-menu>
                           </el-dropdown>
                           <el-button type="">导出</el-button>
@@ -168,7 +174,7 @@
                                     <el-row>
                                       <el-col :span='10' style='text-align:end;letter-spacing:2px;'><span>区域：</span></el-col>
                                       <el-col :span='14'>
-                                        <span>{{citem.rect.x}},{{citem.rect.y}},{{citem.rect.width}},{{citem.rect.height}}</span>
+                                        <!-- <span>{{citem.rect.x}},{{citem.rect.y}},{{citem.rect.width}},{{citem.rect.height}}</span> -->
                                       </el-col>
                                     </el-row>
                                   </el-col>
@@ -508,7 +514,6 @@ export default {
     this.imagePool = new ImagePool(100);
   },
   mounted() {
-    // console.log(this.$refs.chartOption.codemirror.on)
     this.editor = this.$refs.chartOption.codemirror
     this.editor.on('keypress', () => {
       this.$refs.chartOption.codemirror.showHint();
@@ -518,8 +523,6 @@ export default {
     this.canvas.fg = document.querySelector('#fgCanvas')
 
     this.deviceId = 'android:'
-    // this.checkVersion()
-    // this.activeMouseControl()
     this.initPythonWebSocket()
     this.getHasDevice()
     // 编辑进入
@@ -527,6 +530,14 @@ export default {
     if (uid) {
       this.editData()
     }
+    window.onresize = () => {
+      // console.log('aaa', window.innerHeight)
+      // const screenDiv = document.getElementById('screen');
+      // screenDiv.style.height = (window.innerHeight - 310) + 'px' // '430px'
+      this.resizeScreen(this.img)
+    }
+    const arr = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
+    this.disposeActionSequence(arr)
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
@@ -601,6 +612,7 @@ export default {
     },
     // 选择连接设备
     linkDevice(ip) {
+      if (ip === 'no') return
       this.screenLoading = true
       this.deviceUrl = ip
       this.baseCode = "d = u3.connect('" + ip + "')"
@@ -703,6 +715,7 @@ export default {
           this.runPythonWithConnect(code)
         }).catch(err => {
           console.warn(err)
+          this.screenLoading = false
         })
       }
       // this.pyshell.lineno.offset = 0
@@ -745,69 +758,17 @@ export default {
         // 用蓝色的breakpoint标记已经运行过的代码
         // 用另外的breakpoint标记当前运行中的代码
         // 代码行号:lineno 从0开始
-        // switch (data.method) {
-        //   case 'gotoLine':
-        //     lineNumber = data.value + this.pyshell.lineno.offset;
-        //     this.setLineGoThrough(this.pyshell.lineno.current)
-        //     this.pyshell.lineno.current = lineNumber
-
-        //     // 下面这两行注释掉，因为会影响 "运行当前行" 功能中的自动跳到下一行的功能
-        //     // this.editor.selection.moveTo(lineNumber, 0) // 移动光标
-        //     // this.editor.scrollToLine(lineNumber) // 屏幕滚动到当前行
-        //     break;
-        //   case 'resetContent':
-        //     this.editor.setValue(data.value)
-        //     break;
-        //   case 'output':
-        //     this.appendConsole(data.value)
-        //     break;
-        //   case 'finish':
-        //     this.setLineGoThrough(this.pyshell.lineno.current)
-        //     this.pyshell.running = false
-        //     timeUsed = (data.value / 1000) + 's'
-        //     this.appendConsole('[Finished ' + timeUsed + ']')
-        //     break;
-        //   case 'restarted':
-        //     this.pyshell.restarting = false
-        //     this.pyshell.running = false
-        //     this.resetEditor()
-        //     this.$notify.success({
-        //       title: '重启内核',
-        //       message: '成功',
-        //       duration: 800,
-        //       offset: 100
-        //     })
-        //     this.runPython(this.generatePreloadCode())
-        //     break
-        //   default:
-        //     console.error('Unknown method', data.method)
-        // }
       }
       ws.onclose = () => {
         this.pyshell.wsOpen = false
         this.pyshell.ws = null
         this.pyshell.running = false
-        // this.resetEditor()
         console.log('python关闭连接websocket closed')
       }
     },
-    // appendConsole(text) {
-    //   this.pyshell.consoleData.push({ lineno: this.pyshell.lineno.current, value: text })
-    //   setTimeout(() => {
-    //     const c = this.$refs.console
-    //     c.scrollTop = c.scrollHeight - c.clientHeight
-    //   }, 1)
-    // },
-    // setLineGoThrough(lineno) {
-    //   if (lineno >= 0) {
-    //     // this.editor.session.setBreakpoint(lineno, 'ace_code_exercised')
-    //   }
-    // },
     // wh-运行python
     runPython(code) {
       return new Promise((resolve, reject) => {
-        // this.resetConsole()
-        // this.resetEditor()
         this.pyshell.running = true
         this.pyshell.ws.send(JSON.stringify({ method: 'input', value: code }))
         resolve()
@@ -826,18 +787,6 @@ export default {
     checkVersion: function() {
       this.$axios.get('/api/v1/version').then(res => {
         this.version = res.version;
-        // var lastScreenshotBase64 = localStorage.screenshotBase64;
-        // if (lastScreenshotBase64) {
-        //   var blob = b64toBlob(lastScreenshotBase64, 'image/jpeg');
-        //   this.drawBlobImageToScreen(blob);
-        //   this.canvasStyle.opacity = 1.0;
-        // }
-        // if (localStorage.jsonHierarchy) {
-        //   let source = JSON.parse(localStorage.jsonHierarchy);
-        //   this.drawAllNodeFromSource(source);
-        //   this.loading = false;
-        //   this.canvasStyle.opacity = 1.0;
-        // }
       })
     },
     // 获取当前屏幕截图
@@ -861,11 +810,13 @@ export default {
         console.log(this.screenWebSocketUrl)
         this.getCurrentScreen()
       }).catch(err => {
-        console.log('err', err)
+        this.screenLoading = false
+        console.log('doConnet-err', err)
       })
     },
     // 绘制当前屏幕
     drawBlobImageToScreen(blob) {
+      const _this = this
       var bgcanvas = this.canvas.bg;
       var fgcanvas = this.canvas.fg;
       var ctx = bgcanvas.getContext('2d');
@@ -876,23 +827,25 @@ export default {
       img.onload = function() {
         const w = fgcanvas.width = bgcanvas.width = img.width
         const h = fgcanvas.height = bgcanvas.height = img.height
-        var screenDiv = document.getElementById('screen');
+        // var screenDiv = document.getElementById('screen');
         // ctx.drawImage(img, 0, 0, img.width, img.height);
-        // self.resizeScreen(img);
         // const w = canvas.width = img.width
         // const h = canvas.height = img.height
-        const r = w / h
-        screenDiv.style.width = Math.floor(500 * r) + 'px'
-        screenDiv.style.height = '430px'
+        // console.log(window.innerHeight)
+        // const r = w / h
+        // screenDiv.style.width = Math.floor(500 * r) + 'px'
+        // screenDiv.style.height = (window.innerHeight - 320) + 'px' // '430px'
+        _this.img = img
+        _this.resizeScreen(img)
         ctx.drawImage(img, 0, 0, img.width, img.height);
 
-        // Try to forcefully clean everything to get rid of memory
-        // leaks. Note self despite this effort, Chrome will still
-        // leak huge amounts of memory when the developer tools are
-        // open, probably to save the resources for inspection. When
-        // the developer tools are closed no memory is leaked.
+        /**
+         * 尝试强制清除所有东西以消除内存泄漏。
+         * 尽管如此，当开发者工具打开时，Chrome仍然会泄漏大量的内存，可能是为了节省检查的资源。
+         * 关闭开发人员工具时，内存不会泄漏。
+        */
         img.onload = img.onerror = null
-        img.src = BLANK_IMG
+        // img.src = BLANK_IMG
         img = null
         blob = null
         URL.revokeObjectURL(url)
@@ -901,8 +854,8 @@ export default {
       }
 
       img.onerror = function() {
-        // Happily ignore. I suppose this shouldn't happen, but sometimes it does, presumably when we're loading images too quickly.
-        // Do the same cleanup here as in onload.
+        // 幸福的忽视。我认为这是不应该发生的，但有时它会发生，大概当我们加载图像太快。
+        // 和onload中一样，在这里做同样的清理。
         img.onload = img.onerror = null
         img.src = BLANK_IMG
         img = null
@@ -913,7 +866,6 @@ export default {
       }
       var url = URL.createObjectURL(blob)
       img.src = url;
-      // return dtd;
     },
     // wh-获取安卓屏幕结构
     dumpHierarchy() { // v2
@@ -922,6 +874,9 @@ export default {
         this.packageName = res.packageName;
         this.drawAllNodeFromSource(res.jsonHierarchy);
         this.activeMouseControl()
+      }).catch(err => {
+        console.log('dumpHierarchy-err:', err)
+        this.screenLoading = false
       })
     },
     // wh-绘制所有安卓屏幕所有节点
@@ -985,34 +940,22 @@ export default {
     // wh-可视区域尺寸变化
     resizeScreen(img) {
       // check if need update
-      if (img) {
-        if (this.lastScreenSize.canvas.width == img.width &&
-          this.lastScreenSize.canvas.height == img.height) {
-          return;
-        }
+      console.log(img)
+      if (!img) {
+        return
+      }
+      var screenDiv = this.$refs.screen
+      const w = img.width;
+      const h = img.height
+      console.log(img.width, img.height)
+      const r = img.width / img.height
+      if (w > h) {
+        screenDiv.style.width = Math.floor(330 * r) + 'px'
+        screenDiv.style.height = '330px'
       } else {
-        img = this.lastScreenSize.canvas;
-        if (!img) {
-          return;
-        }
+        screenDiv.style.width = Math.floor((window.innerHeight - 310) * r) + 'px'
+        screenDiv.style.height = (window.innerHeight - 310) + 'px' // '500px'
       }
-      var screenDiv = this.$refs.screen // document.getElementById('screen');
-      this.lastScreenSize = {
-        canvas: {
-          width: img.width,
-          height: img.height
-        },
-        screen: {
-          width: screenDiv.clientWidth,
-          height: screenDiv.clientHeight
-        }
-      }
-      var canvasRatio = img.width / img.height;
-      // var screenRatio = screenDiv.clientWidth / screenDiv.clientHeight;
-      Object.assign(this.canvasStyle, {
-        width: Math.floor(screenDiv.clientHeight * canvasRatio) + 'px', // 'inherit',
-        height: Math.floor(screenDiv.clientHeight) + 'px' // '100%',
-      })
     },
     drawRefresh() {
       this.drawAllNode()
@@ -1159,7 +1102,8 @@ export default {
           canvas.width = img.width
           canvas.height = img.height
           ctx.drawImage(img, 0, 0, img.width, img.height);
-          // self.resizeScreen(img);
+          self.img = img
+          self.resizeScreen(img);
 
           // Try to forcefully clean everything to get rid of memory
           // leaks. Note self despite this effort, Chrome will still
@@ -1167,10 +1111,9 @@ export default {
           // open, probably to save the resources for inspection. When
           // the developer tools are closed no memory is leaked.
           img.onload = img.onerror = null
-          img.src = BLANK_IMG
+          // img.src = BLANK_IMG
           img = null
           blob = null
-
           URL.revokeObjectURL(url)
           url = null
         }
@@ -1478,218 +1421,230 @@ export default {
 
 <style lang='less' scoped>
 .new-screen {
-    /deep/ .el-card__header{
-      padding: 5px 10px 0px 10px;
+  height: 100%;
+  overflow-y: hidden;
+  .content {
+    overflow-y: hidden;
+  }
+  /deep/ .el-card__header{
+    padding: 5px 10px 0px 10px;
+  }
+  /deep/ .el-card__body {
+    padding: 5px;
+  }
+  span {
+    font-size: 12px;
+  }
+  .row{
+    height: 85%;
+    .el-col {
+      padding-right: 0px;
     }
-    /deep/ .el-card__body {
-      padding: 5px;
-    }
-    span {
-      font-size: 12px;
-    }
-    .left{
-      .el-card {
-        overflow-y: auto;
-        .clearfix:before,
-        .clearfix:after {
-          display: table;
-          content: "";
-        }
-        .clearfix:after {
-          clear: both
-        }
-        .action-btn{
-        }
+  }
+  .left{
+    height: 100%;
+    overflow-y: auto;
+    .el-card {
+      overflow-y: auto;
+      .clearfix:before,
+      .clearfix:after {
+        display: table;
+        content: "";
       }
-      .box-card-top {
-        height: 330px;
-        overflow: hidden;
-        .editor{
-          .vue-codemirror{
-            /deep/ .CodeMirror-scroll {
-              padding-bottom: 0px;
-              width: 100%;
-              height: 93%;
-              overflow-x: hidden !important;
-            }
-          }
-          /deep/ .CodeMirror-vscrollbar {
-            overflow: hidden;
-          }
-        }
+      .clearfix:after {
+        clear: both
       }
-      .box-card-bottom {
-        .action-bottom{
-          display: flex;
-          justify-content: space-between;
-          p{
-            span {
-              padding:0 5px;
-              box-sizing: border-box;
-              cursor: pointer;
-            }
-            .active{
-              display: inline-block;
-              height: 33px;
-              line-height: 33px;
-              color: #006CEB;
-              border-bottom: 2px solid #006CEB;
-            }
-          }
-          .el-dropdown{
-            margin-right: 10px;
-          }
-        }
-        .action-sequence-content{
-          height: 165px;
-          overflow-y: auto;
-          .row{
-            width: 830px;
-            display: flex;
-            margin: 0 auto;
-            .row-wrap {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              margin-top:12px;
-            }
-          }
-          .row:nth-child(even){
-            flex-direction: row-reverse;
-          }
-          .row-content{
-            display: flex;
-          }
-          .action-item{
-            display: flex;
-            align-items: center;
-          }
-          .click-icon{
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              .property{
-                width: 150px;
-              }
-              span{
-                font-size: 12px;
-                color: #9B9B9B;
-              }
-              .red{
-                color: #D0021B;
-              }
-            }
-            .point-to{
-              width: 30px;
-              display: flex;
-              justify-content: center;
-            }
-        }
-        /deep/ .action-sequence-content::-webkit-scrollbar{
-            width:5px;
-            height:5px;
-          }
-          /*正常情况下滑块的样式*/
-         /deep/ .action-sequence-content::-webkit-scrollbar-thumb{
-            background-color:rgb(83,98,111);
-            border-radius:10px;
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*鼠标悬浮在该类指向的控件上时滑块的样式*/
-         /deep/ .action-sequence-content:hover::-webkit-scrollbar-thumb{
-            background-color:rgba(0,0,0,.2);
-            border-radius:10px;
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*鼠标悬浮在滑块上时滑块的样式*/
-         /deep/ .action-sequence-content::-webkit-scrollbar-thumb:hover{
-            background-color:rgba(0,0,0,.4);
-            -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
-          }
-          /*正常时候的主干部分*/
-         /deep/ .action-sequence-content::-webkit-scrollbar-track{
-            border-radius:10px;
-            -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0);
-            background-color: #fff;//rgb(38, 56, 73);
-          }
-          /*鼠标悬浮在滚动条上的主干部分*/
-          /deep/ .action-sequence-content::-webkit-scrollbar-track:hover{
-            -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.4);
-            background-color:rgba(0,0,0,.01);
-          }
-      }
-      .action-list {
-        margin-top: 20px;
-      }
-    }
-    .right{
-      position: relative;
-      .box-card-right {
-        // height: 605px;
-       /deep/ .el-card__body{
-          padding: 10px;
-        }
-        .screen{
-          // width: 100%;
-          height: 430px;
-          margin: 0 auto;
-          position: relative;
-          overflow: hidden;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: center;
-          flex: 1;
-          background-color: #4f4f4f;
-          .canvas-fg {
-            z-index: 1;
-            position: absolute;
-          }
 
-          .canvas-bg {
-            z-index: 0;
-            position: absolute;
-          }
-          .svgIcon{
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
-            width: 101px;
-            height: 116px;
-            z-index: 333;
-          }
-        }
-        .screenBottomBtn{
-          margin-top: 10px;
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          .el-button{
-            width: 80px;
-            margin-left: 0;
-            margin-right: 10px;
-            margin-bottom: 10px;
+    }
+    .box-card-top {
+      height: 330px;
+      overflow: hidden;
+      .editor{
+        .vue-codemirror{
+          /deep/ .CodeMirror-scroll {
+            padding-bottom: 0px;
+            width: 100%;
+            height: 93%;
+            overflow-x: hidden !important;
           }
         }
-      }
-      .mobile-btn{
-        position: absolute;
-        width: 200px;
-        background: rgba(170, 235, 252, 0.51);;
-        padding: 10px;
-        margin: 0 auto;
-        box-sizing: border-box;
-        top:20px;
-        left: -150px;
-        z-index: 11;
-        border-radius: 5px;
-        .el-button {
-          width: 90px;
-          margin-left: 0;
-          margin-bottom: 5px;
+        /deep/ .CodeMirror-vscrollbar {
+          overflow: hidden;
         }
       }
     }
+    .box-card-bottom {
+      .action-bottom{
+        display: flex;
+        justify-content: space-between;
+        p{
+          span {
+            padding:0 5px;
+            box-sizing: border-box;
+            cursor: pointer;
+          }
+          .active{
+            display: inline-block;
+            height: 33px;
+            line-height: 33px;
+            color: #006CEB;
+            border-bottom: 2px solid #006CEB;
+          }
+        }
+        .el-dropdown{
+          margin-right: 10px;
+        }
+      }
+      .action-sequence-content{
+        height: 165px;
+        overflow-y: scroll;
+        .row{
+          width: 830px;
+          display: flex;
+          margin: 0 auto;
+          .row-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top:12px;
+          }
+        }
+        .row:nth-child(even){
+          flex-direction: row-reverse;
+        }
+        .row-content{
+          display: flex;
+        }
+        .action-item{
+          display: flex;
+          align-items: center;
+        }
+        .click-icon{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .property{
+              width: 150px;
+            }
+            span{
+              font-size: 12px;
+              color: #9B9B9B;
+            }
+            .red{
+              color: #D0021B;
+            }
+          }
+          .point-to{
+            width: 30px;
+            display: flex;
+            justify-content: center;
+          }
+      }
+      /deep/ .action-sequence-content::-webkit-scrollbar{
+          width:5px;
+          height:5px;
+        }
+        /*正常情况下滑块的样式*/
+        /deep/ .action-sequence-content::-webkit-scrollbar-thumb{
+          background-color:rgb(83,98,111);
+          border-radius:10px;
+          -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
+        }
+        /*鼠标悬浮在该类指向的控件上时滑块的样式*/
+        /deep/ .action-sequence-content:hover::-webkit-scrollbar-thumb{
+          background-color:rgba(0,0,0,.2);
+          border-radius:10px;
+          -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
+        }
+        /*鼠标悬浮在滑块上时滑块的样式*/
+        /deep/ .action-sequence-content::-webkit-scrollbar-thumb:hover{
+          background-color:rgba(0,0,0,.4);
+          -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1);
+        }
+        /*正常时候的主干部分*/
+        /deep/ .action-sequence-content::-webkit-scrollbar-track{
+          border-radius:10px;
+          -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0);
+          background-color: #fff;//rgb(38, 56, 73);
+        }
+        /*鼠标悬浮在滚动条上的主干部分*/
+        /deep/ .action-sequence-content::-webkit-scrollbar-track:hover{
+          -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.4);
+          background-color:rgba(0,0,0,.01);
+        }
+    }
+    .action-list {
+      margin-top: 20px;
+    }
+  }
+  .right{
+    position: relative;
+    .box-card-right {
+      // height: 605px;
+      /deep/ .el-card__body{
+        padding: 10px;
+      }
+      .screen{
+        // width: 100%;
+        height: 330px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        background-color: #4f4f4f;
+        .canvas-fg {
+          z-index: 1;
+          position: absolute;
+        }
+
+        .canvas-bg {
+          z-index: 0;
+          position: absolute;
+        }
+        .svgIcon{
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%,-50%);
+          width: 101px;
+          height: 116px;
+          z-index: 333;
+        }
+      }
+      .screenBottomBtn{
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        .el-button{
+          width: 70px;
+          margin-left: 0;
+          margin-right: 10px;
+          margin-bottom: 10px;
+        }
+      }
+    }
+    .mobile-btn{
+      position: absolute;
+      width: 200px;
+      background: rgba(170, 235, 252, 0.51);;
+      padding: 10px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      top:20px;
+      left: -150px;
+      z-index: 11;
+      border-radius: 5px;
+      .el-button {
+        width: 90px;
+        margin-left: 0;
+        margin-bottom: 5px;
+      }
+    }
+  }
 }
 </style>

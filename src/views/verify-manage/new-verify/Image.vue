@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-02 16:32:22
+ * @LastEditTime: 2021-02-03 13:55:42
 -->
 <template>
   <div class="new-verify">
@@ -19,8 +19,8 @@
             :rules="rulesCaseInfo"
             label-width="120px"
             >
-            <el-row>
-              <el-col :span="9">
+            <el-row class="row">
+              <el-col :span="9" class="left-container">
                 <el-row class="left">
                   <el-col :span="24">
                     <el-form-item label="链接设备：" prop="device_name">
@@ -255,7 +255,7 @@
               </el-col>
               <el-col :span="15">
                 <div class="gutter" >
-                  <div class="screen" ref="screen" >
+                  <div class="screen" ref="screen" id='screen'>
                     <canvas v-show="pageShow" id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
                     <canvas id="bgCanvas" class="canvas-bg" @mousedown.stop.prevent="mouseDown" :style="canvasStyle"></canvas>
                     <template v-if="domArr.length > 0 && !pageShow">
@@ -443,6 +443,12 @@ export default {
     this.initPythonWebSocket()
     this.canvas.bg = document.querySelector('#bgCanvas')
     this.canvas.fg = document.querySelector('#fgCanvas')
+    window.onresize = () => {
+      console.log('aaa', window.innerHeight)
+      // const screenDiv = document.getElementById('screen');
+      // screenDiv.style.height = (window.innerHeight - 210) + 'px' // '430px'
+      this.resizeScreen(this.img)
+    }
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
@@ -601,48 +607,11 @@ export default {
 
         }
 
-        const lineNumber = null
-        const timeUsed = null
+        // const lineNumber = null
+        // const timeUsed = null
         // 用蓝色的breakpoint标记已经运行过的代码
         // 用另外的breakpoint标记当前运行中的代码
         // 代码行号:lineno 从0开始
-        // switch (data.method) {
-        //   case 'gotoLine':
-        //     lineNumber = data.value + this.pyshell.lineno.offset;
-        //     this.setLineGoThrough(this.pyshell.lineno.current)
-        //     this.pyshell.lineno.current = lineNumber
-
-        //     // 下面这两行注释掉，因为会影响 "运行当前行" 功能中的自动跳到下一行的功能
-        //     // this.editor.selection.moveTo(lineNumber, 0) // 移动光标
-        //     // this.editor.scrollToLine(lineNumber) // 屏幕滚动到当前行
-        //     break;
-        //   case 'resetContent':
-        //     this.editor.setValue(data.value)
-        //     break;
-        //   case 'output':
-        //     this.appendConsole(data.value)
-        //     break;
-        //   case 'finish':
-        //     this.setLineGoThrough(this.pyshell.lineno.current)
-        //     this.pyshell.running = false
-        //     timeUsed = (data.value / 1000) + 's'
-        //     this.appendConsole('[Finished ' + timeUsed + ']')
-        //     break;
-        //   case 'restarted':
-        //     this.pyshell.restarting = false
-        //     this.pyshell.running = false
-        //     this.resetEditor()
-        //     this.$notify.success({
-        //       title: '重启内核',
-        //       message: '成功',
-        //       duration: 800,
-        //       offset: 100
-        //     })
-        //     this.runPython(this.generatePreloadCode())
-        //     break
-        //   default:
-        //     console.error('Unknown method', data.method)
-        // }
       }
       ws.onclose = () => {
         this.pyshell.wsOpen = false
@@ -833,29 +802,20 @@ export default {
     },
     // wh-绘制当前屏幕
     drawBlobImageToScreen(blob) {
+      const _this = this
       const bgcanvas = this.canvas.bg;
       const fgcanvas = this.canvas.fg;
       const ctx = bgcanvas.getContext('2d');
       const URL = window.URL || window.webkitURL;
       const BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-      const screen = document.getElementsByClassName('screen')[0]
-
       let img = this.imagePool.next();
       let url = URL.createObjectURL(blob)
       img.src = url;
       img.onload = function() {
-        const w = fgcanvas.width = bgcanvas.width = img.width;
-        const h = fgcanvas.height = bgcanvas.height = img.height
-        console.log(img.width, img.height)
-        const r = img.width / img.height
-        if (w > h) {
-          screen.style.width = Math.floor(330 * r) + 'px'
-          screen.style.height = '330px'
-        } else {
-          screen.style.width = Math.floor(500 * r) + 'px'
-          screen.style.height = '500px'
-        }
-        // let screenDiv = document.getElementById('screen');
+        fgcanvas.width = bgcanvas.width = img.width;
+        fgcanvas.height = bgcanvas.height = img.height
+        _this.img = img
+        _this.resizeScreen(img)
         ctx.drawImage(img, 0, 0, img.width, img.height);
 
         /**
@@ -865,7 +825,7 @@ export default {
         */
 
         img.onload = img.onerror = null
-        img.src = BLANK_IMG
+        // img.src = BLANK_IMG
         img = null
         blob = null
         URL.revokeObjectURL(url)
@@ -974,7 +934,6 @@ export default {
       var ws = new WebSocket(this.screenWebSocketUrl);
       var canvas = document.getElementById('bgCanvas')
       var ctx = canvas.getContext('2d');
-      const screen = document.getElementsByClassName('screen')[0]
       // self.loadLiveHierarchy() // 计算手机app所有元素的黑色框
       this.screenWebSocket = ws;
       ws.onopen = function(ev) {
@@ -987,22 +946,16 @@ export default {
         })
         var img = self.imagePool.next();
         img.onload = function() {
-          const w = canvas.width = img.width
-          const h = canvas.height = img.height
-          const r = img.width / img.height
-          if (w > h) {
-            screen.style.width = Math.floor(330 * r) + 'px'
-            screen.style.height = '330px'
-          } else {
-            screen.style.width = Math.floor(500 * r) + 'px'
-            screen.style.height = '500px'
-          }
-          ctx.drawImage(img, 0, 0, img.width, img.height);
+          canvas.width = img.width
+          canvas.height = img.height
+          self.img = img
+          ctx.drawImage(img, 0, 0, img.width, img.height)
+          self.resizeScreen(img)
+
           img.onload = img.onerror = null
-          img.src = BLANK_IMG
+          // img.src = BLANK_IMG
           img = null
           blob = null
-
           URL.revokeObjectURL(url)
           url = null
         }
@@ -1011,7 +964,6 @@ export default {
           img.src = BLANK_IMG
           img = null
           blob = null
-
           URL.revokeObjectURL(url)
           url = null
         }
@@ -1021,6 +973,25 @@ export default {
 
       ws.onclose = (ev) => {
         this.liveScreen = false;
+      }
+    },
+    // wh-可视区域尺寸变化
+    resizeScreen(img) {
+      console.log(img)
+      if (!img) {
+        return
+      }
+      var screenDiv = this.$refs.screen
+      const w = img.width;
+      const h = img.height
+      console.log(img.width, img.height)
+      const r = img.width / img.height
+      if (w > h) {
+        screenDiv.style.width = Math.floor(330 * r) + 'px'
+        screenDiv.style.height = '330px'
+      } else {
+        screenDiv.style.width = Math.floor((window.innerHeight - 210) * r) + 'px'
+        screenDiv.style.height = (window.innerHeight - 210) + 'px' // '500px'
       }
     },
     // wh-鼠标移动，点击事件
@@ -1550,6 +1521,11 @@ export default {
 
 <style lang='less' scoped>
 .new-verify{
+  height: 100%;
+  overflow-y: hidden;
+  .content {
+    overflow-y:hidden ;
+  }
   .title {
     height: 41px;
     line-height: 41px;
@@ -1558,13 +1534,23 @@ export default {
     border-bottom: 1px solid #ddd;
   }
   .formData{
+    height: 100%;
     padding: 10px 10px 10px 10px;
+    .el-form{
+      height: 100%;
+      .row {
+        height: 100%;
+      }
+    }
     .el-select{
         width: 100%;
       }
+    .left-container{
+      height: 85%;
+      overflow-y: scroll;
+    }
     .left{
       padding: 0 10px;
-
       border-bottom: 1px solid #ddd;
     }
     .left-bottom{
@@ -1572,10 +1558,12 @@ export default {
     }
     .gutter {
       position: relative;
+      margin-left: 10px;
       .screen{
         // width: 100%;
-        height: 500px;
+        height: 300px;
         margin: 0 auto;
+        // margin-left: 10px;
         position: relative;
         overflow-x: hidden;
         overflow-y: auto;
