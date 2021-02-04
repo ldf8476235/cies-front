@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 17:41:25
+ * @LastEditTime: 2021-02-04 10:24:53
 -->
 <template>
   <div class="new-verify">
@@ -288,6 +288,8 @@
 <script>
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 import { GET, POST } from '@/utils/api.js';
+// 引入常量
+import { WS_URL } from '@/axios/C_L.js';
 export default {
   name: '',
   data() {
@@ -605,8 +607,8 @@ export default {
       // 初始化变量
       this.pyshell.running = false
       this.pyshell.restarting = false
-
-      const ws = this.pyshell.ws = new WebSocket('ws://192.168.210.130:5000/ws/v1/python')
+      const url = 'ws://' + WS_URL + '/ws/v1/python'
+      const ws = this.pyshell.ws = new WebSocket(url)
       ws.onopen = () => {
         this.pyshell.wsOpen = true
         console.log('python:连接成功')

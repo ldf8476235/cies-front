@@ -4,7 +4,7 @@
  * @Date: 2021-01-25 15:44:01
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 17:18:29
+ * @LastEditTime: 2021-02-04 10:06:23
 -->
 <template>
   <div class="environment">
@@ -21,12 +21,47 @@
           <el-col :span="8">
             <el-button>编辑语料库</el-button>
             <el-button>删除语料库</el-button>
-            <el-button type="primary">添加语料库</el-button>
+            <el-button @click="addCorpusLibrary" type="primary">添加语料库</el-button>
           </el-col>
         </el-row>
         <el-row class="tableContent">
-          <el-col :span="16">asd</el-col>
-          <el-col :span="8">asd</el-col>
+          <el-col :span="16">
+            <p><span>语料库名称:</span><span>123</span></p>
+            <p><span>创建人:</span><span>123</span></p>
+            <p><span>创建时间:</span><span>123</span></p>
+            <p><span>语料库描述:</span><span>123</span></p>
+          </el-col>
+          <el-col :span="8">
+            <el-input placeholder="请输入内容" v-model="searchKey" class="input-with-select">
+              <el-button slot="append" icon="el-icon-search"></el-button>
+            </el-input>
+            <div class="tree-container">
+              <el-tree
+                :data="corpusData"
+                show-checkbox
+                node-key="id"
+                default-expand-all
+                :expand-on-click-node="false">
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>{{ node.label }}</span>
+                  <span>
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => append(data)">
+                      Append
+                    </el-button>
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => remove(node, data)">
+                      Delete
+                    </el-button>
+                  </span>
+                </span>
+              </el-tree>
+            </div>
+          </el-col>
         </el-row>
         <!-- 新增编辑配置 -->
         <el-dialog width='30%' title="新建配置" :visible.sync="dialogFormVisible">
@@ -35,10 +70,6 @@
               <el-input v-model="configInfo.name" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="创建人" prop='builder'>
-              <!-- <el-select v-model="configInfo.region" placeholder="请选择活动区域">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
-              </el-select> -->
               <el-input v-model="configInfo.builder" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="配置描述" prop='desc'>
@@ -48,7 +79,6 @@
               <input type='file' style='display:none;' accept='audio/wav' ref='file' id='file' @change= "changeFile" >
               <el-input style='width:70%;' disabled v-model="configInfo.file_name" autocomplete="off"></el-input>
               <el-button style="margin-left: 10px;" type="" @click="scan">浏览</el-button>
-              <el-button><i class='el-icon-caret-right'></i></el-button>
               <el-progress :percentage="percentage" :format="format"></el-progress>
             </el-form-item>
           </el-form>
@@ -109,8 +139,44 @@ export default {
         ]
       },
       percentage: 0, // 上传进度
-      corpusLibraryName: ''
-    };
+      corpusLibraryName: '',
+      searchKey: '',
+      corpusData: [{
+        id: 1,
+        label: '一级 1',
+        children: [{
+          id: 4,
+          label: '二级 1-1',
+          children: [{
+            id: 9,
+            label: '三级 1-1-1'
+          }, {
+            id: 10,
+            label: '三级 1-1-2'
+          }]
+        }]
+      }, {
+        id: 2,
+        label: '一级 2',
+        children: [{
+          id: 5,
+          label: '二级 2-1'
+        }, {
+          id: 6,
+          label: '二级 2-2'
+        }]
+      }, {
+        id: 3,
+        label: '一级 3',
+        children: [{
+          id: 7,
+          label: '二级 3-1'
+        }, {
+          id: 8,
+          label: '二级 3-2'
+        }]
+      }]
+    }
   },
   methods: {
     // 上传文件进度条显示文案
@@ -268,7 +334,7 @@ export default {
     // 批量删除
     deleteBatch() {},
     // 新增环境
-    goNewEnvironment() {
+    addCorpusLibrary() {
       this.dialogFormVisible = true
     },
     // 选择列表
@@ -314,8 +380,26 @@ export default {
       }
     }
     .tableContent{
+      padding-top: 10px;
       margin-top:15px;
       border-top: 1px solid #DDDDDD;
+      .el-col:last-child{
+        .el-input{
+          width: 50%;
+          .el-button {
+            margin-left: -20px;
+          }
+        }
+        .tree-container{
+          margin-top: 10px;
+          border-top: 1px solid #DDDDDD;
+          .el-tree {
+            padding-top: 10px;
+          }
+        }
+
+
+      }
     }
     /deep/ .el-dialog__body{
       padding: 0 20px;

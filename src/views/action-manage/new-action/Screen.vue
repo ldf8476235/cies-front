@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 17:28:21
+ * @LastEditTime: 2021-02-04 10:01:27
 -->
 <template>
   <div class="new-screen">
@@ -828,16 +828,8 @@ export default {
       var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
       var img = this.imagePool.next()
       img.onload = function() {
-        const w = fgcanvas.width = bgcanvas.width = img.width
-        const h = fgcanvas.height = bgcanvas.height = img.height
-        // var screenDiv = document.getElementById('screen');
-        // ctx.drawImage(img, 0, 0, img.width, img.height);
-        // const w = canvas.width = img.width
-        // const h = canvas.height = img.height
-        // console.log(window.innerHeight)
-        // const r = w / h
-        // screenDiv.style.width = Math.floor(500 * r) + 'px'
-        // screenDiv.style.height = (window.innerHeight - 320) + 'px' // '430px'
+        fgcanvas.width = bgcanvas.width = img.width
+        fgcanvas.height = bgcanvas.height = img.height
         _this.img = img
         _this.resizeScreen(img)
         ctx.drawImage(img, 0, 0, img.width, img.height);
