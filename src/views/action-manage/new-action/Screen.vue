@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 10:01:27
+ * @LastEditTime: 2021-02-04 10:44:53
 -->
 <template>
   <div class="new-screen">
@@ -381,6 +381,7 @@ import 'codemirror/addon/hint/show-hint';
 import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 import { GET } from '@/utils/api';
+import { WS_URL } from '@/axios/C_L.js';
 export default {
 
   name: 'NewScreen',
@@ -746,8 +747,8 @@ export default {
       // 初始化变量
       this.pyshell.running = false
       this.pyshell.restarting = false
-
-      const ws = this.pyshell.ws = new WebSocket('ws://192.168.210.233:5000/ws/v1/python')
+      const url = 'ws://' + WS_URL + '/ws/v1/python'
+      const ws = this.pyshell.ws = new WebSocket(url)
       ws.onopen = () => {
         this.pyshell.wsOpen = true
         console.log('python:连接成功')
