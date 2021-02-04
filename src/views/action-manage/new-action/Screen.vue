@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 16:14:18
+ * @LastEditTime: 2021-02-04 17:03:32
 -->
 <template>
   <div class="new-screen">
@@ -540,12 +540,12 @@ export default {
     // const arr = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
     // this.disposeActionSequence(arr)
   },
+
   destroyed() {
-    console.log('destoryed')
+    console.log(this.screenWebSocket)
     this.screenWebSocket && this.screenWebSocket.close()
     this.destroy = true
     window.onresize = null
-    // this.loadLiveHierarchy = null
   },
   computed: {
     nodes: {
@@ -602,10 +602,7 @@ export default {
     }
   },
   methods: {
-    // 睡眠
-    sleep() {
-      this.generatedCode = this.editor.getValue() + '\n' + 'time.sleep(1)'
-    },
+
     // 刷新屏幕
     refreshDeviceScreen() {
       this.dumpHierarchy()
@@ -613,7 +610,6 @@ export default {
     // 获取现有设备
     getHasDevice() {
       this.$http.get('/device/screen/phones/').then(res => {
-        console.log(res)
         this.hasDeviceList = res.data
       })
     },
@@ -662,6 +658,11 @@ export default {
     },
     // 手机home建
     home() {
+      const flag = this.editor.getValue()
+      if (!flag) {
+        this.$hintMsg('warning', '请先链接设备！')
+        return
+      }
       const code = "d.press('home')"
       this.editor.setValue(this.generatedCode + '\n' + code)
       const codeComplate = this.baseCode + '\n' + code
@@ -670,11 +671,25 @@ export default {
     },
     // 模拟手机返回
     back() {
+      const flag = this.editor.getValue()
+      if (!flag) {
+        this.$hintMsg('warning', '请先链接设备！')
+        return
+      }
       const code = "d.press('back')"
       this.editor.setValue(this.generatedCode + '\n' + code)
       const codeComplate = this.baseCode + '\n' + code
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
+    },
+    // 睡眠
+    sleep() {
+      const flag = this.editor.getValue()
+      if (!flag) {
+        this.$hintMsg('warning', '请先链接设备！')
+        return
+      }
+      this.generatedCode = this.editor.getValue() + '\n' + 'time.sleep(1)'
     },
     preview() {
       const codeComplate = this.editor.getValue()
@@ -940,14 +955,12 @@ export default {
     // wh-可视区域尺寸变化
     resizeScreen(img) {
       // check if need update
-      console.log(img)
       if (!img) {
         return
       }
       var screenDiv = this.$refs.screen
       const w = img.width;
       const h = img.height
-      console.log(img.width, img.height)
       const r = img.width / img.height
       if (w > h) {
         screenDiv.style.width = Math.floor(330 * r) + 'px'
@@ -1088,15 +1101,23 @@ export default {
       var canvas = document.getElementById('bgCanvas')
       var ctx = canvas.getContext('2d');
 
-      self.loadLiveHierarchy() // 计算手机app所有元素的黑色框
+      // self.loadLiveHierarchy() // 计算手机app所有元素的黑色框
       this.screenWebSocket = ws;
       ws.onopen = function(ev) {
-        console.log('屏幕连接成功：screen websocket connected')
+        console.log('屏幕连接成功：screen websocket connected', ev)
       };
+      var time = 0
       ws.onmessage = function(message) {
+        if (+new Date() - time < 50) {
+          console.log('new')
+          return
+        }
+        console.log('00000')
+        time = +new Date()
         var blob = new Blob([message.data], {
           type: 'image/jpeg'
         })
+
         var img = self.imagePool.next()
         img.onload = function() {
           canvas.width = img.width
@@ -1117,7 +1138,6 @@ export default {
           URL.revokeObjectURL(url)
           url = null
         }
-
         img.onerror = function() {
           // Happily ignore. I suppose this shouldn't happen, but
           // sometimes it does, presumably when we're loading images

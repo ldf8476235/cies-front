@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2021-02-01 11:14:45
+ * @LastEditTime: 2021-02-04 17:05:28
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -297,7 +297,7 @@ export default {
       GET(url).then(res => {
         console.log(res)
         this.actionList = res.result
-        this.total = res.totalCount
+        this.total = res.count
       })
     },
     // 新建任务

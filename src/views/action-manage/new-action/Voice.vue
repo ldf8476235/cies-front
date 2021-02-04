@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 16:00:15
+ * @LastEditTime: 2021-02-04 17:08:23
 -->
 <template>
   <div class="new-voice">
@@ -132,7 +132,7 @@
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span> -->
-                      <span > {{scope.row.name}} </span>
+                      <span > {{scope.row.file_name}} </span>
                     </el-form-item>
                   </template>
                 </el-table-column>
