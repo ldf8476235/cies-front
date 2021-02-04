@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 11:30:50
+ * @LastEditTime: 2021-02-04 14:14:16
 -->
 <template>
   <div class="new-verify">
@@ -1512,13 +1512,13 @@ export default {
       this.verifyInfo.builder = 'admin'
       this.$refs.verifyInfo.validate(valid => {
         if (!valid) return
-        if (!this.testResult) {
-          this.$message({
-            type: 'error',
-            message: '测试结果有误，请检查页面元素类型'
-          })
-          return
-        }
+        // if (!this.testResult) {
+        //   this.$message({
+        //     type: 'error',
+        //     message: '测试结果有误，请检查页面元素类型'
+        //   })
+        //   return
+        // }
         let url = 'verify/add'
         let method = 'POST'
         if (this.verifyInfo.uid) {

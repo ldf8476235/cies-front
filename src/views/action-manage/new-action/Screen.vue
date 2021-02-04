@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 11:30:21
+ * @LastEditTime: 2021-02-04 16:14:18
 -->
 <template>
   <div class="new-screen">
@@ -347,6 +347,7 @@
                   <el-button>Menu</el-button>
                   <el-button>Volume+</el-button>
                   <el-button>Volume-</el-button>
+                  <el-button @click='sleep'>Sleep</el-button>
                 </div>
               </el-card>
               <div class='mobile-btn'  v-show='mobileBtn'>
@@ -356,7 +357,7 @@
                 <el-button>LongPress</el-button>
                 <el-button>ScrollWidget</el-button>
                 <el-button>Swipe</el-button>
-                <el-button>Sleep</el-button>
+
               </div>
             </div>
           </el-col>
@@ -378,7 +379,7 @@ import 'codemirror/addon/hint/show-hint';
 
 import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool } from '@/utils/common.js';
-import { GET } from '@/utils/api';
+import { GET, POST } from '@/utils/api';
 import WS_URL from '@/axios/C_L.js';
 export default {
 
@@ -540,6 +541,7 @@ export default {
     // this.disposeActionSequence(arr)
   },
   destroyed() {
+    console.log('destoryed')
     this.screenWebSocket && this.screenWebSocket.close()
     this.destroy = true
     window.onresize = null
@@ -600,6 +602,10 @@ export default {
     }
   },
   methods: {
+    // 睡眠
+    sleep() {
+      this.generatedCode = this.editor.getValue() + '\n' + 'time.sleep(1)'
+    },
     // 刷新屏幕
     refreshDeviceScreen() {
       this.dumpHierarchy()
@@ -1131,6 +1137,7 @@ export default {
       }
 
       ws.onclose = (ev) => {
+        console.log('socket关闭')
         this.liveScreen = false;
       }
     },
@@ -1386,25 +1393,13 @@ export default {
           url = 'action/add'
           methods = 'POST'
         }
-        this.$http({
-          method: methods,
-          url: url,
-          data: this.actionInfo
-        }).then(res => {
-          if (res.status_code === 200) {
-            this.$message({
-              type: 'success',
-              message: '添加动作成功！'
-            })
-            this.$router.push({
-              path: '/action'
-            })
-          } else {
-            this.$message({
-              type: 'error',
-              message: '添加动作失败！'
-            })
-          }
+        POST(url, methods, this.actionInfo).then(res => {
+          this.$hintMsg('success', res)
+          this.$router.push({
+            path: '/action'
+          })
+        }).catch(err => {
+          this.$hintMsg('error', err)
         })
       })
 
@@ -1611,14 +1606,14 @@ export default {
       }
       .screenBottomBtn{
         margin-top: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        // display: flex;
+        // flex-wrap: wrap;
+        // justify-content: center;
         .el-button{
           width: 70px;
           margin-left: 0;
-          margin-right: 10px;
-          margin-bottom: 10px;
+          margin-right: 0px;
+          margin-bottom: 5px;
         }
       }
     }

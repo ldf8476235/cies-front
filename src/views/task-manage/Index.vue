@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-04 11:29:30
+ * @LastEditTime: 2021-02-04 14:19:28
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -191,7 +191,7 @@ export default {
       total: 0,
       pageSize: 10,
       currPage: 1,
-      title: '配置环境',
+      title: '执行机',
       // 选择项内容
       options: [
         {

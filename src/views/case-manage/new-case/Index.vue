@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-01 18:45:46
+ * @LastEditTime: 2021-02-04 13:52:26
 -->
 <template>
   <div class="new-case">
@@ -195,7 +195,7 @@
                       <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>替换动作</span></p>
                       <p><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
                       <p><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
-                      <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
+                      <p @click='del(scope.$index)'><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
                       <div slot="reference">
                         <svg-icon data_iconName='icon-more'></svg-icon>
                       </div>
@@ -376,6 +376,11 @@ export default {
     this.getVerifyList(this.currPage, this.pageSize)
   },
   methods: {
+    // 删除
+    del(index) {
+      console.log('s', index)
+      this.caseInfo.action.splice(index, 1)
+    },
     // 获取动作列表
     getActionList(page, count) {
       const url = `action/list/?page=${page}&count=${count}`

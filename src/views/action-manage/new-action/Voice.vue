@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-02 18:30:14
+ * @LastEditTime: 2021-02-04 16:00:15
 -->
 <template>
   <div class="new-voice">
@@ -150,7 +150,7 @@
                           placeholder=""
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input> -->
-                        10
+                        1
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -164,7 +164,7 @@
                         <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
                         <span>插入语音</span>
                       </p>
-                      <p><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
+                      <p @click='del(scope.$index)'><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
                       <el-button slot="reference"><i  class="el-icon-more"></i></el-button>
                     </el-popover>
                   </template>
@@ -280,6 +280,10 @@ export default {
     }
   },
   methods: {
+    // 删除语音
+    del(index) {
+      this.voiceInfo.settings.splice(index, 1)
+    },
     // 获取编辑的数据
     getEditData() {
       const uid = this.$route.query.uid
@@ -324,7 +328,7 @@ export default {
       }
       const data = {
         uid: this.radioData.uid,
-        name: this.radioData.name,
+        name: this.radioData.file_name,
         type: this.radioData.type,
         timeout: 0,
         executeWait: '10'

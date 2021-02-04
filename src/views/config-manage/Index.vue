@@ -4,7 +4,7 @@
  * @Date: 2021-01-25 15:44:01
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 11:47:58
+ * @LastEditTime: 2021-02-04 15:09:17
 -->
 <template>
   <div class="environment">
@@ -48,13 +48,13 @@
                       type="text"
                       size="mini"
                       @click="() => append(data)">
-                      Append
+                      添加
                     </el-button>
                     <el-button
                       type="text"
                       size="mini"
                       @click="() => remove(node, data)">
-                      Delete
+                      删除
                     </el-button>
                   </span>
                 </span>
@@ -63,18 +63,18 @@
           </el-col>
         </el-row>
         <!-- 新增编辑配置 -->
-        <el-dialog width='30%' title="新建配置" :visible.sync="dialogFormVisible">
+        <el-dialog width='30%' title="新建语料库" :visible.sync="dialogFormVisible">
           <el-form ref='formConfig' :model="configInfo" label-position="top" :rules='ruleConfigInfo'>
-            <el-form-item label="配置名称" prop='name'>
+            <el-form-item label="语料库名称" prop='name'>
               <el-input v-model="configInfo.name" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item label="创建人" prop='builder'>
               <el-input v-model="configInfo.builder" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="配置描述" prop='desc'>
+            <el-form-item label="语料库描述" prop='desc'>
               <el-input type='textarea' v-model="configInfo.desc" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="配置文件" prop='file_name'>
+            <el-form-item label="语料文件" prop='file_name'>
               <input type='file' style='display:none;' accept='audio/wav' ref='file' id='file' @change= "changeFile" >
               <el-input style='width:70%;' disabled v-model="configInfo.file_name" autocomplete="off"></el-input>
               <el-button style="margin-left: 10px;" type="" @click="scan">浏览</el-button>
@@ -142,10 +142,10 @@ export default {
       searchKey: '',
       corpusData: [{
         id: 1,
-        label: '一级 1',
+        label: '系统设置',
         children: [{
           id: 4,
-          label: '二级 1-1',
+          label: '音量调节',
           children: [{
             id: 9,
             label: '三级.wav'
@@ -156,23 +156,23 @@ export default {
         }]
       }, {
         id: 2,
-        label: '一级 2',
+        label: '音量',
         children: [{
           id: 5,
-          label: '二级 2-1'
+          label: '播放音乐.wav'
         }, {
           id: 6,
-          label: '二级 2-2'
+          label: '顺序播放.wav'
         }]
       }, {
         id: 3,
-        label: '一级 3',
+        label: '导航相关',
         children: [{
           id: 7,
-          label: '二级 3-1'
+          label: '唤醒导航.wav'
         }, {
           id: 8,
-          label: '二级 3-2'
+          label: '导航去目的地.wav'
         }]
       }]
     }
