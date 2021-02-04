@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 10:34:10
+ * @LastEditTime: 2021-02-04 11:30:50
 -->
 <template>
   <div class="new-verify">
@@ -289,7 +289,7 @@
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 import { GET, POST } from '@/utils/api.js';
 // 引入常量
-import { WS_URL } from '@/axios/C_L.js';
+import WS_URL from '@/axios/C_L.js';
 export default {
   name: '',
   data() {
@@ -304,7 +304,6 @@ export default {
       } else {
         callback()
       }
-
     };
     return {
       crumbs: {
@@ -607,7 +606,7 @@ export default {
       // 初始化变量
       this.pyshell.running = false
       this.pyshell.restarting = false
-      const url = 'ws://' + WS_URL + '/ws/v1/python'
+      const url = 'ws://' + WS_URL.WS_URL_WE + '/ws/v1/python'
       const ws = this.pyshell.ws = new WebSocket(url)
       ws.onopen = () => {
         this.pyshell.wsOpen = true

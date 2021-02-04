@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 10:44:53
+ * @LastEditTime: 2021-02-04 11:30:21
 -->
 <template>
   <div class="new-screen">
@@ -50,8 +50,6 @@
                               placeholder="输入软件版本"
                             ></el-input>
                           </el-form-item>
-
-
                           <el-form-item label="超时时间：" prop='timeout'>
                             <el-input
                               v-model="actionInfo.timeout"
@@ -381,7 +379,7 @@ import 'codemirror/addon/hint/show-hint';
 import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 import { GET } from '@/utils/api';
-import { WS_URL } from '@/axios/C_L.js';
+import WS_URL from '@/axios/C_L.js';
 export default {
 
   name: 'NewScreen',
@@ -747,7 +745,7 @@ export default {
       // 初始化变量
       this.pyshell.running = false
       this.pyshell.restarting = false
-      const url = 'ws://' + WS_URL + '/ws/v1/python'
+      const url = 'ws://' + WS_URL.WS_URL_WE + '/ws/v1/python'
       const ws = this.pyshell.ws = new WebSocket(url)
       ws.onopen = () => {
         this.pyshell.wsOpen = true

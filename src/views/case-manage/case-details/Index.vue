@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 10:30:22
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 14:50:38
+ * @LastEditTime: 2021-02-04 11:07:28
 -->
 <template>
   <div class="case-details">
@@ -59,7 +59,8 @@
               </el-table-column>
               <el-table-column label="动作名称">
                 <template slot-scope="scope">
-                  <span> {{scope.row.name}}</span>
+                  <span v-if="scope.row.function === 'verify'">检验点： {{scope.row.name}}</span>
+                  <span v-if="scope.row.function === 'action'">动作： {{scope.row.name}}</span>
                 </template>
               </el-table-column>
               <el-table-column label="循环次数">

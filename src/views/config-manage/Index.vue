@@ -4,7 +4,7 @@
  * @Date: 2021-01-25 15:44:01
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 10:06:23
+ * @LastEditTime: 2021-02-04 11:47:58
 -->
 <template>
   <div class="environment">
@@ -26,10 +26,10 @@
         </el-row>
         <el-row class="tableContent">
           <el-col :span="16">
-            <p><span>语料库名称:</span><span>123</span></p>
-            <p><span>创建人:</span><span>123</span></p>
-            <p><span>创建时间:</span><span>123</span></p>
-            <p><span>语料库描述:</span><span>123</span></p>
+            <p><span>语料库名称：</span><span>1大苏打实打实大撒大苏打实打实的23</span></p>
+            <p><span>创建人：</span><span>123</span></p>
+            <p><span>创建时间：</span><span>123</span></p>
+            <p><span>语料库描述：</span><span>123</span></p>
           </el-col>
           <el-col :span="8">
             <el-input placeholder="请输入内容" v-model="searchKey" class="input-with-select">
@@ -38,7 +38,6 @@
             <div class="tree-container">
               <el-tree
                 :data="corpusData"
-                show-checkbox
                 node-key="id"
                 default-expand-all
                 :expand-on-click-node="false">
@@ -149,10 +148,10 @@ export default {
           label: '二级 1-1',
           children: [{
             id: 9,
-            label: '三级 1-1-1'
+            label: '三级.wav'
           }, {
             id: 10,
-            label: '三级 1-1-2'
+            label: '三级 1-1-2.wav'
           }]
         }]
       }, {
@@ -179,6 +178,21 @@ export default {
     }
   },
   methods: {
+    append(data) {
+      let id = 1000
+      const newChild = { id: id++, label: 'testtest', children: [] };
+      if (!data.children) {
+        this.$set(data, 'children', []);
+      }
+      data.children.push(newChild);
+    },
+
+    remove(node, data) {
+      const parent = node.parent;
+      const children = parent.data.children || parent.data;
+      const index = children.findIndex(d => d.id === data.id);
+      children.splice(index, 1);
+    },
     // 上传文件进度条显示文案
     format(percentage) {
       return percentage === 100 ? '完成' : `${percentage}%`;
@@ -211,6 +225,7 @@ export default {
       var file = files[0]
       var chunkSize = 2 * 1024 * 1024 // 以每片1MB大小来逐次读取
       var fileSize = file.size
+      this.configInfo.file_name = file.name
       _this.configInfo.size = fileSize
       var chunks = Math.ceil(fileSize / chunkSize) // 总片数
       var currentChunk = 0
@@ -302,7 +317,7 @@ export default {
         }
         POST('/settings/merge/', 'POST', data).then(res => {
           console.log(res)
-          _this.configInfo.file_name = res.name
+          // _this.configInfo.file_name = res.name
           _this.configInfo.path = res.path
         })
       }
@@ -353,7 +368,6 @@ export default {
           this.$refs.formConfig.resetFields()
           document.getElementById('file').value = ''
           this.percentage = 0
-
           this.dialogFormVisible = false
 
         })
@@ -397,8 +411,16 @@ export default {
             padding-top: 10px;
           }
         }
-
-
+      }
+      .el-col:first-child {
+        p {
+          height: 30px;
+          span:first-child{
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+          }
+        }
       }
     }
     /deep/ .el-dialog__body{

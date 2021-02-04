@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-03 18:26:57
+ * @LastEditTime: 2021-02-04 11:29:30
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -178,7 +178,7 @@ import Func from '@/components/seach-func-header/Func.vue'
 import { GET, DELETE } from '@/utils/api.js';
 import { delHint } from '@/utils/utils.js';
 // 引入常量
-import { WS_URL } from '@/axios/C_L.js';
+import WS_URL from '@/axios/C_L.js';
 export default {
   name: 'Task',
   components: {
@@ -233,7 +233,7 @@ export default {
     // 任务管理页面加载websocket开启
     startWebSocket() {
       const _this = this
-      const url = 'ws://' + WS_URL + '/ws/device'
+      const url = 'ws://' + WS_URL.WS_URL_PY + '/ws/device'
       const ws = new WebSocket(url)
       this.ws = ws
       ws.onopen = function() {
