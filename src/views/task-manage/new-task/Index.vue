@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 14:47:58
+ * @LastEditTime: 2021-02-05 17:39:47
 -->
 <template>
   <div class="newTask">
@@ -361,38 +361,6 @@ export default {
       taskInfo: {
 
         case_list: [
-          // {
-          //   id: '1',
-          //   editCaseGroup: false,
-          //   editLoop: false,
-          //   caseGroup: '节点名称1',
-          //   loop_count: 11,
-          //   error: '123',
-          //   overtime: 'asdasd',
-          //   executeWait: 'aq2134',
-          //   childrens: [
-          //     {
-          //       id: '101',
-          //       editCaseGroup: false,
-          //       editLoop: false,
-          //       caseGroup: '',
-          //       loop_count: 11,
-          //       error: '123',
-          //       overtime: 'asdasd',
-          //       executeWait: 'aq2134'
-          //     },
-          //     {
-          //       id: '102',
-          //       editCaseGroup: false,
-          //       editLoop: false,
-          //       caseGroup: '',
-          //       loop_count: 12,
-          //       error: '1qwe',
-          //       overtime: 'asdasd',
-          //       executeWait: 'aq2134'
-          //     }
-          //   ]
-          // }
         ]
       },
       rulesTaskInfo: {
@@ -438,7 +406,7 @@ export default {
     this.drag()
     const uid = this.$route.query.uid
     if (uid) {
-      this.edit()
+      this.edit(uid)
     }
     this.getCaseList(this.currPage, this.pageSize)
   },
@@ -494,17 +462,15 @@ export default {
       this.dialogTableVisible = true
     },
     // 编辑
-    edit() {
-      // const data = this.$route.params.data
-      // if (data) {
-      //   localStorage.setItem('editData', JSON.stringify(data))
-      // }
-      // this.taskInfo = data || JSON.parse(localStorage.getItem('editData'))
-      const uid = this.$route.query.uid
+    edit(uid) {
       const url = `task/detail/?uid=${uid}`
       GET(url).then(res => {
         console.log(res)
         this.taskInfo = res.result[0]
+        if (this.$route.query.copy) {
+          this.taskInfo.name = ''
+          this.taskInfo.builder = ''
+        }
       }).catch(err => {
         this.$hintMsg('error', err)
       })
@@ -714,7 +680,6 @@ export default {
       }
     },
     save() {
-      const data = { }
       this.$refs.taskInfo.validate((valid) => {
         console.log(this.taskInfo)
         const arr = []
@@ -730,7 +695,8 @@ export default {
           let url = 'task/add'
           let method = 'POST'
           const uid = this.$route.query.uid
-          if (uid) {
+          const copy = this.$route.query.copy
+          if (uid && !copy) {
             url = 'task/edit'
             method = 'PUT'
           }
@@ -740,9 +706,7 @@ export default {
             this.$router.push('/task')
           })
         }
-
       })
-
     },
     // 当前页条数
     handleSizeChange(size) {

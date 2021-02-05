@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-05 15:30:35
+ * @LastEditTime: 2021-02-05 17:32:00
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -136,7 +136,7 @@
                     <svg-icon data_iconName="icon-edit" />
                     <span>编辑</span>
                   </p>
-                  <p><svg-icon data_iconName="icon-copy" /><span>复制</span></p>
+                  <p @click="copy(scope.row)"><svg-icon data_iconName="icon-copy" /><span>复制</span></p>
                   <p><svg-icon data_iconName="icon-log" /><span>日志</span></p>
                   <p><svg-icon data_iconName="icon-report" /><span>报告</span></p>
                   <p @click='del(scope.row.uid)'><svg-icon data_iconName="icon-delete" /><span>删除</span></p>
@@ -350,6 +350,18 @@ export default {
           },
           params: {
             data: row
+          }
+        }
+      )
+    },
+    // 复制
+    copy(row) {
+      this.$router.push(
+        {
+          path: '/task/newtask',
+          query: {
+            uid: row.uid,
+            copy: 'copy'
           }
         }
       )

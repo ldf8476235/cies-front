@@ -4,7 +4,7 @@
  * @Date: 2021-01-29 09:46:30
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 15:04:28
+ * @LastEditTime: 2021-02-05 17:45:05
  */
 // 删除提示
 export function delHint(_this) {
@@ -28,7 +28,6 @@ export function hintMsg(type, msg) {
   })
 }
 // 数字验证
-
 export function selfIsNaN(val) {
   return typeof val === 'number' && !isNaN(val)
 }

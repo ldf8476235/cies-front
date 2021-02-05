@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 15:51:43
+ * @LastEditTime: 2021-02-05 17:56:43
 -->
 <template>
   <div class="new-case">
@@ -127,13 +127,13 @@
                   <template slot-scope="scope">
                     <el-form-item
                       :prop="'action.' + scope.$index + '.loop_count'"
-                      :rules="rulesCaseInfo.action.loopCount"
+                      :rules="rulesCaseInfo.action.loop_count"
                       label-width="0px"
                     >
                       <span v-if="scope.row.editLoop">
                         <el-input
                           ref="inputBlur"
-                          v-model="scope.row.loop_count"
+                          v-model.number="scope.row.loop_count"
                           placeholder=""
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
@@ -333,6 +333,10 @@ export default {
           wait_time: [
             { required: true, message: '请输入执行后等待', trigger: 'blur' },
             { validator: validNum, trigger: 'blur' }
+          ],
+          loop_count: [
+            { required: true, message: '请输入循环次数', trigger: 'blur' },
+            { validator: validNum, trigger: 'blur' }
           ]
         }
       },
@@ -526,13 +530,25 @@ export default {
      * 失去焦点初始化
      */
     inputBlur(row, column) {
-      console.log('失去焦点')
+
       switch (column.label) {
         case '循环次数':
-          row.editLoop = false;
+          if (row.wait_time === 0) {
+            row.editLoop = false;
+          } else if (!row.wait_time) {
+            return
+          } else {
+            row.editLoop = false;
+          }
           break
         case '执行后等待':
-          row.editWait = false;
+          if (row.wait_time === 0) {
+            row.editWait = false;
+          } else if (!row.wait_time) {
+            return
+          } else {
+            row.editWait = false;
+          }
           break
         default:
           return
@@ -565,20 +581,7 @@ export default {
           // 临时action:['assd123123']
           const arr = []
           this.caseInfo.action.forEach(item => {
-            console.log(item)
-            let obj = {}
-            // if (item.function === 'action') {
-            //   obj = {
-            //     function: 'action',
-            //     uid: item.uid
-            //   }
-            // } else if (item.function === 'verify') {
-            //   obj = {
-            //     function: 'verify',
-            //     uid: item.uid
-            //   }
-            // }
-            obj = {
+            const obj = {
               function: item.function,
               uid: item.uid,
               wait_time: item.wait_time,

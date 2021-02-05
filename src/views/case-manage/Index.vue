@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-01-29 14:33:14
+ * @LastEditTime: 2021-02-05 17:46:39
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -225,20 +225,24 @@ export default {
 
     },
     // 复制用例
-    copyCase() {
-
+    copyCase(row) {
+      this.$router.push(
+        {
+          path: '/case/newcase',
+          query: {
+            uid: row.uid,
+            copy: 'copy'
+          }
+        }
+      )
     },
     // 详情
     detail(row) {
-      console.log(row)
       this.$router.push(
         {
-          name: 'CaseDetails',
+          path: '/case/newcase',
           query: {
             uid: row.uid
-          },
-          params: {
-            data: row
           }
         }
       )
