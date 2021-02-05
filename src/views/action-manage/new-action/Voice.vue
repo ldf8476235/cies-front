@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 17:08:23
+ * @LastEditTime: 2021-02-05 15:07:55
 -->
 <template>
   <div class="new-voice">
@@ -77,7 +77,7 @@
                 <el-col :span="12">
                   <el-form-item label="超时时间：" prop="timeout">
                     <el-input
-                      v-model="voiceInfo.timeout"
+                      v-model.number="voiceInfo.timeout"
                       placeholder="输入超时时长"
                     ></el-input>
                   </el-form-item>
@@ -117,40 +117,27 @@
                   align="center"
                   width="40">
                 </el-table-column>
-                <el-table-column label="语音名称"  width='180'>
+                <el-table-column label="语音名称" >
                   <template slot-scope="scope">
-                    <el-form-item
-                      :prop="'settings.' + scope.$index + '.voiceName'"
-                      :rules="rulesCaseInfo.settings.name"
-                      label-width="0px"
-                    >
-                      <!-- <span v-if="scope.row.editNode">
-                        <el-input
-                          ref="inputBlur"
-                          v-model="scope.row.voiceName"
-                          placeholder=""
-                          @blur="inputBlur(scope.row,scope.column)"
-                        ></el-input>
-                      </span> -->
-                      <span > {{scope.row.file_name}} </span>
-                    </el-form-item>
+                    <span > {{scope.row.name}} </span>
                   </template>
                 </el-table-column>
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'settings.' + scope.$index + '.executeWait'"
-                      :rules="rulesCaseInfo.settings.device_function"
+                      :prop="'settings.' + scope.$index + '.wait_time'"
+                      :rules="rulesCaseInfo.settings.wait_time"
                       label-width="0px"
                       >
-                      <!-- <el-input
+                      <el-input
+                          v-if='scope.row.editFlag'
                           style="width:30%;"
                           ref="inputBlur"
-                          v-model="scope.row.executeWait"
+                          v-model.number="scope.row.wait_time"
                           placeholder=""
-                          @blur="inputBlur(scope.row,scope.column)"
-                        ></el-input> -->
-                        1
+                          @blur="inputBlur(scope.row)"
+                        ></el-input>
+                        <span v-else @click='()=> scope.row.editFlag = true'> {{scope.row.wait_time}}</span>
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -179,7 +166,14 @@
               </el-row>
             </div>
           </el-form>
-          <Dialog ref='dialog' :title='title' @confirm='confirm'>
+          <Dialog
+            ref='dialog'
+            :title='title'
+            @confirm='confirm'
+            :total2='total'
+            :currPage2='currPage'
+            :pageSize2='pageSize'
+            >
             <el-table slot='voice' :data="voiceList">
               <el-table-column label="" align="center" width="30">
                 <template slot-scope="scope">
@@ -200,6 +194,8 @@
 
 <script>
 import { GET, POST } from '@/utils/api.js';
+
+import { selfIsNaN } from '@/utils/utils.js';
 import Dialog from '@/components/config-dialog/Dialog.vue';
 export default {
   name: 'NewVoice',
@@ -207,6 +203,9 @@ export default {
     Dialog
   },
   data() {
+    const validNum = (rule, value, callback) => {
+      selfIsNaN(value) ? callback() : callback(new Error('请输入数字'))
+    }
     return {
       crumbs: {
         action: true,
@@ -232,7 +231,6 @@ export default {
       voiceInfo: {
         type: 'Voice',
         corpus: 'corpus',
-        executeWait: '10',
         settings: [
         ]
       },
@@ -247,7 +245,8 @@ export default {
           { required: true, message: '请输入软件版本', trigger: 'blur' }
         ],
         timeout: [
-          { required: true, message: '请输入超时时长', trigger: 'blur' }
+          { required: true, message: '请输入超时时长', trigger: 'blur' },
+          { validator: validNum, trigger: 'blur' }
         ],
         corpus: [
           { required: true, message: '请选择语料库', trigger: 'blur' }
@@ -255,7 +254,12 @@ export default {
         desc: [
           { required: true, message: '请输入动作描述', trigger: 'blur' }
         ],
-        settings: {}
+        settings: {
+          wait_time: [
+            { required: true, message: '请输入执行后等待', trigger: 'blur' },
+            { validator: validNum, trigger: 'blur' }
+          ]
+        }
       },
       corpusList: [// 语料库
         {
@@ -302,7 +306,15 @@ export default {
         this.total = res.count
       })
     },
-    inputBlur() {
+    // 输入框失焦点
+    inputBlur(row) {
+      if (row.wait_time === 0) {
+        row.editFlag = false
+      } else if (!row.wait_time) {
+        return
+      } else {
+        row.editFlag = false
+      }
 
     },
     // 选择语音
@@ -327,23 +339,25 @@ export default {
         return
       }
       const data = {
+        editFlag: true,
         uid: this.radioData.uid,
         name: this.radioData.file_name,
-        type: this.radioData.type,
-        timeout: 0,
-        executeWait: '10'
+        // type: this.radioData.type,s
+        // timeout: 0,
+        wait_time: 0
       }
+      this.$nextTick(() => {
+        this.$refs.inputBlur.focus()
+      })
       this.voiceInfo.settings.splice(this.insertIndex + 1, 0, data)
       this.radio = ''
     },
     save() {
       this.$refs.voiceInfo.validate(valid => {
         if (!valid) return
-
         let url = 'action/add'
         let methods = 'POST'
         const uid = this.$route.query.uid
-
         if (uid) {
           methods = 'PUT'
           url = 'action/edit'

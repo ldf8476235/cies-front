@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 10:30:22
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 11:07:28
+ * @LastEditTime: 2021-02-05 15:53:06
 -->
 <template>
   <div class="case-details">
@@ -65,18 +65,18 @@
               </el-table-column>
               <el-table-column label="循环次数">
                 <template slot-scope="scope">
-                  <span> {{scope.row.loop_count}}12</span>
+                  <span> {{scope.row.loop_count}}</span>
                 </template>
               </el-table-column>
               <el-table-column label="出错处理">
                 <template slot-scope="scope">
-                  <span> {{scope.row.error}}跳出</span>
+                  <span> {{scope.row.error_handle}}</span>
                 </template>
               </el-table-column>
 
               <el-table-column label="执行后等待">
                 <template slot-scope="scope">
-                  <span>{{scope.row.execute_wait}}无处理</span>
+                  <span>{{scope.row.wait_time}}</span>
                 </template>
               </el-table-column>
               <el-table-column label="执行位置">

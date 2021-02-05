@@ -4,7 +4,7 @@
  * @Autor: wh
  * @Date: 2020-11-30 17:12:31
  * @LastEditors: wh
- * @LastEditTime: 2021-01-19 16:33:14
+ * @LastEditTime: 2021-02-05 11:51:50
 -->
 <template>
   <div class="page">
@@ -36,17 +36,21 @@ export default {
       total2: this.total
     }
   },
+  mounted() {
+    console.log(this.$attrs)
+    const attrs = this.$attrs
+    if (JSON.stringify(attrs) !== '{}') {
+      this.pageSize2 = attrs.pageSize2
+      this.currPage2 = attrs.currPage2
+      this.total2 = attrs.total2
+    }
+  },
   methods: {
     handleSizeChange() {
-      // this.$parent.pageSize = parseInt(this.pageSize2);
-      // this.$parent.currPage = 1;
       this.$emit('handleSizeChange', this.pageSize2)
-      // this.$parent.getList();
     },
     handleCurrChange(val) {
-      // this.$parent.currPage = val;
       this.$emit('handleCurrChange', val)
-      // this.$parent.getList();
     }
   },
   watch: {

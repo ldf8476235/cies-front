@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 17:53:18
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 17:49:50
+ * @LastEditTime: 2021-02-05 13:57:13
 -->
 <template>
   <div>
@@ -23,11 +23,8 @@
       </div>
       <PageUtil
         ref="pageutil"
-        :total="total"
-        :pageSize="pageSize"
-        :currPage="currPage"
-        @handleSizeChange='handleSizeChange'
-        @handleCurrChange='handleCurrChange'
+        v-bind="$attrs"
+        v-on="$listeners"
       ></PageUtil>
     </el-dialog>
   </div>
@@ -42,11 +39,9 @@ export default {
       default: ''
     }
   },
+
   data() {
     return {
-      total: 0,
-      pageSize: 10,
-      currPage: 1,
       keyword: '',
       dialogTableVisible: false
     };
@@ -60,15 +55,6 @@ export default {
       console.log('aaa')
       this.dialogTableVisible = false
       this.$emit('confirm', this.dialogTableVisible)
-    },
-    // 当前页条数
-    handleSizeChange(size) {
-      this.pageSize = size
-    },
-    // 当前页面
-    handleCurrChange(page) {
-      this.currPage = page
-      console.log(this.currPage)
     }
   }
 };

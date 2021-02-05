@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-04 14:19:28
+ * @LastEditTime: 2021-02-05 15:30:35
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -111,8 +111,8 @@
             </el-table-column>
             <el-table-column prop="taskStatus" label="" width="80">
               <template slot-scope='scope'>
-                <div v-if='true'  class='execute bg-color'>
-                  <svg-icon v-if='!scope.row.executeFlag' data_iconName='icon-start' className='colorFFF' @click.native='execute(scope.row)'></svg-icon>
+                <div v-if='true' class='execute bg-color' @click='execute(scope.row,scope.row.executeFlag)'>
+                  <svg-icon v-if='!scope.row.executeFlag' data_iconName='icon-start' className='colorFFF'></svg-icon>
                   <svg-icon v-else data_iconName='icon-retry' className='colorFFF' @click.native='reExecute(scope.row)'></svg-icon>
                 </div>
                 <div v-else class='execute'>
@@ -148,7 +148,10 @@
             </el-table-column>
           </el-table>
         </div>
-        <Dialog ref='dialog' :title='title' @confirm='confirmActuator'>
+        <Dialog
+          ref='dialog'
+          :title='title'
+          @confirm='confirmActuator'>
           <el-table slot='executeDevice' :data="executeDeviceList">
             <el-table-column label="" align="center" width="30">
                 <template slot-scope="scope">
@@ -291,7 +294,8 @@ export default {
       this.selectData = val;
     },
     // 执行
-    execute(row) {
+    execute(row, f) {
+      console.log(row, f)
       this.row = row
       this.$refs.dialog.dialogTableVisible = true
     },

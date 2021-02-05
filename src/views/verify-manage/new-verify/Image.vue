@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 14:14:16
+ * @LastEditTime: 2021-02-05 10:47:17
 -->
 <template>
   <div class="new-verify">
@@ -278,7 +278,9 @@
                 </div>
               </el-col>
             </el-row>
+            <img id='img' src="" style="position: absolute;top:0;"/>
           </el-form>
+
         </div>
       </div>
     </div>
@@ -445,7 +447,6 @@ export default {
     this.canvas.bg = document.querySelector('#bgCanvas')
     this.canvas.fg = document.querySelector('#fgCanvas')
     window.onresize = () => {
-      console.log('aaa', window.innerHeight)
       // const screenDiv = document.getElementById('screen');
       // screenDiv.style.height = (window.innerHeight - 210) + 'px' // '430px'
       this.resizeScreen(this.img)
@@ -454,7 +455,6 @@ export default {
     if (uid) {
       this.editData(uid)
     }
-
   },
   destroyed() {
     this.screenWebSocket && this.screenWebSocket.close()
@@ -997,7 +997,6 @@ export default {
     },
     // wh-可视区域尺寸变化
     resizeScreen(img) {
-      console.log(img)
       if (!img) {
         return
       }
@@ -1272,21 +1271,19 @@ export default {
       const startY = e.offsetY
       const canvasWidth = bgCanvas.width;
       const canvasHeight = bgCanvas.height;
-      // const divEle = document.createElement('div');
-      // divEle.setAttribute('id', id);
-      // videoRef.append(divEle)
       const obj = {
         id: id,
         class: 'border',
         class_1: 'desc_1',
-        labelName: this.labelName,
-        // startX: startX + 'px',
-        // startY: startY + 'px',
         img: '',
         flag: true
       }
+      if (_this.domArr.length === 0) {
+        _this.domArr.push(obj)
+      } else {
+        _this.domArr.splice(0, 1, obj)
+      }
 
-      _this.domArr.push(obj)
       let width = 0;
       let height = 0;
       this.$nextTick(() => {
@@ -1338,6 +1335,8 @@ export default {
               0,
               parseInt(divEle.style.width),
               parseInt(divEle.style.height))
+            const img = document.getElementById('img')
+            img.src = canvas.toDataURL()
             const blob = _this.dataURLtoBlob(canvas.toDataURL())
             console.log(blob)
             _this.drag(divEle)
@@ -1413,6 +1412,8 @@ export default {
             0,
             parseInt(divEle.style.width),
             parseInt(divEle.style.height))
+          const img = document.getElementById('img')
+          img.src = canvas.toDataURL()
           _this.flexible(divEle)
           document.onmousemove = null;
           divEle.onmouseup = null
@@ -1545,6 +1546,7 @@ export default {
   overflow-y: hidden;
   .content {
     overflow-y:hidden ;
+
   }
   .title {
     height: 41px;

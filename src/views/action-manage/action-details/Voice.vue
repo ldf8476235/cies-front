@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 10:21:45
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 17:08:05
+ * @LastEditTime: 2021-02-04 17:12:34
 -->
 <template>
   <div class="new-voice">
@@ -59,7 +59,7 @@
                 align="center"
                 width="40">
               </el-table-column>
-              <el-table-column label="语音名称"  width='180'>
+              <el-table-column label="语音名称">
                 <template slot-scope="scope">
                   {{scope.row.file_name}}
                 </template>

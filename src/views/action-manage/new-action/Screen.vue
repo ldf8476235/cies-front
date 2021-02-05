@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 17:03:32
+ * @LastEditTime: 2021-02-05 09:33:15
 -->
 <template>
   <div class="new-screen">
@@ -711,7 +711,6 @@ export default {
       this.generatedCode = this.generatedCode + '\n' + code + '.click()'
       this.editor.setValue(this.generatedCode)
       const codeComplate = this.baseCode + '\n' + code + '.click()'
-      console.log(codeComplate)
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
       this.nodeSelected = null
@@ -733,22 +732,22 @@ export default {
     runPythonWithConnect(code) {
       console.log('code:', code)
       this.tabActiveName = 'console'
-      if (!this.deviceId) {
-        return this.doConnect().then(() => {
-          this.runPythonWithConnect(code)
-        }).catch(err => {
-          console.warn(err)
-          this.screenLoading = false
-        })
-      }
+      // if (!this.deviceId) {
+      //   return this.doConnect().then(() => {
+      //     this.runPythonWithConnect(code)
+      //   }).catch(err => {
+      //     console.warn(err)
+      //     this.screenLoading = false
+      //   })
+      // }
       // this.pyshell.lineno.offset = 0
       return this.runPython(code)
     },
     // 推迟执行
     delayReload(msec) {
-      if (!this.liveScreen) {
-        setTimeout(this.dumpHierarchyWithScreen, msec || 1000);
-      }
+      // if (!this.liveScreen) {
+      //   setTimeout(this.dumpHierarchyWithScreen, msec || 1000);
+      // }
     },
     dumpHierarchyWithScreen() {
       this.screenLoading = true;
@@ -832,6 +831,7 @@ export default {
         this.screenWebSocketUrl = res.screenWebSocketUrl
         console.log(this.screenWebSocketUrl)
         this.getCurrentScreen()
+        this.loadLiveHierarchy()
       }).catch(err => {
         this.screenLoading = false
         console.log('doConnet-err', err)
@@ -1093,14 +1093,13 @@ export default {
         })
     },
     loadLiveScreen() {
-      console.log('---------------')
+      this.screenWebSocket && this.screenWebSocket.close()
       var self = this;
       var BLANK_IMG = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
       // var protocol = location.protocol == 'http:' ? 'ws://' : 'wss://'
       var ws = new WebSocket(this.screenWebSocketUrl);
       var canvas = document.getElementById('bgCanvas')
       var ctx = canvas.getContext('2d');
-
       // self.loadLiveHierarchy() // 计算手机app所有元素的黑色框
       this.screenWebSocket = ws;
       ws.onopen = function(ev) {
@@ -1415,6 +1414,7 @@ export default {
         }
         POST(url, methods, this.actionInfo).then(res => {
           this.$hintMsg('success', res)
+          this.screenWebSocket && this.screenWebSocket.close()
           this.$router.push({
             path: '/action'
           })

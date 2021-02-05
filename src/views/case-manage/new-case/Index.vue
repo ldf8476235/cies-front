@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-04 13:52:26
+ * @LastEditTime: 2021-02-05 15:51:43
 -->
 <template>
   <div class="new-case">
@@ -101,14 +101,15 @@
                 </el-table-column>
                 <el-table-column label="名称">
                   <template slot-scope="scope">
-                    <el-form-item
+                    <!-- <el-form-item
                       :prop="'action.' + scope.$index + '.name'"
                       :rules="rulesCaseInfo.action.name"
                       label-width="0px"
                       >
-                      <span v-if="scope.row.function === 'verify'">检验点： {{scope.row.name}} </span>
-                      <span v-if="scope.row.function === 'action'">动作： {{scope.row.name}} </span>
-                    </el-form-item>
+
+                    </el-form-item> -->
+                    <span v-if="scope.row.function === 'verify'">检验点： {{scope.row.name}} </span>
+                    <span v-if="scope.row.function === 'action'">动作： {{scope.row.name}} </span>
                   </template>
                 </el-table-column>
                 <!-- <el-table-column label="校验点名称">
@@ -125,31 +126,31 @@
                 <el-table-column label="循环次数">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'action.' + scope.$index + '.loopTimes'"
+                      :prop="'action.' + scope.$index + '.loop_count'"
                       :rules="rulesCaseInfo.action.loopCount"
                       label-width="0px"
                     >
                       <span v-if="scope.row.editLoop">
                         <el-input
                           ref="inputBlur"
-                          v-model="scope.row.loopTimes"
+                          v-model="scope.row.loop_count"
                           placeholder=""
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loopTimes}} 10</span>
+                      <span v-else @click='()=> scope.row.editLoop = true' > {{scope.row.loop_count}}</span>
                     </el-form-item>
                   </template>
                 </el-table-column>
                 <el-table-column label="出错处理">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'action.' + scope.$index + '.errorDispose'"
-                      :rules="rulesCaseInfo.action.errorDispose"
+                      :prop="'action.' + scope.$index + '.error_handle'"
+                      :rules="rulesCaseInfo.action.error_handle"
                       label-width="0px"
                     >
                       <span v-if="true">
-                        <el-select v-model="scope.row.errorDispose" placeholder="请选择">
+                        <el-select v-model="scope.row.error_handle" placeholder="请选择">
                           <el-option
                             v-for="item in options"
                             :key="item.value"
@@ -166,11 +167,11 @@
                 <el-table-column label="执行后等待">
                   <template slot-scope="scope">
                     <el-form-item
-                      :prop="'action.' + scope.$index + '.executeWait'"
-                      :rules="rulesCaseInfo.action.executeWait"
+                      :prop="'action.' + scope.$index + '.wait_time'"
+                      :rules="rulesCaseInfo.action.wait_time"
                       label-width="0px"
                     >
-                      <el-select v-model="scope.row.executeWait" placeholder="请选择">
+                      <!-- <el-select v-model="scope.row.wait_time" placeholder="请选择">
                         <el-option
                           v-for="item in executeWaitList"
                           :key="item.value"
@@ -178,7 +179,16 @@
                           :value="item.value"
                         >
                         </el-option>
-                      </el-select>
+                      </el-select> -->
+                      <el-input
+                          v-if='scope.row.editWait'
+                          style="width:30%;"
+                          ref="inputBlur"
+                          v-model.number="scope.row.wait_time"
+                          placeholder=""
+                          @blur="inputBlur(scope.row,scope.column)"
+                        ></el-input>
+                        <span v-else @click='()=> scope.row.editWait = true'> {{scope.row.wait_time}}</span>
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -207,13 +217,21 @@
                 <el-col>
                   <el-button type="" @click="addAction">
                     <i class="el-icon-plus"></i> 添加动作</el-button>
-                     <el-button type="" @click="addVerify">
+                  <el-button type="" @click="addVerify">
                     <i class="el-icon-plus"></i> 添加检验点</el-button>
                 </el-col>
               </el-row>
             </div>
           </el-form>
-          <Dialog ref='dialog' :title='title' @confirm='confirm'>
+          <Dialog
+            ref='dialog'
+            :title='title'
+            @confirm='confirm'
+            :total2='total'
+            :currPage2='currPage'
+            :pageSize2='pageSize'
+            @handleSizeChange='handleSizeChange'
+            @handleCurrChange='handleCurrChange'>
             <el-table v-if="slotType === 'caseAction'" slot='caseAction' :data="actionList">
               <el-table-column label="" align="center" width="40">
                 <template slot-scope="scope">
@@ -261,12 +279,16 @@
 import Sortable from 'sortablejs';
 import Dialog from '@/components/config-dialog/Dialog.vue';
 import { GET, POST } from '@/utils/api.js';
+import { selfIsNaN } from '@/utils/utils.js';
 export default {
   name: 'NewCase',
   components: {
     Dialog
   },
   data() {
+    const validNum = (rule, value, callback) => {
+      selfIsNaN(value) ? callback() : callback(new Error('请输入数字'))
+    }
     return {
       crumbs: {
         action: true,
@@ -280,45 +302,18 @@ export default {
       loading: false, // 任务名称动态验证动画
       options: [
         {
-          value: 'index1',
-          label: '项目1'
+          value: 'PASS',
+          label: 'PASS'
         },
         {
-          value: 'index2',
-          label: '项目2'
+          value: 'FAIL',
+          label: 'FAIL'
         }
       ],
       selectVal: '', // 选中项
       tabClickIndex: '',
       caseInfo: {
-        // 'caseCreator': '',
-        // 'caseDesc': '',
-        // 'caseName': '',
-        // 'caseProject': '',
-        // 'caseVersion': '',
         'action': [
-          // {
-          //   id: '01',
-          //   editLoop: false,
-          //   actionName: '节点名称1',
-          //   actionType: 'screen',
-          //   loopTimes: 11,
-          //   errorDispose: '123',
-          //   overtime: 'asdasd',
-          //   executeWait: 'aq2134',
-          //   selectFlag: false
-          // },
-          // {
-          //   id: '02',
-          //   editLoop: false,
-          //   actionName: '节点名称2',
-          //   actionType: 'screen',
-          //   loopTimes: 10,
-          //   errorDispose: '123',
-          //   overtime: 'asdasd',
-          //   executeWait: 'aq2134',
-          //   selectFlag: false
-          // }
         ]
       },
       rulesCaseInfo: {
@@ -334,24 +329,17 @@ export default {
         desc: [
           { required: true, message: '请输入用例描述', trigger: 'blur' }
         ],
-        action: {}
+        action: {
+          wait_time: [
+            { required: true, message: '请输入执行后等待', trigger: 'blur' },
+            { validator: validNum, trigger: 'blur' }
+          ]
+        }
       },
 
       isIndeterminate: false, // 半选
       checkAll: false, // 全选
       actionList: [
-        // { uid: '1',
-        //   type: 'screen1',
-        //   name: 'name1',
-        //   builder: 'user',
-        //   date: '2012-01-01'
-        // },
-        // { uid: '2',
-        //   type: 'screen2',
-        //   name: 'name2',
-        //   builder: 'user',
-        //   date: '2012-02-01'
-        // }
       ],
       verifyList: [
 
@@ -425,15 +413,16 @@ export default {
         return
       }
       const data = {
-        editLoop: false,
+        editLoop: true,
+        editWait: true,
         uid: this.radioData.uid,
         name: this.radioData.name,
         function: this.radioData.function,
         type: this.radioData.type,
-        timeout: 0,
-        errorDispose: 'PASS',
-        overtime: 'asdasd',
-        executeWait: '--',
+        error_handle: 'PASS',
+        wait_time: 0,
+        loop_count: 1,
+        exec_locate: '123',
         selectFlag: false
       }
       console.log(data)
@@ -542,6 +531,9 @@ export default {
         case '循环次数':
           row.editLoop = false;
           break
+        case '执行后等待':
+          row.editWait = false;
+          break
         default:
           return
       }
@@ -570,26 +562,34 @@ export default {
             method = 'PUT'
           }
           this.caseInfo.builder = '啊啊啊admin'
-          console.log('保存', this.caseInfo)
           // 临时action:['assd123123']
           const arr = []
           this.caseInfo.action.forEach(item => {
             console.log(item)
             let obj = {}
-            if (item.function === 'action') {
-              obj = {
-                function: 'action',
-                uid: item.uid
-              }
-            } else if (item.function === 'verify') {
-              obj = {
-                function: 'verify',
-                uid: item.uid
-              }
+            // if (item.function === 'action') {
+            //   obj = {
+            //     function: 'action',
+            //     uid: item.uid
+            //   }
+            // } else if (item.function === 'verify') {
+            //   obj = {
+            //     function: 'verify',
+            //     uid: item.uid
+            //   }
+            // }
+            obj = {
+              function: item.function,
+              uid: item.uid,
+              wait_time: item.wait_time,
+              loop_count: item.loop_count,
+              error_handle: item.error_handle,
+              exec_locate: item.exec_locate
             }
             arr.push(obj)
           })
           this.caseInfo.action = arr
+          console.log('保存', this.caseInfo)
           POST(url, method, this.caseInfo).then(res => {
             this.$hintMsg('success', res)
             this.$router.push('/case')
@@ -598,6 +598,26 @@ export default {
           })
         }
       })
+    },
+    // 当前页条数
+    handleSizeChange(size) {
+      this.pageSize = size
+      console.log(size)
+      if (this.slotType === 'caseAction') {
+        this.getActionList(this.currPage, this.pageSize)
+      } else {
+        this.getVerifyList(this.currPage, this.pageSize)
+      }
+    },
+    // 当前页面
+    handleCurrChange(page) {
+      this.currPage = page
+      console.log(this.currPage)
+      if (this.slotType === 'caseAction') {
+        this.getActionList(this.currPage, this.pageSize)
+      } else {
+        this.getVerifyList(this.currPage, this.pageSize)
+      }
     }
   }
 };
