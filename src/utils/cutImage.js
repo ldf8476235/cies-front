@@ -4,7 +4,7 @@
  * @Date: 2021-02-18 15:26:45
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 11:12:49
+ * @LastEditTime: 2021-02-22 15:34:58
  */
 let canvasWidth, canvasHeight
 // 鼠标按下函数
@@ -113,7 +113,7 @@ function drag(divEle, bgCanvas, screen, opt) {
     document.onmouseup = function(e) {
       e.stopPropagation();
       e.preventDefault();
-      drawImg(divEle, bgCanvas, screen, endx, endy, opt)
+      drawImg(divEle, bgCanvas, screen, parseInt(_target.style.left), parseInt(_target.style.top), opt)
       flexible(divEle, bgCanvas, opt)
       document.onmousemove = null;
       divEle.onmouseup = null
@@ -208,7 +208,7 @@ function drawImg(divEle, bgCanvas, screen, startX, startY, opt) {
   const h = parseInt(divEle.style.height)
   canvas.width = w
   canvas.height = h
-  console.log(startX, screen.offsetWidth)
+  console.log(startX, startY)
   const x = Math.floor(startX / screen.offsetWidth * opt.screenSize.width)
   const y = Math.floor(startY / screen.offsetHeight * opt.screenSize.height)
   const w1 = Math.floor(w / screen.offsetWidth * opt.screenSize.width)

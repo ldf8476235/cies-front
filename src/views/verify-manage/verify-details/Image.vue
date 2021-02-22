@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 14:22:34
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 15:43:15
+ * @LastEditTime: 2021-02-22 16:00:36
 -->
 <template>
   <div class="new-verify">
@@ -44,7 +44,7 @@
               <!-- 图像 -->
               <div v-if="selectVal === 'Image'">
                 <el-col :span="24">
-                  <p><span class='label'>匹配结果：</span><span>{{verifyInfo.name}}</span></p>
+                  <p><span class='label'>匹配结果：</span><span>{{verifyInfo.regex_result}}</span></p>
                 </el-col>
                 <el-col :span="24">
                   <p><span class='label'>类型：</span><span>图像采集 </span><span> 校验范围</span></p>
@@ -76,8 +76,8 @@
                 <el-col :span="24">
                   <p><span class='label'>页面元素：</span><span>{{verifyInfo.element}}</span></p>
                 </el-col>
-                <el-col :span="24">
-                  <p><span class='label'>页面内容：</span><span>{{verifyInfo.content}}</span></p>
+                <el-col :span="24" class="textOverstep">
+                  <p><span class='label'>页面内容：</span><span :title="verifyInfo.content">{{verifyInfo.content}}</span></p>
                 </el-col>
                 <el-col :span="24">
                   <p><span class='label'>匹配结果：</span><span>{{verifyInfo.regex_result}}</span></p>
@@ -146,6 +146,7 @@ export default {
   },
   mounted() {
     this.canvas.bg = document.querySelector('#bgCanvas')
+    this.selectVal = this.$route.query.type
     this.getDetails()
   },
   methods: {

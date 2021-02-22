@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-07 09:46:11
+ * @LastEditTime: 2021-02-22 15:44:34
 -->
 <template>
   <div class="new-voice">
@@ -119,7 +119,7 @@
                 </el-table-column>
                 <el-table-column label="语音名称" >
                   <template slot-scope="scope">
-                    <span > {{scope.row.name}} </span>
+                    <span > {{scope.row.file_name}} </span>
                   </template>
                 </el-table-column>
                 <el-table-column label="执行后等待">

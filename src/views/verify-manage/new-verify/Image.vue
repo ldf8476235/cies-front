@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 10:46:35
+ * @LastEditTime: 2021-02-22 15:42:50
 -->
 <template>
   <div class="new-verify">
@@ -262,6 +262,7 @@
                     <template v-if="domArr.length > 0 && !pageShow">
                       <div v-for="(item,index) in domArr" :key="index">
                         <div
+                          :style='item.style'
                           :id="item.id"
                           :class="item.flag"
                           @contextmenu.prevent="rightClick(index)"
@@ -279,7 +280,6 @@
             </el-row>
             <!-- <img id='img' src="" style="position: absolute;top:0;"/> -->
           </el-form>
-
         </div>
       </div>
     </div>
@@ -564,12 +564,7 @@ export default {
       }
       console.log(params)
       this.$axios.post(url, params).then(res => {
-        this.testResult = res.success ? 'PASS' : 'FAIL'
-        if (res.message === this.verifyInfo.regex_result) {
-          this.testResult = 'PASS'
-        } else {
-          this.testResult = 'FAIL'
-        }
+        this.testResult = res.message === this.verifyInfo.regex_result ? 'PASS' : 'FAIL'
       }).catch(err => {
         this.$hintMsg('error', err)
       })
@@ -787,6 +782,31 @@ export default {
       this.screenWebSocket && this.screenWebSocket.close()
       this.doConnect()
     },
+    // 编辑显示矩形框
+    editRect(data, screen) {
+      const inTop = data.inline_area[0] / this.screenSize.width * screen.offsetWidth;
+      const inLeft = data.inline_area[1] / this.screenSize.height * screen.offsetHeight;
+      const inWidth = (data.inline_area[2] - data.inline_area[0]) / this.screenSize.width * screen.offsetWidth
+      const inHeight = (data.inline_area[3] - data.inline_area[1]) / this.screenSize.height * screen.offsetHeight
+
+      const outTop = data.outline_area[0] / this.screenSize.width * screen.offsetWidth;
+      const outLeft = data.outline_area[1] / this.screenSize.height * screen.offsetHeight;
+      const outWidth = (data.outline_area[2] - data.outline_area[0]) / this.screenSize.width * screen.offsetWidth
+      const outHeight = (data.outline_area[3] - data.outline_area[1]) / this.screenSize.height * screen.offsetHeight
+      const inObj = {
+        id: 'imgCollect',
+        flag: 'imgCollect',
+        style: `top:${inTop}px;left:${inLeft}px;width:${inWidth}px;height:${inHeight}px`
+      }
+      const outObj = {
+        id: 'verifyScope',
+        flag: 'verifyScope',
+        style: `top:${outTop}px;left:${outLeft}px;width:${outWidth}px;height:${outHeight}px`
+      }
+      console.log(inObj)
+      this.domArr.push(inObj)
+      this.domArr.push(outObj)
+    },
     // 图片采集
     imgCollect() {
       console.log('图像采集')
@@ -860,13 +880,20 @@ export default {
       img.onload = function() {
         fgcanvas.width = bgcanvas.width = img.width;
         fgcanvas.height = bgcanvas.height = img.height
-        console.log('833', img.width, img.height)
         _this.screenSize = {
           width: img.width,
           height: img.height
         }
+
         _this.img = img
         _this.resizeScreen(img)
+        // 编辑时，显示矩形框
+        if (_this.$route.query.type === 'Image') {
+          const screen = _this.$refs.screen
+          console.log(screen.offsetWidth)
+          console.log(_this.screenSize)
+          _this.editRect(_this.verifyInfo, screen)
+        }
         ctx.drawImage(img, 0, 0, img.width, img.height);
         /**
          * 尝试强制清除所有东西以消除内存泄漏。

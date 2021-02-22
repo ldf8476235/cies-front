@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-18 10:22:01
- * @LastEditTime: 2021-02-22 10:15:05
+ * @LastEditTime: 2021-02-22 13:56:05
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\utils\request.js

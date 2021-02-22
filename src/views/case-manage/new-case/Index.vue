@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 17:56:43
+ * @LastEditTime: 2021-02-22 16:08:36
 -->
 <template>
   <div class="new-case">
@@ -171,15 +171,6 @@
                       :rules="rulesCaseInfo.action.wait_time"
                       label-width="0px"
                     >
-                      <!-- <el-select v-model="scope.row.wait_time" placeholder="请选择">
-                        <el-option
-                          v-for="item in executeWaitList"
-                          :key="item.value"
-                          :label="item.label"
-                          :value="item.value"
-                        >
-                        </el-option>
-                      </el-select> -->
                       <el-input
                           v-if='scope.row.editWait'
                           style="width:30%;"
@@ -360,9 +351,9 @@ export default {
   },
   mounted() {
     this.drag()
-    const queryId = this.$route.query.uid
-    if (queryId) {
-      this.editInto()
+    const uid = this.$route.query.uid
+    if (uid) {
+      this.editInto(uid)
     }
     this.getActionList(this.currPage, this.pageSize)
     this.getVerifyList(this.currPage, this.pageSize)
@@ -397,11 +388,19 @@ export default {
     },
 
     // 编辑进入
-    editInto() {
-      const uid = this.$route.query.uid
+    editInto(uid) {
+      const copy = this.$route.query.copy
       const url = `case/detail/?uid=${uid}`
       GET(url).then(res => {
         this.caseInfo = res.result[0]
+        console.log(this.caseInfo.action)
+        this.caseInfo.action.forEach(item => {
+          this.$set(item, 'editLoop', true)
+          this.$set(item, 'editWait', true)
+        })
+        if (copy) {
+          this.caseInfo.name = ''
+        }
       })
     },
     // 取消插入动作

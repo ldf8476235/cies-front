@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-02-18 15:04:09
+ * @LastEditTime: 2021-02-22 16:04:40
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -90,7 +90,7 @@
                     <svg-icon data_iconName="icon-edit" className="icon-gesture"/>
                     <span>编辑</span>
                   </p>
-                  <p @click="copyCase"><svg-icon data_iconName="icon-copy" className="icon-gesture"/><span>复制</span></p>
+                  <p @click="copyCase(scope.row)"><svg-icon data_iconName="icon-copy" className="icon-gesture"/><span>复制</span></p>
                   <p><svg-icon data_iconName="icon-report" className="icon-gesture"/><span>报告</span></p>
                   <p @click="delCase(scope.row)"><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
                   <!-- <el-button slot="reference"><i  class="el-icon-more"></i></el-button> -->
@@ -226,6 +226,7 @@ export default {
     },
     // 复制用例
     copyCase(row) {
+      console.log(row)
       this.$router.push(
         {
           path: '/case/newcase',
