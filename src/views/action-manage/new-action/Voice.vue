@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 15:07:55
+ * @LastEditTime: 2021-02-07 09:46:11
 -->
 <template>
   <div class="new-voice">
@@ -194,7 +194,6 @@
 
 <script>
 import { GET, POST } from '@/utils/api.js';
-
 import { selfIsNaN } from '@/utils/utils.js';
 import Dialog from '@/components/config-dialog/Dialog.vue';
 export default {

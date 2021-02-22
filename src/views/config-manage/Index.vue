@@ -4,7 +4,7 @@
  * @Date: 2021-01-25 15:44:01
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 09:36:03
+ * @LastEditTime: 2021-02-22 10:13:26
 -->
 <template>
   <div class="environment">
@@ -40,23 +40,46 @@
                 :data="corpusData"
                 node-key="id"
                 default-expand-all
+                @node-contextmenu='rightClick'
                 :expand-on-click-node="false">
                 <span class="custom-tree-node" slot-scope="{ node, data }">
-                  <span>{{ node.label }}</span>
-                  <span>
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => append(data)">
-                      添加
-                    </el-button>
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => remove(node, data)">
-                      删除
-                    </el-button>
-                  </span>
+                  <!-- <div class="custom-node">
+                    <div class="label">{{ node.label }}</div>
+                    <el-dropdown v-if="data.flag === 'first'">
+                      <span class="el-dropdown-link">
+                        下拉菜单<i class="el-icon-arrow-down el-icon--right"></i>
+                      </span>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item>黄金糕</el-dropdown-item>
+                        <el-dropdown-item>狮子头</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                  </div> -->
+                   <div>{{ node.label }}</div>
+                    <div>
+                      <el-dropdown v-if="data.flag === 'first'">
+                        <span class="el-dropdown-link">
+                          下拉菜单
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item><i class="el-icon-plus"></i>添加目录</el-dropdown-item>
+                          <el-dropdown-item><i class="el-icon-edit-outline"></i>编辑目录名</el-dropdown-item>
+                          <el-dropdown-item><i class="el-icon-plus"></i>添加语料</el-dropdown-item>
+                          <el-dropdown-item><i class="el-icon-delete"></i>删除</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </el-dropdown>
+                      <el-dropdown v-if="data.flag === 'third'">
+                        <span class="el-dropdown-link">
+                          下拉菜单
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item><i class="el-icon-plus"></i>添加目录</el-dropdown-item>
+                          <el-dropdown-item><i class="el-icon-edit-outline"></i>编辑目录名</el-dropdown-item>
+                          <el-dropdown-item><i class="el-icon-plus"></i>添加语料</el-dropdown-item>
+                          <el-dropdown-item><i class="el-icon-delete"></i>删除</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </el-dropdown>
+                    </div>
                 </span>
               </el-tree>
             </div>
@@ -66,13 +89,10 @@
         <el-dialog width='30%' title="新建语料库" :visible.sync="dialogFormVisible">
           <el-form ref='formConfig' :model="configInfo" label-position="top" :rules='ruleConfigInfo'>
             <el-form-item label="语料库名称" prop='name'>
-              <el-input v-model="configInfo.name" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item label="创建人" prop='builder'>
-              <el-input v-model="configInfo.builder" autocomplete="off"></el-input>
+              <el-input v-model="configInfo.name" autocomplete="off" placeholder="输入语料库名称"></el-input>
             </el-form-item>
             <el-form-item label="语料库描述" prop='desc'>
-              <el-input type='textarea' v-model="configInfo.desc" autocomplete="off"></el-input>
+              <el-input type='textarea' v-model="configInfo.desc" autocomplete="off" placeholder="输入语料库描述"></el-input>
             </el-form-item>
             <el-form-item label="语料文件" prop='file_name'>
               <input type='file' style='display:none;' accept='audio/wav' ref='file' id='file' @change= "changeFile" >
@@ -143,14 +163,18 @@ export default {
       corpusData: [{
         id: 1,
         label: '系统设置',
+        flag: 'first',
         children: [{
           id: 4,
           label: '音量调节',
+          flag: 'second',
           children: [{
             id: 9,
-            label: '三级.wav'
+            label: '三级.wav',
+            flag: 'third'
           }, {
             id: 10,
+            flag: 'third',
             label: '三级 1-1-2.wav'
           }]
         }]
@@ -178,6 +202,10 @@ export default {
     }
   },
   methods: {
+    // 树形控件右键点击事件
+    rightClick(e) {
+      console.log(e)
+    },
     append(data) {
       let id = 1000
       const newChild = { id: id++, label: 'testtest', children: [] };
@@ -199,7 +227,6 @@ export default {
     },
     async changeFile() {
       const files = document.getElementById('file').files
-
       console.log(document.getElementById('file').value)
       this.uploadFile(files)
     },
@@ -242,22 +269,25 @@ export default {
           console.log('Finished loading!')
           const fileMD5 = spark.end()
           console.log('str', fileMD5)
-          const checkResult = await checkFileMD5(file.name, fileMD5)
-          console.log(checkResult)
-          if (checkResult === 0) {
-            for (let i = 0; i < chunks; i++) {
-              const result = await upload(i, fileMD5);
-              console.log(result)
-              if (result.rate === 1) {
-                merge(file.name, fileMD5)
-              }
-              _this.percentage = Number((result.rate * 100).toFixed(0))
-            }
-          } else {
-
-            _this.$hintMsg('error', '此文件已存在')
-            document.getElementById('file').value = ''
+          // const checkResult = await checkFileMD5(file.name, fileMD5)
+          // console.log(checkResult)
+          const result = []
+          // if (checkResult === 0) {
+          for (let i = 0; i < chunks; i++) {
+            result.push(upload(i, fileMD5))
+            // if (result.rate === 1) {
+            //   merge(file.name, fileMD5)
+            // }
+            // _this.percentage = Number((result.rate * 100).toFixed(0))
           }
+          // } else {
+          //   _this.$hintMsg('error', '此文件已存在')
+          //   document.getElementById('file').value = ''
+          // }
+          Promise.all(result).then(res => {
+            console.log(res)
+            merge(file.name, fileMD5)
+          })
         }
       }
       fileReader.onerror = function() {
@@ -284,27 +314,39 @@ export default {
       }
       // 上传方法
       function upload(currentChunk, fileMD5) {
+        console.log('--', currentChunk)
+        // const end = (currentChunk + 1) * chunkSize >= fileSize ? fileSize : (currentChunk + 1) * chunkSize;
+        // const form = new FormData();
+        // const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+        // form.append('file', blobSlice.call(file, currentChunk * chunkSize, end));
+        // form.append('uid', fileMD5);
+        // form.append('voice_name', file.name);
+        // form.append('chunk', currentChunk);
+        // form.append('total_chunk', chunks);
+        // form.append('file_size', fileSize);
+        // console.log('--', currentChunk, form.get('chunk'))
+        // _this.$http({
+        //   url: '/settings/upload/',
+        //   method: 'POST',
+        //   data: form
+        // }).then(res => {
+        //   console.log(res)
+        // })
+        const end = (currentChunk + 1) * chunkSize >= fileSize ? fileSize : (currentChunk + 1) * chunkSize;
+        const form = new FormData();
+        const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+        form.append('file', blobSlice.call(file, currentChunk * chunkSize, end));
+        form.append('uid', fileMD5);
+        form.append('voice_name', file.name);
+        form.append('chunk', currentChunk);
+        form.append('total_chunk', chunks);
+        form.append('file_size', fileSize);
         return new Promise((reslove, reject) => {
-          const end = (currentChunk + 1) * chunkSize >= fileSize ? fileSize : (currentChunk + 1) * chunkSize;
-          const form = new FormData();
-          const blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
-          form.append('file', blobSlice.call(file, currentChunk * chunkSize, end));
-          form.append('uid', fileMD5);
-          form.append('voice_name', file.name);
-          form.append('chunk', currentChunk);
-          form.append('total_chunk', chunks);
-          form.append('file_size', fileSize);
-          // console.log(form)
           _this.$http({
             url: '/settings/upload/',
             method: 'POST',
             data: form
-            // headers: {
-            //   // 文件上传要设置的我就不细说了
-            //   'Content-Type': 'multipart/form-data;charset=utf-8'
-            // }
           }).then(res => {
-            // console.log(res)
             reslove(res)
           })
         })
@@ -409,6 +451,24 @@ export default {
           border-top: 1px solid #DDDDDD;
           .el-tree {
             padding-top: 10px;
+            .custom-node{
+              display: flex;
+              .label {
+                width: 90%;
+              }
+              .el-dropdown{
+
+                width: 100px;
+              }
+            }
+            .custom-tree-node {
+              flex: 1;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              font-size: 14px;
+              padding-right: 8px;
+            }
           }
         }
       }

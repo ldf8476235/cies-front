@@ -1,23 +1,20 @@
 /*
  * @Author: your name
  * @Date: 2020-11-18 10:22:01
- * @LastEditTime: 2021-02-05 17:38:35
+ * @LastEditTime: 2021-02-22 10:15:05
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\utils\request.js
  */
 import axios from 'axios';
-// import {
-//   Message
-// } from 'element-ui'
 let BASE_URL = ''
 if (process.env.NODE_ENV == 'development') {
-  BASE_URL = '192.168.210.233:8000'
+  BASE_URL = '192.168.210.232:8000'
 } else if (process.env.NODE_ENV == 'production') {
   BASE_URL = '192.168.210.233:8000'
 }
 const http = axios.create({
-  timeout: 10000,
+  timeout: 100000,
   baseURL: 'http://' + BASE_URL
 });
 // request拦截器

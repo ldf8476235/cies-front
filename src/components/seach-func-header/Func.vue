@@ -4,10 +4,9 @@
  * @Date: 2020-12-15 09:38:07
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-26 14:51:26
+ * @LastEditTime: 2021-02-18 15:04:24
 -->
 <template>
-  <div>
     <div class="funcTop">
       <div class="search">
         <el-select v-model="selectVal" placeholder="请选择">
@@ -54,7 +53,6 @@
           <slot name="action"></slot>
       </div>
     </div>
-  </div>
 </template>
 
 <script>

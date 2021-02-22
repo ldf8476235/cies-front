@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-02-05 17:46:39
+ * @LastEditTime: 2021-02-18 15:04:09
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -285,36 +285,6 @@ export default {
   .content {
     padding: 20px;
     box-sizing: border-box;
-  }
-  .funcTop {
-    display: flex;
-    justify-content: space-between;
-    .search {
-      .el-select {
-        width: 90px;
-        height: 30px;
-        .el-input {
-          width: 100%;
-          margin-left: 0px;
-        }
-      }
-      .el-input {
-        width: 180px;
-        height: 30px;
-        margin-left: 10px;
-        i {
-          cursor: pointer;
-        }
-      }
-    }
-    .newBtn {
-      .el-button {
-        // width: 100px;
-        // height: 30px;
-        // padding: 0;
-        // font-size: 12px;
-      }
-    }
   }
   .tableContent {
     margin-top: 10px;

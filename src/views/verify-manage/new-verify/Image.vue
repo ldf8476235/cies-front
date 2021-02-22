@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 10:47:17
+ * @LastEditTime: 2021-02-22 10:46:35
 -->
 <template>
   <div class="new-verify">
@@ -24,9 +24,9 @@
                 <el-row class="left">
                   <el-col :span="24">
                     <el-form-item label="链接设备：" prop="device_name">
-                      <el-input style="width:40%;margin-right:10px;" v-model="deviceUrl"></el-input>
+                      <el-input style="width:40%;margin-right:10px;" disabled v-model="deviceUrl"></el-input>
                       <el-dropdown @command='linkDevice'>
-                      <el-button type="">
+                      <el-button type="" @click="linkDeviceBtn">
                         链接设备<i class="el-icon-arrow-down el-icon--right"></i>
                       </el-button>
                       <el-dropdown-menu slot="dropdown">
@@ -104,7 +104,7 @@
                       <el-form-item label="匹配结果：" prop="regex_result">
                         <el-select v-model="verifyInfo.regex_result" placeholder="请选择">
                           <el-option
-                            v-for="item in options"
+                            v-for="item in regResuslt"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value"
@@ -116,7 +116,7 @@
                     <el-col :span="24">
                       <el-form-item label="类型：">
                         <el-button @click="imgCollect">图像采集</el-button>
-                        <el-button>检验范围</el-button>
+                        <el-button @click='verifyScope'>检验范围</el-button>
                       </el-form-item>
                     </el-col>
                     <el-col :span="24">
@@ -129,10 +129,11 @@
                     </el-col>
                     <el-col :span="24">
                       <el-form-item label="测试：">
-                        <el-button>
+                        <el-button @click="testImage">
                           <i class="el-icon-caret-right"></i>
                           <!-- <svg-icon data_iconName='icon-start'></svg-icon> -->
                         </el-button>
+                        <span :style="{color:(testResult === 'PASS' ? 'green':'red')}">&nbsp;{{testResult}}</span>
                       </el-form-item>
                     </el-col>
                   </div>
@@ -257,16 +258,14 @@
                 <div class="gutter" >
                   <div class="screen" ref="screen" id='screen'>
                     <canvas v-show="pageShow" id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
-                    <canvas id="bgCanvas" class="canvas-bg" @mousedown.stop.prevent="mouseDown" :style="canvasStyle"></canvas>
+                    <canvas id="bgCanvas" class="canvas-bg" @mousedown.stop.prevent="mouseDownCanvas" :style="canvasStyle"></canvas>
                     <template v-if="domArr.length > 0 && !pageShow">
                       <div v-for="(item,index) in domArr" :key="index">
                         <div
-                        :id="item.id"
-                        v-if="item.flag"
-                        :class="item.class">
-                          <!-- <p :class="item.class_1">
-                            <span @click.stop="delDom(item.id)">X</span>
-                          </p> -->
+                          :id="item.id"
+                          :class="item.flag"
+                          @contextmenu.prevent="rightClick(index)"
+                          >
                         </div>
                       </div>
                     </template>
@@ -278,7 +277,7 @@
                 </div>
               </el-col>
             </el-row>
-            <img id='img' src="" style="position: absolute;top:0;"/>
+            <!-- <img id='img' src="" style="position: absolute;top:0;"/> -->
           </el-form>
 
         </div>
@@ -290,6 +289,8 @@
 <script>
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 import { GET, POST } from '@/utils/api.js';
+// 图像截屏函数
+import { mouseDown } from '@/utils/cutImage.js';
 // 引入常量
 import WS_URL from '@/axios/C_L.js';
 export default {
@@ -338,10 +339,10 @@ export default {
           label: '北京烤鸭'
         }
       ],
-      selectVal: 'U3', // 选中项
+      selectVal: 'Image', // 选中项
       tabClickIndex: '',
       verifyInfo: {
-        type: 'U3',
+        type: 'Image',
         content: '',
         element: 'text',
         regex_result: 'PASS',
@@ -447,8 +448,6 @@ export default {
     this.canvas.bg = document.querySelector('#bgCanvas')
     this.canvas.fg = document.querySelector('#fgCanvas')
     window.onresize = () => {
-      // const screenDiv = document.getElementById('screen');
-      // screenDiv.style.height = (window.innerHeight - 210) + 'px' // '430px'
       this.resizeScreen(this.img)
     }
     const uid = this.$route.query.uid
@@ -545,12 +544,40 @@ export default {
     },
     // 刷新屏幕
     refreshDeviceScreen() {
+      this.screenLoading = true
+      this.getCurrentScreen()
       this.dumpHierarchy()
+    },
+    // 测试图像
+    testImage() {
+      this.testResult = ''
+      const url = '/api/v1/algorithm'
+      if (!this.verifyInfo.inline_area && !this.verifyInfo.outline_area) {
+        this.$hintMsg('warning', '请选择区域')
+        return
+      }
+      const params = {
+        ip: this.deviceUrl,
+        inline_area: this.verifyInfo.inline_area,
+        outline_area: this.verifyInfo.outline_area,
+        base64: this.verifyInfo.base64
+      }
+      console.log(params)
+      this.$axios.post(url, params).then(res => {
+        this.testResult = res.success ? 'PASS' : 'FAIL'
+        if (res.message === this.verifyInfo.regex_result) {
+          this.testResult = 'PASS'
+        } else {
+          this.testResult = 'FAIL'
+        }
+      }).catch(err => {
+        this.$hintMsg('error', err)
+      })
     },
     // 测试页面
     testPage() {
       const node = this.nodeSelected
-      // console.log(node)
+      this.testResult = ''
       if (node) {
         node.action = 'tap'
       }
@@ -559,12 +586,8 @@ export default {
       }
       var code = this.verifyInfo.content
       const ele = this.verifyInfo.element
-      // const regResult = this.verifyInfo.regex_result
       const timeout = this.verifyInfo.timeout
       let codeComplate
-      // this.loadLiveHierarchy()
-      // this.nodeSelected = null
-      // this.nodeHovered = null
       if (ele === 'xpath') {
         codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + 'exists' + ')'
       } else if (ele === 'text') {
@@ -577,26 +600,16 @@ export default {
         }
         codeComplate = this.baseCode + '\n' + 'print(' + code + '.' + 'exists' + '(' + timeout + '))'
       }
-      console.log(codeComplate)
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
     },
     // 运行python代码
     runPythonWithConnect(code) {
-      console.log('code:', code)
-      // if (!this.deviceId) {
-      //   return this.doConnect().then(() => {
-      //     this.runPythonWithConnect(code)
-      //   })
-      // }
-      // this.pyshell.lineno.offset = 0
       return this.runPython(code)
     },
     // wh-运行python
     runPython(code) {
       return new Promise((resolve, reject) => {
-        // this.resetConsole()
-        // this.resetEditor()
         this.pyshell.running = true
         this.pyshell.ws.send(JSON.stringify({ method: 'input', value: code }))
         resolve()
@@ -750,6 +763,10 @@ export default {
 
 
     },
+    // 点击链接设备重新获取设备列表
+    linkDeviceBtn() {
+      this.getHasDevice()
+    },
     // 获取现有设备
     getHasDevice() {
       this.$http.get('/device/screen/phones/').then(res => {
@@ -772,14 +789,22 @@ export default {
     },
     // 图片采集
     imgCollect() {
-
+      console.log('图像采集')
+      this.imgCollectFlag = true
+      this.btnType = 'imgCollect'
+    },
+    // 校验范围
+    verifyScope() {
+      console.log('校验范围')
+      this.verifyScopeFlag = true
+      this.btnType = 'verifyScope'
     },
     // 选择类型
     selectType(e) {
       this.selectVal = e
       console.log(e)
+      this.testResult = ''
       if (e === 'U3') {
-        console.log('ssss')
         this.pageShow = true
         if (this.connect) {
           this.dumpHierarchy()
@@ -801,9 +826,9 @@ export default {
           this.pageShow = true
           this.dumpHierarchy()
           this.loadLiveHierarchy()
-
         }
       }).catch(err => {
+        this.screenLoading = false
         console.log('err', err)
       })
     },
@@ -818,6 +843,7 @@ export default {
         localStorage.setItem('screenshotBase64', res.data);
       }).catch(err => {
         console.log('err:', err)
+        this.screenLoading = false
       })
     },
     // wh-绘制当前屏幕
@@ -834,16 +860,19 @@ export default {
       img.onload = function() {
         fgcanvas.width = bgcanvas.width = img.width;
         fgcanvas.height = bgcanvas.height = img.height
+        console.log('833', img.width, img.height)
+        _this.screenSize = {
+          width: img.width,
+          height: img.height
+        }
         _this.img = img
         _this.resizeScreen(img)
         ctx.drawImage(img, 0, 0, img.width, img.height);
-
         /**
          * 尝试强制清除所有东西以消除内存泄漏。
          * 尽管如此，当开发者工具打开时，Chrome仍然会泄漏大量的内存，可能是为了节省检查的资源。
          * 关闭开发人员工具时，内存不会泄漏。
         */
-
         img.onload = img.onerror = null
         // img.src = BLANK_IMG
         img = null
@@ -946,32 +975,31 @@ export default {
           this.loadLiveHierarchy()
         })
     },
+    // websocket画面实时更新手机页面
     loadLiveScreen() {
       var self = this;
       var BLANK_IMG =
         'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
       // var protocol = location.protocol == 'http:' ? 'ws://' : 'wss://'
-      var ws = new WebSocket(this.screenWebSocketUrl);
+      var ws = new WebSocket(this.screenWebSocketUrl)
       var canvas = document.getElementById('bgCanvas')
-      var ctx = canvas.getContext('2d');
+      var ctx = canvas.getContext('2d')
       // self.loadLiveHierarchy() // 计算手机app所有元素的黑色框
       this.screenWebSocket = ws;
       ws.onopen = function(ev) {
         console.log('screen websocket connected')
       };
       ws.onmessage = function(message) {
-        console.log(message)
         var blob = new Blob([message.data], {
           type: 'image/jpeg'
         })
-        var img = self.imagePool.next();
+        var img = self.imagePool.next()
         img.onload = function() {
           canvas.width = img.width
           canvas.height = img.height
           self.img = img
           ctx.drawImage(img, 0, 0, img.width, img.height)
           self.resizeScreen(img)
-
           img.onload = img.onerror = null
           // img.src = BLANK_IMG
           img = null
@@ -1003,7 +1031,6 @@ export default {
       var screenDiv = this.$refs.screen
       const w = img.width;
       const h = img.height
-      console.log(img.width, img.height)
       const r = img.width / img.height
       if (w > h) {
         screenDiv.style.width = Math.floor(330 * r) + 'px'
@@ -1248,278 +1275,66 @@ export default {
       // }
 
     },
+    // 鼠标右键删除
+    rightClick(index) {
+      this.domArr.splice(index, 1)
+    },
+
     // 鼠标按下
-    mouseDown(e) {
-      console.log(!this.connect, this.verifyInfo.type !== 'Image')
-      if (this.verifyInfo.type === 'U3' || !this.connect) {
-        this.$message({
-          type: 'warning',
-          message: '无截屏功能'
-        })
+    mouseDownCanvas(e) {
+      console.log(e)
+      if (!this.imgCollectFlag && !this.verifyScopeFlag) {
+        this.$hintMsg(
+          'warning',
+          '请点击类型按钮'
+        )
         return
       }
-      const _this = this
-      let x = 0;
-      let y = 0;
-      const date = new Date().getTime()
-      const id = 'funcDiv' + date + parseInt(Math.random() * 10)
+      if (this.verifyInfo.type === 'U3' || !this.connect) {
+        this.$hintMsg(
+          'warning',
+          '无截屏功能'
+        )
+        return
+      }
       const bgCanvas = document.getElementById('bgCanvas')
       const screen = document.getElementsByClassName('screen')[0]
-      x = e.pageX // - e.offsetX
-      y = e.pageY // - e.offsetY
-      const startX = e.offsetX
-      const startY = e.offsetY
-      const canvasWidth = bgCanvas.width;
-      const canvasHeight = bgCanvas.height;
+      const _this = this
+      const date = new Date().getTime()
+      const id = 'funcDiv' + date + parseInt(Math.random() * 10)
       const obj = {
         id: id,
-        class: 'border',
-        class_1: 'desc_1',
-        img: '',
-        flag: true
+        flag: this.btnType
       }
       if (_this.domArr.length === 0) {
         _this.domArr.push(obj)
       } else {
-        _this.domArr.splice(0, 1, obj)
+        _this.domArr.forEach((item, index) => {
+          if (item.flag === _this.btnType) {
+            _this.domArr.splice(index, 1, obj)
+          } else {
+            _this.domArr.push(obj)
+          }
+        })
       }
-
-      let width = 0;
-      let height = 0;
-      this.$nextTick(() => {
-        const divEle = document.getElementById(id)
-        document.onmousemove = function(e) {
-          e.preventDefault()
-          e.stopPropagation()
-          width = e.pageX - x
-          height = e.pageY - y
-          divEle.style.left = startX + 'px';
-          divEle.style.top = startY + 'px';
-          // 拖拽矩形框放大边界检测
-          if (width >= (canvasWidth - startX)) {
-            divEle.style.width = (canvasWidth - startX) + 'px';
-          } else {
-            divEle.style.width = width + 'px';
-          }
-          if (height >= (canvasHeight - startY)) {
-            divEle.style.height = (canvasHeight - startY) + 'px';
-          } else {
-            divEle.style.height = height + 'px';
-          }
-        }
-        document.onmouseup = function(e) {
-          e.stopPropagation();
-          e.preventDefault();
-          document.onmousemove = null
-          if (width < 10 || height < 10) {
-            // divEle.remove()
-            _this.domArr = _this.domArr.filter(item => {
-              return id !== item.id
-            })
-            // alert('选中区域过小')
-            document.onmousemove = null
-            document.onmouseup = null
-            return
-          } else {
-            const canvas = document.createElement('canvas')
-            const ctx = canvas.getContext('2d')
-            const rateX = canvasWidth / screen.offsetWidth
-            const rateY = canvasHeight / screen.offsetHeight
-            ctx.drawImage(
-              bgCanvas,
-              startX * rateX,
-              startY * rateY,
-              parseInt(divEle.style.width) * rateX,
-              parseInt(divEle.style.height) * rateY,
-              0,
-              0,
-              parseInt(divEle.style.width),
-              parseInt(divEle.style.height))
-            const img = document.getElementById('img')
-            img.src = canvas.toDataURL()
-            const blob = _this.dataURLtoBlob(canvas.toDataURL())
-            console.log(blob)
-            _this.drag(divEle)
-            _this.flexible(divEle)
-            document.onmousemove = null
-            document.onmouseup = null
-          }
-        }
-      })
-    },
-    // 拖拽函数
-    drag(divEle) {
-      const _this = this
-      let twidth = 0;
-      let theight = 0;
-      const bgCanvas = document.getElementById('bgCanvas')
-      const canvasWidth = bgCanvas.width;
-      const canvasHeight = bgCanvas.height;
-      const screen = document.getElementsByClassName('screen')[0]
-      divEle.onmousedown = function(e) {
-        if (e.target.className === 'desc_1') return
-        e.stopPropagation();
-        e.preventDefault();
-        const event = e || window.event;
-        const _target = event.target
-        const sb_bkx = event.clientX - _target.offsetLeft;
-        const sb_bky = event.clientY - _target.offsetTop;
-        let endx
-        let endy
-        twidth = parseInt(_target.style.width)
-        theight = parseInt(_target.style.height)
-        if (event.preventDefault) {
-          event.preventDefault();
-        } else {
-          event.returnValue = false;
-        }
-        document.onmousemove = function(ev) {
-          e.stopPropagation();
-          e.preventDefault();
-          const event = ev || window.event;
-          endx = event.clientX - sb_bkx;
-          endy = event.clientY - sb_bky;
-          // 拖拽边界检测
-          if (endx <= 0) {
-            _target.style.left = 0 + 'px';
-          } else if (endx + twidth >= screen.offsetWidth) {
-            _target.style.left = (screen.offsetWidth - twidth - 4) + 'px';
-          } else {
-            _target.style.left = endx + 'px';
-          }
-          if (endy <= 0) {
-            _target.style.top = 0 + 'px';
-          } else if (endy + theight >= screen.offsetHeight) {
-            _target.style.top = (screen.offsetHeight - theight - 4) + 'px';
-          } else {
-            _target.style.top = endy + 'px';
-          }
-        }
-        document.onmouseup = function(e) {
-          e.stopPropagation();
-          e.preventDefault();
-          const canvas = document.createElement('canvas')
-          const ctx = canvas.getContext('2d')
-          const rateX = canvasWidth / screen.offsetWidth
-          const rateY = canvasHeight / screen.offsetHeight
-          ctx.drawImage(
-            bgCanvas,
-            endx * rateX,
-            endy * rateY,
-            parseInt(divEle.style.width) * rateX,
-            parseInt(divEle.style.height) * rateY,
-            0,
-            0,
-            parseInt(divEle.style.width),
-            parseInt(divEle.style.height))
-          const img = document.getElementById('img')
-          img.src = canvas.toDataURL()
-          _this.flexible(divEle)
-          document.onmousemove = null;
-          divEle.onmouseup = null
-        }
+      const options = {
+        _this: this,
+        event: e,
+        canvas: bgCanvas,
+        screen: screen,
+        id: id,
+        domArr: _this.domArr,
+        screenSize: _this.screenSize
       }
-    },
-    // 拉伸缩放函数
-    flexible(divEle) {
-      let twidth = parseInt(divEle.style.width);
-      let theight = parseInt(divEle.style.height);
-      const canvasWidth = document.getElementById('bgCanvas').width;
-      const canvasHeight = document.getElementById('bgCanvas').height;
-      const dLeft = parseInt(divEle.style.left);
-      const dTop = parseInt(divEle.style.top);
-      let arrows = ''
-      const dateArrows = new Date().getTime();
-      const idArrows = 'newDiv' + dateArrows + parseInt(Math.random() * 10);
-      const arr = divEle.getElementsByTagName('div')
-      if (arr.length > 0) {
-        divEle.removeChild(arr[0])
-      }
-      arrows = document.createElement('div')
-      arrows.setAttribute('class', 'arrows')
-      arrows.setAttribute('id', idArrows)
-      arrows.style.position = 'absolute'
-      arrows.style.cursor = 'nw-resize'
-      arrows.style.left = twidth - 9 + 'px'
-      arrows.style.top = theight - 9 + 'px'
-      arrows.style.width = 10 + 'px'
-      arrows.style.height = 10 + 'px'
-      divEle.appendChild(arrows)
-      arrows.onmousedown = function(e) {
-        const x = e.pageX - e.target.offsetLeft - 10
-        const y = e.pageY - e.target.offsetTop - 10
-        e.stopPropagation();
-        e.preventDefault();
-        document.onmousemove = function(e) {
-          e.stopPropagation();
-          e.preventDefault();
-          twidth = e.pageX - x
-          theight = e.pageY - y
-          // 矩形框最小收缩区域
-          if (twidth <= 40) {
-            twidth = 40
-            theight = e.pageY - y
-          }
-          if (theight <= 40) {
-            twidth = e.pageX - x
-            theight = 40
-          }
-          if (twidth <= 40 && theight <= 40) {
-            twidth = 40
-            theight = 40
-          }
-          // 拖拽放大边界检测
-          if (twidth >= (canvasWidth - dLeft)) {
-            divEle.style.width = (canvasWidth - dLeft) + 'px';
-            arrows.style.left = (canvasWidth - dLeft - 9) + 'px';
-          } else {
-            divEle.style.width = twidth + 'px';
-            arrows.style.left = twidth - 9 + 'px'
-          }
-
-          if (theight >= (canvasHeight - dTop)) {
-            divEle.style.height = (canvasHeight - dTop) + 'px';
-            arrows.style.top = (canvasHeight - dTop - 9) + 'px'
-          } else {
-            divEle.style.height = theight + 'px';
-            arrows.style.top = theight - 9 + 'px'
-          }
-
-        }
-        document.onmouseup = function(e) {
-          e.stopPropagation();
-          e.preventDefault();
-          document.onmousemove = null
-          document.onmouseup = null
-        }
-      }
-    },
-    // base64转化blob
-    dataURLtoBlob(dataurl) {
-      var arr = dataurl.split(',');
-      var mime = arr[0].match(/:(.*?);/)[1];
-      var bstr = atob(arr[1]);
-      var n = bstr.length;
-      var u8arr = new Uint8Array(n);
-      console.log(mime)
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new Blob([u8arr], { type: mime });
+      mouseDown(options)
     },
     // 保存数据
     save() {
-      console.log('保存', this.verifyInfo)
-      this.verifyInfo.builder = 'admin'
+      console.log('保存', JSON.stringify(this.verifyInfo))
       this.$refs.verifyInfo.validate(valid => {
         if (!valid) return
-        // if (!this.testResult) {
-        //   this.$message({
-        //     type: 'error',
-        //     message: '测试结果有误，请检查页面元素类型'
-        //   })
-        //   return
-        // }
+        this.verifyInfo.builder = 'admin'
+        this.verifyInfo.function = 'verify'
         let url = 'verify/add'
         let method = 'POST'
         if (this.verifyInfo.uid) {
@@ -1604,11 +1419,32 @@ export default {
           z-index: 0;
           position: absolute;
         }
-        .border{
+        .del{
+          position: absolute;
+          top:-16px;
+          right: -2px;
+          background: #ccc;
+          width: 14px;
+          height: 14px;
+          color: #fff;
+          text-align: center;
+          border-top-left-radius: 5px;
+          cursor: pointer;
+          font-size: 10px;
+        }
+        .imgCollect{
           border: 2px solid red;
           position: absolute;
           z-index: 999;
           cursor: Move;
+          color: #fff;
+        }
+        .verifyScope{
+          border: 2px solid green;
+          position: absolute;
+          z-index: 999;
+          cursor: Move;
+          color: #fff;
         }
         .arrows {
           position: absolute;
