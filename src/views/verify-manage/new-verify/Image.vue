@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 14:45:26
+ * @LastEditTime: 2021-02-23 14:54:58
 -->
 <template>
   <div class="new-verify">
@@ -88,7 +88,7 @@
                     </el-form-item>
                   </el-col>
                   <el-col :span="24">
-                    <el-form-item label="校验点描述：">
+                    <el-form-item label="校验点描述：" prop="desc">
                       <el-input
                         type="textarea"
                         v-model="verifyInfo.desc"
