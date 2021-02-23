@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 11:40:05
+ * @LastEditTime: 2021-02-23 14:40:55
 -->
 <template>
   <div class="verify">
@@ -117,6 +117,8 @@
           :total="total"
           :pageSize="pageSize"
           :currPage="currPage"
+          @handleSizeChange='handleSizeChange'
+          @handleCurrChange='handleCurrChange'
         ></PageUtil>
       </div>
     </div>
@@ -303,6 +305,19 @@ export default {
           data: row
         }
       })
+    },
+    // 当前页条数
+    handleSizeChange(size) {
+      console.log(size)
+      this.pageSize = size
+      this.getVerifyList(this.currPage, size)
+    },
+    // 当前页面
+    handleCurrChange(page) {
+      console.log(page)
+      this.currPage = page
+      console.log(this.currPage)
+      this.getVerifyList(page, this.pageSize)
     }
   }
 };

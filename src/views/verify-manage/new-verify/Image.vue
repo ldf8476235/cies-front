@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 17:45:40
+ * @LastEditTime: 2021-02-23 14:45:26
 -->
 <template>
   <div class="new-verify">
@@ -114,12 +114,6 @@
                       </el-form-item>
                     </el-col>
                     <el-col :span="24">
-                      <el-form-item label="类型：">
-                        <el-button @click="imgCollect">图像采集</el-button>
-                        <el-button @click='verifyScope'>检验范围</el-button>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="24">
                       <el-form-item label="超时时长：">
                         <el-input
                           v-model="verifyInfo.timeout"
@@ -134,6 +128,18 @@
                           <!-- <svg-icon data_iconName='icon-start'></svg-icon> -->
                         </el-button>
                         <span :style="{color:(testResult === 'PASS' ? 'green':'red')}">&nbsp;{{testResult}}</span>
+                      </el-form-item>
+                    </el-col>
+                     <el-col :span="24">
+                      <el-form-item label="类型：">
+                        <el-button @click="imgCollect">图像采集</el-button>
+                        <el-button @click='verifyScope'>检验范围</el-button>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="24">
+                      <el-form-item label="">
+                        <img ref="img">
+                      <span> {{verifyInfo.inline_area}}</span>
                       </el-form-item>
                     </el-col>
                   </div>
@@ -1416,6 +1422,7 @@ export default {
     .left-container{
       height: 85%;
       overflow-y: scroll;
+
     }
     .left{
       padding: 0 10px;
@@ -1423,6 +1430,11 @@ export default {
     }
     .left-bottom{
       padding: 10px 10px 0 10px;
+      img{
+        // border: 1px solid #ff8901;
+        width:90px;
+        height: 70px;
+      }
     }
     .gutter {
       position: relative;
