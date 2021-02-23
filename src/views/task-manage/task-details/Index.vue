@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 14:04:56
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 14:46:57
+ * @LastEditTime: 2021-02-23 13:46:16
 -->
 <template>
   <div class="case-details">
@@ -70,7 +70,6 @@
                           width="100">
                           <template slot-scope="scope">
                             <div class="func">
-
                               <div>
                                 <svg-icon data_iconName = 'icon-subset'></svg-icon>
                               </div>
@@ -164,7 +163,16 @@
                   </template>
                 </el-table-column>
               </el-table>
+              <PageUtil
+                ref="pageutil"
+                :total="total"
+                :pageSize="pageSize"
+                :currPage="currPage"
+                @handleSizeChange='handleSizeChange'
+                @handleCurrChange='handleCurrChange'
+              ></PageUtil>
             </div>
+
         </div>
       </div>
     </div>
@@ -183,6 +191,9 @@ export default {
         details: true,
         name: ''
       },
+      total: 0,
+      pageSize: 10,
+      currPage: 1,
       editFlag: false,
       loading: false, // 任务名称动态验证动画
       options: [
@@ -212,6 +223,7 @@ export default {
       GET(url).then(res => {
         console.log(res)
         this.taskInfo = res.result[0]
+        this.total = this.taskInfo.case_list.length
         this.crumbs.name = this.taskInfo.name
       }).catch(err => {
         this.$hintMsg('error', err)
@@ -250,6 +262,15 @@ export default {
     // 复制
     copy() {
       console.log('复制')
+      const uid = this.$route.query.uid
+      console.log('编辑')
+      this.$router.push({
+        path: '/task/newtask',
+        query: {
+          uid,
+          copy: 'copy'
+        }
+      })
     },
     // 编辑
     edit() {
@@ -272,6 +293,21 @@ export default {
       this.editFlag = false
       this.crumbs.details = true
       console.log(this.taskInfo)
+    },
+    // 当前页条数
+    handleSizeChange(size) {
+      console.log(size)
+      this.pageSize = size
+      // this.getTaskList(this.currPage, size)
+      // this.getActuatorList()
+    },
+    // 当前页面
+    handleCurrChange(page) {
+      console.log(page)
+      this.currPage = page
+      console.log(this.currPage)
+      // this.getTaskList(page, this.pageSize)
+      // this.getActuatorList()
     }
   }
 };

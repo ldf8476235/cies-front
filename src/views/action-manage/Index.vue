@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2021-02-04 17:05:28
+ * @LastEditTime: 2021-02-23 11:39:36
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -78,7 +78,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="name" label="动作名称" width="180">
+            <el-table-column prop="name" label="动作名称" width="180" show-overflow-tooltip>
             </el-table-column>
             <el-table-column prop="mount" label="引用" min-width="80">
               <template slot-scope="scope">

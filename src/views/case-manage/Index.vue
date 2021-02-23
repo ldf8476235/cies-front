@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-02-22 17:52:38
+ * @LastEditTime: 2021-02-23 11:39:21
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -59,7 +59,7 @@
             @selection-change="handleSelectionChange">
             <el-table-column type="selection" align="center" width="55">
             </el-table-column>
-            <el-table-column prop="name" label="用例名称" width="180">
+            <el-table-column prop="name" label="用例名称" width="180" show-overflow-tooltip>
             </el-table-column>
             <el-table-column prop="mount" label="引用" width="60">
               <template slot-scope='scope'>

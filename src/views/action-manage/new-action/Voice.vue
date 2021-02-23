@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 15:44:34
+ * @LastEditTime: 2021-02-23 11:45:09
 -->
 <template>
   <div class="new-voice">
@@ -117,7 +117,7 @@
                   align="center"
                   width="40">
                 </el-table-column>
-                <el-table-column label="语音名称" >
+                <el-table-column label="语音名称" show-overflow-tooltip>
                   <template slot-scope="scope">
                     <span > {{scope.row.file_name}} </span>
                   </template>
@@ -181,7 +181,7 @@
                 </template>
               </el-table-column>
               <el-table-column property="" label="序号" width="50" type="index"></el-table-column>
-              <el-table-column property="file_name" label="语料名称"></el-table-column>
+              <el-table-column property="file_name" label="语料名称" show-overflow-tooltip></el-table-column>
               <el-table-column property="builder" label="创建人" width="100"></el-table-column>
               <el-table-column property="time_create" label="创建时间" width="140"></el-table-column>
             </el-table>
@@ -340,7 +340,7 @@ export default {
       const data = {
         editFlag: true,
         uid: this.radioData.uid,
-        name: this.radioData.file_name,
+        file_name: this.radioData.file_name,
         // type: this.radioData.type,s
         // timeout: 0,
         wait_time: 0

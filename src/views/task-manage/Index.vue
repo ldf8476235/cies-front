@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-22 18:24:31
+ * @LastEditTime: 2021-02-23 11:38:48
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -83,7 +83,7 @@
               width="55"
               >
             </el-table-column>
-            <el-table-column prop="name" label="任务名称" width="180">
+            <el-table-column prop="name" label="任务名称" width="180" show-overflow-tooltip>
             </el-table-column>
             <el-table-column prop="project" label="所属项目" min-width="180">
             </el-table-column>

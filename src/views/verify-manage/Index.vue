@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-03 15:40:24
+ * @LastEditTime: 2021-02-23 11:40:05
 -->
 <template>
   <div class="verify">
@@ -79,7 +79,7 @@
                 <svg-icon v-else data_iconName="icon-gesture" />
               </template>
             </el-table-column>
-            <el-table-column prop="name" label="检验点名称" min-width="180">
+            <el-table-column prop="name" label="检验点名称" min-width="180" show-overflow-tooltip>
             </el-table-column>
             <el-table-column prop="project" label="所属项目" width="180">
             </el-table-column>

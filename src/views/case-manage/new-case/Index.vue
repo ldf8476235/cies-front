@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 17:50:21
+ * @LastEditTime: 2021-02-23 14:13:02
 -->
 <template>
   <div class="new-case">
@@ -193,9 +193,9 @@
                         <svg-icon data_iconName="icon-plus" className="icon-gesture"/>
                         <span>插入动作</span>
                       </p>
-                      <p><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>替换动作</span></p>
-                      <p><svg-icon data_iconName="icon-top" className="icon-gesture"/><span>移动到顶部</span></p>
-                      <p><svg-icon data_iconName="icon-bottom" className="icon-gesture"/><span>移动到底部</span></p>
+                      <p @click='replaceAction(scope.$index,scope.row)'><svg-icon data_iconName="icon-replace" className="icon-gesture"/><span>替换动作</span></p>
+                      <p @click='moveTop(scope.$index,scope.row)'><svg-icon data_iconName="icon-top" className="icon-gesture" /><span>移动到顶部</span></p>
+                      <p @click='moveBottom(scope.$index)'><svg-icon data_iconName="icon-bottom" className="icon-gesture" /><span>移动到底部</span></p>
                       <p @click='del(scope.$index)'><svg-icon data_iconName="icon-delete" className="icon-gesture"/><span>删除</span></p>
                       <div slot="reference">
                         <svg-icon data_iconName='icon-more'></svg-icon>
@@ -359,6 +359,35 @@ export default {
     this.getVerifyList(this.currPage, this.pageSize)
   },
   methods: {
+    // 替换动作
+    replaceAction(index) {
+      this.replaceActionFlag = true
+      this.insertIndex = index
+      this.$refs.dialog.dialogTableVisible = true
+    },
+    // 移动到顶部
+    moveTop(index, row) {
+      console.log(index, row)
+      if (index == 0) {
+        this.$hintMsg('warning', '处于最顶端，不能继续上移')
+      } else {
+        const upDate = this.caseInfo.action[index];
+        this.caseInfo.action.unshift(upDate)
+        this.caseInfo.action.splice(index + 1, 1);
+      }
+    },
+    // 移动到最底部
+    moveBottom(index) {
+      const len = this.caseInfo.action.length - 1
+      if (index === len) {
+        this.$hintMsg('warning', '处于最低部，不能继续下移')
+      } else {
+        console.log(index)
+        const upDate = this.caseInfo.action[index];
+        this.caseInfo.action.splice(index, 1);
+        this.caseInfo.action.push(upDate)
+      }
+    },
     // 删除
     del(index) {
       console.log('s', index)
@@ -429,7 +458,9 @@ export default {
         selectFlag: false
       }
       console.log(data)
-      this.caseInfo.action.splice(this.insertIndex + 1, 0, data)
+      this.replaceActionFlag ? this.caseInfo.action.splice(this.insertIndex, 1, data)
+        : this.caseInfo.action.splice(this.insertIndex + 1, 0, data)
+      this.replaceActionFlag = false
       this.radio = ''
       this.radioData = {}
     },
