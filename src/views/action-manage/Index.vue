@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:35:49
- * @LastEditTime: 2021-02-23 11:39:36
+ * @LastEditTime: 2021-02-23 15:59:07
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\action-mangage\Index.vue
@@ -109,7 +109,7 @@
                     <span>详情</span>
                   </p>
                   <p @click="edit(scope.row)"><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
-                  <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
+                  <p @click="copy(scope.row)"><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
                   <p @click="del(scope.row)"><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
                   <!-- <el-button slot="reference"><i class="el-icon-more"></i></el-button> -->
                   <div slot="reference">
@@ -241,6 +241,27 @@ export default {
         name: name,
         query: {
           uid: row.uid
+        },
+        params: {
+          data: row
+        }
+      })
+    },
+    // 复制
+    copy(row) {
+      let name = ''
+      if (row.type === 'U3') {
+        name = 'NewScreen'
+      } else if (row.type === 'Voice') {
+        name = 'NewVoice'
+      } else if (row.type === 'Shell') {
+        name = 'NewScript'
+      }
+      this.$router.push({
+        name: name,
+        query: {
+          uid: row.uid,
+          copy: 'copy'
         },
         params: {
           data: row

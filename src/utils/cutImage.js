@@ -4,7 +4,7 @@
  * @Date: 2021-02-18 15:26:45
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 14:48:09
+ * @LastEditTime: 2021-02-23 15:09:23
  */
 let canvasWidth, canvasHeight
 // 鼠标按下函数
@@ -234,15 +234,17 @@ function drawImg(divEle, bgCanvas, screen, startX, startY, opt) {
     ip: opt._this.deviceUrl
   }
   const img = opt._this.$refs.img
-  console.log(canvas.toDataURL())
   // img.src = canvas.toDataURL()
   const base64 = encode(JSON.stringify(data))
   const url = `/api/v1/algorithm?data=${base64}`
   opt._this.$axios.get(url).then(res => {
     opt._this.verifyInfo.base64 = res.image_code
     img.src = 'data:image/png;base64,' + res.image_code
-    console.log(res.image_code)
-    opt._this.verifyInfo.image_uid = res.image_uid
+    const img_uid = opt._this.$route.query.uid
+    if (!img_uid) {
+      opt._this.verifyInfo.image_uid = res.image_uid
+    }
+    // opt._this.verifyInfo.image_uid = res.image_uid
   })
   opt._this.verifyInfo.inline_area = [x, y, x + w1, y + h1]
 }

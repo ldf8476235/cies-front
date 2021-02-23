@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 14:54:58
+ * @LastEditTime: 2021-02-23 15:46:54
 -->
 <template>
   <div class="new-verify">
@@ -138,7 +138,7 @@
                     </el-col>
                     <el-col :span="24">
                       <el-form-item label="">
-                        <img ref="img">
+                      <img ref="img" />
                       <span> {{verifyInfo.inline_area}}</span>
                       </el-form-item>
                     </el-col>
@@ -268,6 +268,7 @@
                     <template v-if="domArr.length > 0 && !pageShow">
                       <div v-for="(item,index) in domArr" :key="index">
                         <div
+
                           :style='item.style'
                           :id="item.id"
                           :class="item.flag"
@@ -350,7 +351,7 @@ export default {
       verifyInfo: {
         type: 'Image',
         content: '',
-        element: 'text',
+        element: 'screenshots',
         regex_result: 'PASS',
         timeout: '0'
       },
@@ -839,7 +840,9 @@ export default {
         if (this.connect) {
           this.dumpHierarchy()
         }
+        this.verifyInfo.element = 'text'
       } else {
+        this.verifyInfo.element = 'screenshots'
         this.pageShow = false
       }
 
@@ -1434,6 +1437,7 @@ export default {
         // border: 1px solid #ff8901;
         width:90px;
         height: 70px;
+        vertical-align:top;
       }
     }
     .gutter {

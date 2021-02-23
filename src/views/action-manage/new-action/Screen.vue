@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 09:33:15
+ * @LastEditTime: 2021-02-23 16:03:00
 -->
 <template>
   <div class="new-screen">
@@ -1398,14 +1398,15 @@ export default {
     save() {
       this.$refs.actionInfo.validate(valid => {
         if (!valid) return
-        this.actionInfo.sequence = this.clickMobileApp
+        this.clickMobileApp.length > 0 ? this.actionInfo.sequence = this.clickMobileApp : this.actionInfo.sequence
         this.actionInfo.script = this.generatedCode
         this.actionInfo.builder = 'admin'
         this.actionInfo.settings = ''
         console.log('保存', this.actionInfo)
         let url = ''
         let methods = ''
-        if (this.$route.query.uid) {
+        const query = this.$route.query
+        if (query.uid && !query.copy) {
           url = 'action/edit'
           methods = 'PUT'
         } else {
