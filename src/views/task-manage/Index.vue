@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-05 17:32:00
+ * @LastEditTime: 2021-02-22 18:24:31
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -151,7 +151,13 @@
         <Dialog
           ref='dialog'
           :title='title'
-          @confirm='confirmActuator'>
+          :total2='total'
+          :currPage2='currPage'
+          :pageSize2='pageSize'
+          @confirm='confirmActuator'
+          @handleSizeChange='handleSizeChange'
+          @handleCurrChange='handleCurrChange'
+          >
           <el-table slot='executeDevice' :data="executeDeviceList">
             <el-table-column label="" align="center" width="30">
                 <template slot-scope="scope">
@@ -160,6 +166,8 @@
               </el-table-column>
             <el-table-column property="index" label="序号" type="index" width="50"></el-table-column>
             <el-table-column property="actuator_name" label="执行机"></el-table-column>
+            <el-table-column property="actuator_mac" label="MAC"></el-table-column>
+            <el-table-column property="actuator_ip" label="IP"></el-table-column>
           </el-table>
         </Dialog>
         <PageUtil
@@ -176,12 +184,12 @@
 </template>
 
 <script>
-import Dialog from '@/components/config-dialog/Dialog.vue';
+import Dialog from '@/components/config-dialog/Dialog.vue'
 import Func from '@/components/seach-func-header/Func.vue'
-import { GET, DELETE } from '@/utils/api.js';
-import { delHint } from '@/utils/utils.js';
+import { GET, DELETE } from '@/utils/api.js'
+import { delHint } from '@/utils/utils.js'
 // 引入常量
-import WS_URL from '@/axios/C_L.js';
+import WS_URL from '@/axios/C_L.js'
 export default {
   name: 'Task',
   components: {
@@ -430,14 +438,18 @@ export default {
     },
     // 当前页条数
     handleSizeChange(size) {
+      console.log(size)
       this.pageSize = size
       this.getTaskList(this.currPage, size)
+      // this.getActuatorList()
     },
     // 当前页面
     handleCurrChange(page) {
+      console.log(page)
       this.currPage = page
       console.log(this.currPage)
       this.getTaskList(page, this.pageSize)
+      // this.getActuatorList()
     }
   }
 };

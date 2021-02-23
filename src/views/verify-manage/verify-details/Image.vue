@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 14:22:34
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 16:00:36
+ * @LastEditTime: 2021-02-22 17:44:41
 -->
 <template>
   <div class="new-verify">
@@ -302,6 +302,15 @@ export default {
     // 复制
     copy() {
       console.log('保存', this.verifyInfo)
+      const uid = this.$route.query.uid
+      this.$router.push({
+        path: '/verify/newimage',
+        query: {
+          uid,
+          type: this.verifyInfo.type,
+          copy: 'copy'
+        }
+      })
     },
     // 编辑
     edit() {
@@ -309,7 +318,8 @@ export default {
       this.$router.push({
         path: '/verify/newimage',
         query: {
-          uid
+          uid,
+          type: this.verifyInfo.type
         }
       })
     }

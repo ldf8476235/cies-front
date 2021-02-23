@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 15:42:50
+ * @LastEditTime: 2021-02-22 17:45:40
 -->
 <template>
   <div class="new-verify">
@@ -538,6 +538,10 @@ export default {
       const url = `/verify/detail/?uid=${uid}`
       GET(url).then(res => {
         this.verifyInfo = res.result[0]
+        this.selectVal = this.verifyInfo.type
+        if (this.$route.query.copy) {
+          this.verifyInfo.name = ''
+        }
       }).catch(err => {
         this.$hintMsg('error', err)
       })

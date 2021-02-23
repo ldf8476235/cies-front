@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 10:30:22
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 15:53:06
+ * @LastEditTime: 2021-02-22 17:53:31
 -->
 <template>
   <div class="case-details">
@@ -143,6 +143,16 @@ export default {
     // 复制
     copy() {
       console.log('复制')
+      const uid = this.$route.query.uid
+      this.$router.push(
+        {
+          path: '/case/newcase',
+          query: {
+            uid,
+            copy: 'copy'
+          }
+        }
+      )
     },
     // 编辑
     edit() {

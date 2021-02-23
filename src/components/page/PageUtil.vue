@@ -4,7 +4,7 @@
  * @Autor: wh
  * @Date: 2020-11-30 17:12:31
  * @LastEditors: wh
- * @LastEditTime: 2021-02-05 11:51:50
+ * @LastEditTime: 2021-02-22 17:20:26
 -->
 <template>
   <div class="page">
@@ -37,7 +37,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.$attrs)
     const attrs = this.$attrs
     if (JSON.stringify(attrs) !== '{}') {
       this.pageSize2 = attrs.pageSize2

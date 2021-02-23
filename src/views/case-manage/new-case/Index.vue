@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 16:08:36
+ * @LastEditTime: 2021-02-22 17:50:21
 -->
 <template>
   <div class="new-case">
@@ -431,6 +431,7 @@ export default {
       console.log(data)
       this.caseInfo.action.splice(this.insertIndex + 1, 0, data)
       this.radio = ''
+      this.radioData = {}
     },
     // 选择动作
     radioItem(row) {
@@ -572,7 +573,8 @@ export default {
         if (valid) {
           let url = '/case/add'
           let method = 'POST'
-          if (this.caseInfo.uid) {
+          const copy = this.$route.query.copy
+          if (this.caseInfo.uid && !copy) {
             url = '/case/edit/'
             method = 'PUT'
           }

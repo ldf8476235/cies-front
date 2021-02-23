@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 17:39:47
+ * @LastEditTime: 2021-02-22 18:16:55
 -->
 <template>
   <div class="newTask">
@@ -224,7 +224,7 @@
                           @blur="inputBlur(scope.row,scope.column)"
                         ></el-input>
                       </span>
-                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loop_count}}10 </span>
+                      <span v-else @click="tabDblClick(scope.row,scope.column)" > {{scope.row.loop_count}} </span>
                     </el-form-item>
                   </template>
                 </el-table-column>
@@ -306,7 +306,16 @@
               </el-row>
             </div>
           </el-form>
-          <Dialog ref='dialog' :title='title' @confirm='confirm'>
+          <Dialog
+            ref='dialog'
+            :title='title'
+            @confirm='confirm'
+            :total2='total'
+            :currPage2='currPage'
+            :pageSize2='pageSize'
+            @handleSizeChange='handleSizeChange'
+            @handleCurrChange='handleCurrChange'
+            >
             <el-table slot='environment' :data="caseList">
               <el-table-column label="" align="center" width="30">
                 <template slot-scope="scope">
@@ -711,12 +720,14 @@ export default {
     // 当前页条数
     handleSizeChange(size) {
       this.pageSize = size
-      this.getEnvironmentList(this.currPage, size)
+      // this.getEnvironmentList(this.currPage, size)
+      this.getCaseList(this.currPage, size)
     },
     // 当前页面
     handleCurrChange(page) {
       this.currPage = page
-      this.getEnvironmentList(page, this.pageSize)
+      // this.getEnvironmentList(page, this.pageSize)
+      this.getCaseList(page, this.pageSize)
     }
   }
 };

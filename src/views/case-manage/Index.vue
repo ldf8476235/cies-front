@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-02-22 16:04:40
+ * @LastEditTime: 2021-02-22 17:52:38
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -241,7 +241,7 @@ export default {
     detail(row) {
       this.$router.push(
         {
-          path: '/case/newcase',
+          path: '/case/casedetails',
           query: {
             uid: row.uid
           }
