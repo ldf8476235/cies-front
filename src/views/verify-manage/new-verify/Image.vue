@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-24 11:32:07
+ * @LastEditTime: 2021-02-24 17:55:04
 -->
 <template>
   <div class="new-verify">
@@ -139,7 +139,7 @@
                     <el-col :span="24">
                       <el-form-item label="">
                       <img ref="img" />
-                      <span> {{verifyInfo.inline_area}}</span>
+                      <span> {{verifyInfo.outline_area.length>0 ? verifyInfo.outline_area : ''}}</span>
                       </el-form-item>
                     </el-col>
                   </div>
@@ -272,7 +272,7 @@
                           :id="item.id"
                           :class="item.flag"
                           @mousedown.stop.prevent="mouseDownRect"
-                          @contextmenu.prevent="rightClick(index)"
+                          @contextmenu.prevent="rightClick(index,item.flag)"
                           >
                         </div>
                       </div>
@@ -353,7 +353,8 @@ export default {
         content: '',
         element: 'screenshots',
         regex_result: 'PASS',
-        timeout: '0'
+        timeout: '0',
+        outline_area: []
       },
       rulesCaseInfo: {
         name: [
@@ -459,6 +460,10 @@ export default {
     }
     const uid = this.$route.query.uid
     if (uid) {
+      // const url = '/media/image/4571302d4636433cac0643445532b4a9.png'
+      // GET(url).then(res => {
+      //   console.log('+++++:', res)
+      // })
       this.editData(uid)
     }
   },
@@ -545,6 +550,7 @@ export default {
       const url = `/verify/detail/?uid=${uid}`
       GET(url).then(res => {
         this.verifyInfo = res.result[0]
+        this.$refs.img.src = 'data:image/png;base64,' + this.verifyInfo.base64
         this.selectVal = this.verifyInfo.type
         if (this.$route.query.copy) {
           this.verifyInfo.name = ''
@@ -1318,8 +1324,15 @@ export default {
 
     },
     // 鼠标右键删除
-    rightClick(index) {
+    rightClick(index, flag) {
       this.domArr.splice(index, 1)
+      if (flag === 'verifyScope') {
+        this.verifyInfo.outline_area = []
+      } else {
+        this.verifyInfo.inline_area = []
+        this.verifyInfo.base64 = ''
+        this.verifyInfo.image_uid = ''
+      }
     },
     // 矩形框鼠标点击操作
     mouseDownRect(e) {
@@ -1335,8 +1348,8 @@ export default {
         screenSize: this.screenSize
       }
 
-      drag(verifyScope, this.canvas.bg, this.$refs.screen, options)
-      drag(imgCollect, this.canvas.bg, this.$refs.screen, options)
+      verifyScope ? drag(verifyScope, this.canvas.bg, this.$refs.screen, options) : ''
+      imgCollect ? drag(imgCollect, this.canvas.bg, this.$refs.screen, options) : ''
     },
     // 鼠标按下
     mouseDownCanvas(e) {
@@ -1390,7 +1403,7 @@ export default {
     },
     // 保存数据
     save() {
-      console.log('保存', JSON.stringify(this.verifyInfo))
+      // console.log('保存', JSON.stringify(this.verifyInfo))
       this.$refs.verifyInfo.validate(valid => {
         if (!valid) return
         this.verifyInfo.builder = 'admin'
@@ -1453,8 +1466,8 @@ export default {
     .left-bottom{
       padding: 10px 10px 0 10px;
       img{
-        // border: 1px solid #ff8901;
-        width:90px;
+        border: 1px solid #ff8901;
+        // width:90px;
         height: 70px;
         vertical-align:top;
       }

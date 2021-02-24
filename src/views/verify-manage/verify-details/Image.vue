@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 14:22:34
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 17:44:41
+ * @LastEditTime: 2021-02-24 18:08:42
 -->
 <template>
   <div class="new-verify">
@@ -47,10 +47,14 @@
                   <p><span class='label'>匹配结果：</span><span>{{verifyInfo.regex_result}}</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>类型：</span><span>图像采集 </span><span> 校验范围</span></p>
+                  <p><span class='label'>超时时间：</span><span>{{verifyInfo.timeout}}</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>超时时间：</span><span>{{verifyInfo.timeout}}</span></p>
+                  <p><span class='label'>类型：</span><span>图像采集 </span><span> 检验范围</span></p>
+                </el-col>
+                <el-col :span="24">
+                    <img ref="img" />
+                    <span> {{verifyInfo.outline_area}}</span>
                 </el-col>
               </div>
               <!-- 文本 -->
@@ -65,11 +69,15 @@
                   <p><span class='label'>匹配结果：</span><span>{{verifyInfo.desc}}</span></p>
                 </el-col>
                 <el-col :span="24">
-                  <p><span class='label'>类型：</span><span>图像采集 </span><span> 检验范围</span></p>
-                </el-col>
-                <el-col :span="24">
                   <p><span class='label'>超时时间：</span><span>{{verifyInfo.desc}}</span></p>
                 </el-col>
+                <el-col :span="24">
+                  <p><span class='label'>类型：</span><span>图像采集 </span><span> 检验范围</span></p>
+                </el-col>
+                <!-- <el-col :span="24">
+                    <img ref="img" />
+                    <span> {{verifyInfo.outline_area.length>0 ? verifyInfo.outline_area : ''}}</span>
+                </el-col> -->
               </div>
               <!-- 页面 -->
               <div v-if="selectVal === 'U3'">
@@ -158,8 +166,8 @@ export default {
         console.log(res)
         if (res.status_code === 200) {
           this.verifyInfo = res.data.result[0]
+          this.$refs.img.src = 'data:image/png;base64,' + this.verifyInfo.base64
         }
-        //
 
       })
     },
@@ -355,6 +363,10 @@ export default {
     }
     .left-bottom{
       padding: 0 10px;
+      img{
+        height: 70px;
+        margin-left: 70px;
+      }
     }
     .right-image{
       border-left: 1px solid #ddd;

@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-11-18 10:22:01
- * @LastEditTime: 2021-02-24 10:35:08
+ * @LastEditTime: 2021-02-24 17:05:05
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \ec_project\src\utils\request.js
@@ -9,7 +9,7 @@
 import axios from 'axios';
 let BASE_URL = ''
 if (process.env.NODE_ENV == 'development') {
-  BASE_URL = '192.168.210.233:8000'
+  BASE_URL = '192.168.210.232:8000'
 } else if (process.env.NODE_ENV == 'production') {
   BASE_URL = '192.168.210.233:8000'
 }

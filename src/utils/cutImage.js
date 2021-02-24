@@ -4,7 +4,7 @@
  * @Date: 2021-02-18 15:26:45
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-24 11:23:42
+ * @LastEditTime: 2021-02-24 17:52:25
  */
 let canvasWidth, canvasHeight
 // 鼠标按下函数
@@ -210,7 +210,6 @@ function drawImg(divEle, bgCanvas, screen, startX, startY, opt) {
   const h = parseInt(divEle.style.height)
   canvas.width = w
   canvas.height = h
-  console.log(startX, startY)
   const x = Math.floor(startX / screen.offsetWidth * opt.screenSize.width)
   const y = Math.floor(startY / screen.offsetHeight * opt.screenSize.height)
   const w1 = Math.floor(w / screen.offsetWidth * opt.screenSize.width)
@@ -218,6 +217,8 @@ function drawImg(divEle, bgCanvas, screen, startX, startY, opt) {
   const area = [x, y, x + w1, y + h1]
   if (divEle.id === 'verifyScope') {
     opt._this.verifyInfo.outline_area = area
+    console.log('area', opt._this.verifyInfo.outline_area)
+    // opt._this.$set(opt._this.verifyInfo, 'outline_area', area)
     return
   }
   ctx.drawImage(
@@ -235,6 +236,7 @@ function drawImg(divEle, bgCanvas, screen, startX, startY, opt) {
     inline_area: area,
     ip: opt._this.deviceUrl
   }
+  console.log(data)
   const img = opt._this.$refs.img
   // img.src = canvas.toDataURL()
   const base64 = encode(JSON.stringify(data))
