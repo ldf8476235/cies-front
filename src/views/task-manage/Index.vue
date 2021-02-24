@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-23 11:38:48
+ * @LastEditTime: 2021-02-24 09:53:56
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -94,7 +94,6 @@
             <el-table-column prop="time_create" label="创建时间" width="150">
             </el-table-column>
             <el-table-column prop="time_modify" label="更新时间" width="150">
-              2020-01-01 10:30:00
             </el-table-column>
             <el-table-column prop="taskStatus" label="状态" width="120">
               <template>

@@ -4,11 +4,11 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 15:46:54
+ * @LastEditTime: 2021-02-24 11:32:07
 -->
 <template>
   <div class="new-verify">
-    <Crumbs :crumbs='crumbs' @save='save'></Crumbs>
+    <Crumbs :crumbs='crumbs' @cancel='cancel' @save='save'></Crumbs>
     <div class="container">
       <div class="content">
         <div class="title">检验点信息</div>
@@ -268,10 +268,10 @@
                     <template v-if="domArr.length > 0 && !pageShow">
                       <div v-for="(item,index) in domArr" :key="index">
                         <div
-
                           :style='item.style'
                           :id="item.id"
                           :class="item.flag"
+                          @mousedown.stop.prevent="mouseDownRect"
                           @contextmenu.prevent="rightClick(index)"
                           >
                         </div>
@@ -297,7 +297,7 @@
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 import { GET, POST } from '@/utils/api.js';
 // 图像截屏函数
-import { mouseDown } from '@/utils/cutImage.js';
+import { mouseDown, drag } from '@/utils/cutImage.js';
 // 引入常量
 import WS_URL from '@/axios/C_L.js';
 export default {
@@ -795,15 +795,15 @@ export default {
     },
     // 编辑显示矩形框
     editRect(data, screen) {
-      const inTop = data.inline_area[0] / this.screenSize.width * screen.offsetWidth;
-      const inLeft = data.inline_area[1] / this.screenSize.height * screen.offsetHeight;
-      const inWidth = (data.inline_area[2] - data.inline_area[0]) / this.screenSize.width * screen.offsetWidth
-      const inHeight = (data.inline_area[3] - data.inline_area[1]) / this.screenSize.height * screen.offsetHeight
+      const inTop = Math.floor(data.inline_area[1] / this.screenSize.width * screen.offsetWidth);
+      const inLeft = Math.floor(data.inline_area[0] / this.screenSize.height * screen.offsetHeight);
+      const inWidth = Math.floor((data.inline_area[2] - data.inline_area[0]) / this.screenSize.width * screen.offsetWidth)
+      const inHeight = Math.floor((data.inline_area[3] - data.inline_area[1]) / this.screenSize.height * screen.offsetHeight)
 
-      const outTop = data.outline_area[0] / this.screenSize.width * screen.offsetWidth;
-      const outLeft = data.outline_area[1] / this.screenSize.height * screen.offsetHeight;
-      const outWidth = (data.outline_area[2] - data.outline_area[0]) / this.screenSize.width * screen.offsetWidth
-      const outHeight = (data.outline_area[3] - data.outline_area[1]) / this.screenSize.height * screen.offsetHeight
+      const outTop = Math.floor(data.outline_area[1] / this.screenSize.width * screen.offsetWidth);
+      const outLeft = Math.floor(data.outline_area[0] / this.screenSize.height * screen.offsetHeight);
+      const outWidth = Math.floor((data.outline_area[2] - data.outline_area[0]) / this.screenSize.width * screen.offsetWidth)
+      const outHeight = Math.floor((data.outline_area[3] - data.outline_area[1]) / this.screenSize.height * screen.offsetHeight)
       const inObj = {
         id: 'imgCollect',
         flag: 'imgCollect',
@@ -815,8 +815,10 @@ export default {
         style: `top:${outTop}px;left:${outLeft}px;width:${outWidth}px;height:${outHeight}px`
       }
       console.log(inObj)
-      this.domArr.push(inObj)
-      this.domArr.push(outObj)
+      const arr = []
+      arr.push(inObj)
+      arr.push(outObj)
+      this.domArr = arr
     },
     // 图片采集
     imgCollect() {
@@ -923,7 +925,7 @@ export default {
 
       img.onerror = function() {
         /**
-         * 幸福的忽视。
+         * 忽视。
          * 我认为这是不应该发生的，但有时它会发生，大概当我们加载图像太快。和onload中一样，在这里做同样的清理。
         */
         img.onload = img.onerror = null
@@ -1319,10 +1321,26 @@ export default {
     rightClick(index) {
       this.domArr.splice(index, 1)
     },
+    // 矩形框鼠标点击操作
+    mouseDownRect(e) {
+      console.log('rect', e)
+      const verifyScope = document.getElementById('verifyScope')
+      const imgCollect = document.getElementById('imgCollect')
 
+      const options = {
+        _this: this,
+        event: e,
+        screen: this.$refs.screen,
+        domArr: this.domArr,
+        screenSize: this.screenSize
+      }
+
+      drag(verifyScope, this.canvas.bg, this.$refs.screen, options)
+      drag(imgCollect, this.canvas.bg, this.$refs.screen, options)
+    },
     // 鼠标按下
     mouseDownCanvas(e) {
-      console.log(e)
+      console.log('canvas', e)
       if (!this.imgCollectFlag && !this.verifyScopeFlag) {
         this.$hintMsg(
           'warning',
@@ -1340,10 +1358,8 @@ export default {
       const bgCanvas = document.getElementById('bgCanvas')
       const screen = document.getElementsByClassName('screen')[0]
       const _this = this
-      const date = new Date().getTime()
-      const id = 'funcDiv' + date + parseInt(Math.random() * 10)
       const obj = {
-        id: id,
+        id: this.btnType,
         flag: this.btnType
       }
       if (_this.domArr.length === 0) {
@@ -1362,11 +1378,15 @@ export default {
         event: e,
         canvas: bgCanvas,
         screen: screen,
-        id: id,
+        id: this.btnType,
         domArr: _this.domArr,
         screenSize: _this.screenSize
       }
       mouseDown(options)
+    },
+    // 取消
+    cancel() {
+      this.$router.back()
     },
     // 保存数据
     save() {
@@ -1401,7 +1421,6 @@ export default {
   overflow-y: hidden;
   .content {
     overflow-y:hidden ;
-
   }
   .title {
     height: 41px;

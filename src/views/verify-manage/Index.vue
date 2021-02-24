@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 18:31:44
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 14:40:55
+ * @LastEditTime: 2021-02-24 11:33:47
 -->
 <template>
   <div class="verify">
@@ -102,7 +102,7 @@
                       <span>详情</span>
                     </p>
                   <p @click='edit(scope.row)'><svg-icon data_iconName="icon-edit" className="icon"/><span>编辑</span></p>
-                  <p><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
+                  <p @click='copy(scope.row)'><svg-icon data_iconName="icon-copy" className="icon"/><span>复制</span></p>
                   <p @click='del(scope.row)'><svg-icon data_iconName="icon-delete" className="icon"/><span>删除</span></p>
                   <div slot="reference">
                       <svg-icon data_iconName='icon-more'></svg-icon>
@@ -272,6 +272,34 @@ export default {
         query: {
           uid: row.uid,
           type: type
+        },
+        params: {
+          data: row
+        }
+      })
+    },
+    // 复制
+    copy(row) {
+      const type = row.type
+      let name
+      switch (type) {
+        case 'Image':
+        case 'Text':
+        case 'U3':
+          name = 'NewImage'
+          break;
+        case 'other':
+          name = 'NewOther'
+          break;
+        default:
+          break;
+      }
+      this.$router.push({
+        name: name,
+        query: {
+          uid: row.uid,
+          type: type,
+          copy: 'copy'
         },
         params: {
           data: row

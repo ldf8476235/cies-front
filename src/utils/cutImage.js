@@ -4,7 +4,7 @@
  * @Date: 2021-02-18 15:26:45
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 15:09:23
+ * @LastEditTime: 2021-02-24 11:23:42
  */
 let canvasWidth, canvasHeight
 // 鼠标按下函数
@@ -67,7 +67,7 @@ function dataURLtoBlob(dataurl) {
   return new Blob([u8arr], { type: mime });
 }
 // 拖拽函数
-function drag(divEle, bgCanvas, screen, opt) {
+export function drag(divEle, bgCanvas, screen, opt) {
   let twidth = 0;
   let theight = 0;
   let endx = parseInt(divEle.style.top)
@@ -117,6 +117,7 @@ function drag(divEle, bgCanvas, screen, opt) {
       flexible(divEle, bgCanvas, opt)
       document.onmousemove = null;
       divEle.onmouseup = null
+      divEle.onmousemove = null
     }
   }
 }
@@ -199,6 +200,7 @@ function flexible(divEle, bgCanvas, opt) {
 }
 // canvas绘制
 function drawImg(divEle, bgCanvas, screen, startX, startY, opt) {
+  console.log(divEle.id)
   const canvas = document.createElement('canvas')
   const ctx = canvas.getContext('2d')
   const rateX = canvasWidth / screen.offsetWidth
@@ -214,7 +216,7 @@ function drawImg(divEle, bgCanvas, screen, startX, startY, opt) {
   const w1 = Math.floor(w / screen.offsetWidth * opt.screenSize.width)
   const h1 = Math.floor(h / screen.offsetHeight * opt.screenSize.height)
   const area = [x, y, x + w1, y + h1]
-  if (opt._this.btnType === 'verifyScope') {
+  if (divEle.id === 'verifyScope') {
     opt._this.verifyInfo.outline_area = area
     return
   }
