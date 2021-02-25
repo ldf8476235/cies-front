@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 16:03:00
+ * @LastEditTime: 2021-02-25 15:28:38
 -->
 <template>
   <div class="new-screen">
@@ -111,9 +111,9 @@
 
                             </el-dropdown-menu>
                           </el-dropdown>
-                          <el-button type="">导出</el-button>
-                          <el-button type="">清空</el-button>
-                          <el-button @click='preview' type="">预览</el-button>
+                          <el-button @click='exportData'>导出</el-button>
+                          <el-button @click='empty'>清空</el-button>
+                          <el-button @click='preview'>预览</el-button>
                           <el-button type='info' @click='refreshDeviceScreen'>刷新</el-button>
                         </div>
                       </div>
@@ -353,10 +353,10 @@
               <div class='mobile-btn'  v-show='mobileBtn'>
                 <!-- <el-button @click='doTapWidget'>Tap Widget</el-button> -->
                 <el-button @click='doTap'>Tap</el-button>
-                <el-button>Send Keys</el-button>
+                <el-button @click='doSendKeys'>Send Keys</el-button>
                 <el-button>LongPress</el-button>
                 <el-button>ScrollWidget</el-button>
-                <el-button>Swipe</el-button>
+                <el-button @click='swipe'>Swipe</el-button>
 
               </div>
             </div>
@@ -468,28 +468,6 @@ export default {
       tabFlag: 0,
       jsTreeData: [], // 树形节点对象
       actionSequence: [
-        // [
-        //   {
-        //     name: 'name',
-        //     type: 'type',
-        //     text: 'text',
-        //     picture: 'picture',
-        //     area: 'area',
-        //     action: 'action',
-        //     exectuteWait: '',
-        //     params: 'params'
-        //   },
-        //   {
-        //     name: 'name2',
-        //     type: 'type2',
-        //     text: 'text2',
-        //     picture: 'picture2',
-        //     area: 'area2',
-        //     action: 'action2',
-        //     exectuteWait: '',
-        //     params: 'params2'
-        //   }
-        // ]
       ],
       autoCopy: true,
       mobileBtn: false,
@@ -532,17 +510,11 @@ export default {
       this.editData(uid)
     }
     window.onresize = () => {
-      // console.log('aaa', window.innerHeight)
-      // const screenDiv = document.getElementById('screen');
-      // screenDiv.style.height = (window.innerHeight - 310) + 'px' // '430px'
       this.resizeScreen(this.img)
     }
-    // const arr = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
-    // this.disposeActionSequence(arr)
   },
 
   destroyed() {
-    console.log(this.screenWebSocket)
     this.screenWebSocket && this.screenWebSocket.close()
     this.destroy = true
     window.onresize = null
@@ -650,7 +622,6 @@ export default {
     },
     // 元素节点点击事件
     itemClick(a, b) {
-      console.log('元素节点', a, b)
     },
     // 动作/元素结构切换
     tab(i) {
@@ -691,13 +662,24 @@ export default {
       }
       this.generatedCode = this.editor.getValue() + '\n' + 'time.sleep(1)'
     },
+    // 导出
+    exportData() {
+
+    },
+    // 清空
+    empty() {
+      this.disposeActionSequence([])
+      this.clickMobileApp = []
+      this.baseCode = "d = u3.connect('" + this.deviceUrl + "')"
+      this.editor.setValue(this.baseCode)
+    },
+    // 预览
     preview() {
       const codeComplate = this.editor.getValue()
       if (!codeComplate) {
         this.$hintMsg('warning', '请先链接设备！')
         return
       }
-      console.log(codeComplate)
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
     },
@@ -708,9 +690,9 @@ export default {
       this.clickMobileApp.push(node)
       this.disposeActionSequence(this.clickMobileApp)
       var code = this.generateNodeSelectorCode(node)
-      this.generatedCode = this.generatedCode + '\n' + code + '.click()'
+      this.generatedCode = this.generatedCode + '\n' + code + '.click(timeout=1)'
       this.editor.setValue(this.generatedCode)
-      const codeComplate = this.baseCode + '\n' + code + '.click()'
+      const codeComplate = this.baseCode + '\n' + code + '.click(timeout=1)'
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
       this.nodeSelected = null
@@ -718,29 +700,25 @@ export default {
       this.loadLiveHierarchy()
     },
     doSendKeys(text) {
-      if (!text) {
-        text = window.prompt('Input text?')
-      }
+      // if (!text) {
+      text = window.prompt('Input text?')
+      // }
       if (!text) {
         return;
       }
       const code = this.editor.getValue() + '\n' + `d.send_keys("${text}", clear=True)`
-      this.runPythonWithConnect(code)
+      this.editor.setValue(code)
+      const execute = this.baseCode + '\n' + `d.send_keys("${text}", clear=True)`
+      this.runPythonWithConnect(execute)
         .then(this.delayReload)
+    },
+    // 滑屏
+    swipe() {
+
     },
     // 运行python代码
     runPythonWithConnect(code) {
-      console.log('code:', code)
       this.tabActiveName = 'console'
-      // if (!this.deviceId) {
-      //   return this.doConnect().then(() => {
-      //     this.runPythonWithConnect(code)
-      //   }).catch(err => {
-      //     console.warn(err)
-      //     this.screenLoading = false
-      //   })
-      // }
-      // this.pyshell.lineno.offset = 0
       return this.runPython(code)
     },
     // 推迟执行
@@ -829,7 +807,6 @@ export default {
       this.$axios.post('/api/v1/connect', params, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}).then(res => {
         this.deviceId = res.deviceId
         this.screenWebSocketUrl = res.screenWebSocketUrl
-        console.log(this.screenWebSocketUrl)
         this.getCurrentScreen()
         this.loadLiveHierarchy()
       }).catch(err => {
@@ -1108,10 +1085,8 @@ export default {
       var time = 0
       ws.onmessage = function(message) {
         if (+new Date() - time < 50) {
-          console.log('new')
           return
         }
-        console.log('00000')
         time = +new Date()
         var blob = new Blob([message.data], {
           type: 'image/jpeg'

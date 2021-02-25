@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 14:22:34
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-24 18:08:42
+ * @LastEditTime: 2021-02-25 15:30:07
 -->
 <template>
   <div class="new-verify">
@@ -366,6 +366,7 @@ export default {
       img{
         height: 70px;
         margin-left: 70px;
+        vertical-align: top;
       }
     }
     .right-image{

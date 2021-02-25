@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-02-23 11:39:21
+ * @LastEditTime: 2021-02-25 09:55:25
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -13,7 +13,13 @@
     </div>
     <div class="container">
       <div class="content">
-        <Func :options='options' @goNew='goNewCase' :txt='text' @deleteBatch='deleteBatch'>
+        <Func
+          :options='options'
+          @goNew='goNewCase'
+          :txt='text'
+          @clearSeach='clearSeach'
+          @confirmSearch='confirmSearch'
+          @deleteBatch='deleteBatch'>
           <el-form slot='case' :inline='true' label-position="top" :model="seachInfo" class="demo-form-inline">
             <el-form-item style='width:150px;' label="用例名称">
               <el-input  v-model="seachInfo.user" placeholder="输入用例名称"></el-input>
@@ -42,13 +48,13 @@
                 <el-option label="区域二" value="beijing"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item style="display:block;text-align:right; margin: 0">
+            <!-- <el-form-item style="display:block;text-align:right; margin: 0">
               <div>
                 <el-button size="mini" type="text" @click="clearSeach">清空列表</el-button>
                 <el-button size="mini" style='border: 1px solid #DCDFE6;' @click="cancel">取消</el-button>
                 <el-button type="primary" size="mini" @click="confirm">确定</el-button>
               </div>
-            </el-form-item>
+            </el-form-item> -->
           </el-form>
         </Func>
         <div class="tableContent">

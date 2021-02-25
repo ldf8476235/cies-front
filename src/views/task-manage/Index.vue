@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:12:31
- * @LastEditTime: 2021-02-24 09:53:56
+ * @LastEditTime: 2021-02-25 10:00:55
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\task-manage\Index.vue
@@ -13,7 +13,15 @@
     </div>
     <div class="container">
       <div class="content">
-        <Func ref='func' :options='options' @goNew='goNewTask' @deleteBatch='deleteBatch' :txt='text'>
+        <Func
+         ref='func'
+          :options='options'
+          @goNew='goNewTask'
+          @deleteBatch='deleteBatch'
+          @clearSeach='clearSeach'
+          @confirmSearch='confirmSearch'
+          :seachInfo='seachInfo'
+          :txt='text'>
           <el-form slot='task' :inline='true' label-position="top" :model="seachInfo" class="demo-form-inline">
             <el-form-item style='width:150px;' label="任务名称">
               <el-input  v-model="seachInfo.name" placeholder="输入任务名称"></el-input>
@@ -48,14 +56,13 @@
                 <el-option label="区域二" value="beijing"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item style="display:block;text-align:right; margin: 0">
+            <!-- <el-form-item style="display:block;text-align:right; margin: 0">
               <div>
                 <el-popconfirm
                   title="确认清空搜索列表？"
                   style='padding-right:10px;'
                   @confirm='clearSeach'
                   icon="el-icon-info"
-
                   >
                   <el-button slot="reference" size="mini" type="text">清空列表</el-button>
                 </el-popconfirm>
@@ -69,7 +76,7 @@
                 </el-popconfirm>
                 <el-button type="primary" size="mini" @click="confirmSearch">确定</el-button>
               </div>
-            </el-form-item>
+            </el-form-item> -->
           </el-form>
         </Func>
         <div class="tableContent">
@@ -320,22 +327,17 @@ export default {
     clearSeach() {
       this.seachInfo = {}
     },
-    // 取消搜索
-    cancel() {
-      this.$refs.func.visible = false
-    },
     // 确认搜索
     confirmSearch() {
-      console.log(this.seachInfo)
-      const arr = []
-      for (const key in this.seachInfo) {
-        const obj = {
-          field: key,
-          field_str: this.seachInfo[key]
-        }
-        arr.push(obj)
-      }
-      console.log(arr)
+      // const arr = []
+      // for (const key in this.seachInfo) {
+      //   const obj = {
+      //     field: key,
+      //     field_str: this.seachInfo[key]
+      //   }
+      //   arr.push(obj)
+      // }
+
     },
     // 获取所有任务
     getTaskList(page, size) {

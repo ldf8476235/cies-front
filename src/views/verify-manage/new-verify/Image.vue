@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-24 17:55:04
+ * @LastEditTime: 2021-02-25 14:31:27
 -->
 <template>
   <div class="new-verify">
@@ -1339,7 +1339,6 @@ export default {
       console.log('rect', e)
       const verifyScope = document.getElementById('verifyScope')
       const imgCollect = document.getElementById('imgCollect')
-
       const options = {
         _this: this,
         event: e,
@@ -1347,7 +1346,6 @@ export default {
         domArr: this.domArr,
         screenSize: this.screenSize
       }
-
       verifyScope ? drag(verifyScope, this.canvas.bg, this.$refs.screen, options) : ''
       imgCollect ? drag(imgCollect, this.canvas.bg, this.$refs.screen, options) : ''
     },
@@ -1403,7 +1401,7 @@ export default {
     },
     // 保存数据
     save() {
-      // console.log('保存', JSON.stringify(this.verifyInfo))
+      console.log('保存', this.verifyInfo)
       this.$refs.verifyInfo.validate(valid => {
         if (!valid) return
         this.verifyInfo.builder = 'admin'
@@ -1466,7 +1464,7 @@ export default {
     .left-bottom{
       padding: 10px 10px 0 10px;
       img{
-        border: 1px solid #ff8901;
+        // border: 1px solid #ff8901;
         // width:90px;
         height: 70px;
         vertical-align:top;

@@ -4,7 +4,7 @@
  * @Date: 2020-12-15 09:38:07
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-18 15:04:24
+ * @LastEditTime: 2021-02-25 10:01:27
 -->
 <template>
     <div class="funcTop">
@@ -31,6 +31,25 @@
             <slot name='case'></slot>
             <slot name='device'></slot>
             <slot name='environment'></slot>
+            <div style="text-align:right;">
+                <el-popconfirm
+                  title="确认清空搜索列表？"
+                  style='padding-right:10px;'
+                  icon="el-icon-info"
+                  @confirm='clearSeach'
+                  >
+                  <el-button slot="reference" size="mini" type="text">清空列表</el-button>
+                </el-popconfirm>
+                <el-popconfirm
+                  title="取消搜索列表？"
+                  style='padding-right:10px;'
+                  icon="el-icon-info"
+                  @confirm='cancel'
+                  >
+                  <el-button slot="reference" size="mini" style='border: 1px solid #DCDFE6;'>取消</el-button>
+                </el-popconfirm>
+                <el-button type="primary" size="mini" @click="confirmSearch">确定</el-button>
+              </div>
             <el-button class="btnFilter" slot="reference">
               <svg-icon data_iconName='icon-filter'></svg-icon>
             </el-button>
@@ -64,6 +83,9 @@ export default {
     },
     txt: {
       type: String
+    },
+    seachInfo: {
+      type: Object
     }
   },
   data() {
@@ -98,6 +120,28 @@ export default {
     // 批量删除按钮
     deleteBatch() {
       this.$emit('deleteBatch')
+    },
+    // 清空条件
+    clearSeach() {
+      this.$emit('clearSeach')
+    },
+    // 取消搜索
+    cancel() {
+      this.visible = false
+    },
+    // 确认搜索
+    confirmSearch() {
+      console.log(this.seachInfo)
+      const arr = []
+      for (const key in this.seachInfo) {
+        const obj = {
+          field: key,
+          field_str: this.seachInfo[key]
+        }
+        arr.push(obj)
+      }
+      console.log(arr)
+      this.$emit('confirmSearch', arr)
     }
   }
 

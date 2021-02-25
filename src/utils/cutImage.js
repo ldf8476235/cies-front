@@ -4,7 +4,7 @@
  * @Date: 2021-02-18 15:26:45
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-24 17:52:25
+ * @LastEditTime: 2021-02-25 14:21:11
  */
 let canvasWidth, canvasHeight
 // 鼠标按下函数
@@ -245,7 +245,8 @@ function drawImg(divEle, bgCanvas, screen, startX, startY, opt) {
     opt._this.verifyInfo.base64 = res.image_code
     img.src = 'data:image/png;base64,' + res.image_code
     const img_uid = opt._this.$route.query.uid
-    if (!img_uid) {
+    const type = opt._this.$route.query.type
+    if (!img_uid || type !== 'Image') {
       opt._this.verifyInfo.image_uid = res.image_uid
     }
     // opt._this.verifyInfo.image_uid = res.image_uid
