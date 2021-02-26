@@ -4,7 +4,7 @@
  * @Date: 2020-12-04 14:44:54
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-01-29 09:44:51
+ * @LastEditTime: 2021-02-26 10:16:54
  */
 /**
  * 将字符串复制到剪贴板。必须从事件处理程序(如单击)中调用。
@@ -78,4 +78,29 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
   return new Blob(byteArrays, {
     type: contentType
   });
+}
+// 图片url转化成base64码
+// getBase64Image('http://wwww.test/test.png', 'coopCachetImg')
+// 第一个参数是图片的URL地址，第二个是转换成base64地址后要赋值给的img标签
+export function getBase64Image(url, ref) {
+  var image = new Image()
+  image.src = url
+  image.setAttribute('crossOrigin', 'anonymous')// 解决跨域
+  return new Promise((resolve, reject) => {
+    image.onload = function() {
+      var base64 = drawBase64Image(image)
+      resolve(base64)
+    }
+  })
+
+}
+export function drawBase64Image(img) {
+  console.log(img)
+  var canvas = document.createElement('canvas')
+  canvas.width = img.width
+  canvas.height = img.height
+  var ctx = canvas.getContext('2d')
+  ctx.drawImage(img, 0, 0, img.width, img.height)
+  var dataURL = canvas.toDataURL('image/png')
+  return dataURL
 }

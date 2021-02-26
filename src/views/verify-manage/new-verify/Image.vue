@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-25 14:31:27
+ * @LastEditTime: 2021-02-26 10:40:24
 -->
 <template>
   <div class="new-verify">
@@ -285,7 +285,7 @@
                 </div>
               </el-col>
             </el-row>
-            <!-- <img id='img' src="" style="position: absolute;top:0;"/> -->
+            <!-- <img id='img' src="http://192.168.210.130:5000/static/image/1d4f5c27433578faad979127d3554db7.png?v=0.5136112659397978" style="position: absolute;top:0;"/> -->
           </el-form>
         </div>
       </div>
@@ -294,7 +294,7 @@
 </template>
 
 <script>
-import { b64toBlob, ImagePool } from '@/utils/common.js';
+import { b64toBlob, ImagePool, getBase64Image } from '@/utils/common.js';
 import { GET, POST } from '@/utils/api.js';
 // 图像截屏函数
 import { mouseDown, drag } from '@/utils/cutImage.js';
@@ -450,7 +450,7 @@ export default {
   created() {
     this.imagePool = new ImagePool(100);
   },
-  mounted() {
+  async mounted() {
     this.getHasDevice()
     this.initPythonWebSocket()
     this.canvas.bg = document.querySelector('#bgCanvas')
@@ -460,10 +460,6 @@ export default {
     }
     const uid = this.$route.query.uid
     if (uid) {
-      // const url = '/media/image/4571302d4636433cac0643445532b4a9.png'
-      // GET(url).then(res => {
-      //   console.log('+++++:', res)
-      // })
       this.editData(uid)
     }
   },
@@ -548,9 +544,12 @@ export default {
   methods: {
     editData(uid) {
       const url = `/verify/detail/?uid=${uid}`
-      GET(url).then(res => {
+      GET(url).then(async res => {
         this.verifyInfo = res.result[0]
-        this.$refs.img.src = 'data:image/png;base64,' + this.verifyInfo.base64
+        const base64 = await getBase64Image(this.verifyInfo.base64 + '?v=' + Math.random())
+        console.log(base64.split(','))
+        this.$refs.img.src = base64
+        this.verifyInfo.base64 = base64.split(',')[1]
         this.selectVal = this.verifyInfo.type
         if (this.$route.query.copy) {
           this.verifyInfo.name = ''

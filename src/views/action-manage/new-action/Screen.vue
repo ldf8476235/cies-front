@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-25 15:28:38
+ * @LastEditTime: 2021-02-25 17:45:11
 -->
 <template>
   <div class="new-screen">
@@ -335,33 +335,48 @@
                 </div>
                 <div class="screen" id="screen" ref="screen">
                   <svg-icon class="svgIcon" v-if="screenLoading" data_iconName='loading'></svg-icon>
+                  <span class='dot firstDot'></span>
+                  <span class='dot secondDot'></span>
                   <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
                   <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
                   <span class="finger finger-0" style="transform: translate3d(200px, 100px, 0px)"></span>
                   <span style='color:#fff;'>请先连接设备</span>
                 </div>
                 <div class="screenBottomBtn">
-                  <el-button>Power</el-button>
+                  <el-button @click='power'>Power</el-button>
                   <el-button @click='home'>Home</el-button>
                   <el-button @click='back'>Back</el-button>
                   <el-button>Menu</el-button>
-                  <el-button>Volume+</el-button>
-                  <el-button>Volume-</el-button>
+                  <el-button @click='volumeUp'>Volume+</el-button>
+                  <el-button @click='volumeDown'>Volume-</el-button>
                   <el-button @click='sleep'>Sleep</el-button>
                 </div>
               </el-card>
               <div class='mobile-btn'  v-show='mobileBtn'>
                 <!-- <el-button @click='doTapWidget'>Tap Widget</el-button> -->
                 <el-button @click='doTap'>Tap</el-button>
-                <el-button @click='doSendKeys'>Send Keys</el-button>
+                <el-button @click="doSendKeys('')">Send Keys</el-button>
                 <el-button>LongPress</el-button>
                 <el-button>ScrollWidget</el-button>
                 <el-button @click='swipe'>Swipe</el-button>
-
               </div>
             </div>
           </el-col>
         </el-row>
+        <el-dialog
+          title="提示"
+          :visible.sync="swipeDialogVisible"
+          width="30%">
+          <el-input v-model='x1' placeholder='X1' @change='x1'></el-input>
+          <el-input v-model='y1' placeholder='Y1' @change='y1'></el-input>
+          <el-input v-model='x2' placeholder='X2' @change='x2'></el-input>
+          <el-input v-model='y2' placeholder='Y2' @change='y2'></el-input>
+          <el-input v-model='t' placeholder='T' @change='t'></el-input>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="swipeDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="swipeDialogVisible = false">确 定</el-button>
+          </span>
+        </el-dialog>
       </div>
     </div>
   </div>
@@ -485,8 +500,13 @@ export default {
       },
       clickMobileApp: [], // 收集点击手机app数据
       screenLoading: false, // 屏幕加载动画
-      hasDeviceList: [] // 已有设备选择框
-
+      hasDeviceList: [], // 已有设备选择框
+      swipeDialogVisible: true, // 滑动坐标输入弹框
+      x1: '', // 第一个点x坐标
+      y1: '',
+      x2: '',
+      y2: '',
+      t: '' // 延迟时间
     };
   },
   created() {
@@ -627,31 +647,30 @@ export default {
     tab(i) {
       this.tabFlag = i
     },
+    // 手机锁屏
+    power() {
+      const type = 'power'
+      this.simulateBtn(type)
+    },
     // 手机home建
     home() {
-      const flag = this.editor.getValue()
-      if (!flag) {
-        this.$hintMsg('warning', '请先链接设备！')
-        return
-      }
-      const code = "d.press('home')"
-      this.editor.setValue(this.generatedCode + '\n' + code)
-      const codeComplate = this.baseCode + '\n' + code
-      this.runPythonWithConnect(codeComplate)
-        .then(this.delayReload)
+      const type = 'home'
+      this.simulateBtn(type)
     },
     // 模拟手机返回
     back() {
-      const flag = this.editor.getValue()
-      if (!flag) {
-        this.$hintMsg('warning', '请先链接设备！')
-        return
-      }
-      const code = "d.press('back')"
-      this.editor.setValue(this.generatedCode + '\n' + code)
-      const codeComplate = this.baseCode + '\n' + code
-      this.runPythonWithConnect(codeComplate)
-        .then(this.delayReload)
+      const type = 'back'
+      this.simulateBtn(type)
+    },
+    // 音量加
+    volumeUp() {
+      const type = 'volume_up'
+      this.simulateBtn(type)
+    },
+    // 音量减
+    volumeDown() {
+      const type = 'volume_down'
+      this.simulateBtn(type)
     },
     // 睡眠
     sleep() {
@@ -661,6 +680,20 @@ export default {
         return
       }
       this.generatedCode = this.editor.getValue() + '\n' + 'time.sleep(1)'
+    },
+    // 模拟手机按键操作封装
+    simulateBtn(type) {
+      const code = `d.press('${type}')`
+      const flag = this.editor.getValue()
+      if (!flag) {
+        this.$hintMsg('warning', '请先链接设备！')
+        return
+      }
+      //
+      this.editor.setValue(this.generatedCode + '\n' + code)
+      const codeComplate = this.baseCode + '\n' + code
+      this.runPythonWithConnect(codeComplate)
+        .then(this.delayReload)
     },
     // 导出
     exportData() {
@@ -700,9 +733,9 @@ export default {
       this.loadLiveHierarchy()
     },
     doSendKeys(text) {
-      // if (!text) {
-      text = window.prompt('Input text?')
-      // }
+      if (!text) {
+        text = window.prompt('Input text?')
+      }
       if (!text) {
         return;
       }
@@ -714,7 +747,8 @@ export default {
     },
     // 滑屏
     swipe() {
-
+      this.swipeDialogVisible = true
+      // this.canvas.fg.style.display = 'none'
     },
     // 运行python代码
     runPythonWithConnect(code) {
@@ -1581,6 +1615,18 @@ export default {
         justify-content: center;
         flex: 1;
         background-color: #4f4f4f;
+        .dot{
+          display: inline-block;
+          width:10px;
+          height: 10px;
+          background: pink;
+          border-radius: 50%;
+          position: absolute;
+          z-index: 9999;
+        }
+        .firstDot{
+
+        }
         .canvas-fg {
           z-index: 1;
           position: absolute;
@@ -1630,6 +1676,13 @@ export default {
         margin-bottom: 5px;
       }
     }
+  }
+  .el-dialog {
+
+    .el-input{
+        margin-right: 5px;
+        width: 18%;
+      }
   }
 }
 </style>

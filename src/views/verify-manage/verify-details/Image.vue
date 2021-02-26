@@ -4,7 +4,7 @@
  * @Date: 2021-01-22 14:22:34
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-25 15:30:07
+ * @LastEditTime: 2021-02-26 10:43:33
 -->
 <template>
   <div class="new-verify">
@@ -162,11 +162,12 @@ export default {
     getDetails() {
       const uid = this.$route.query.uid
       const url = `/verify/detail/?uid=${uid}`
-      this.$http.get(url).then(res => {
+      this.$http.get(url).then(async res => {
         console.log(res)
         if (res.status_code === 200) {
           this.verifyInfo = res.data.result[0]
-          this.$refs.img.src = 'data:image/png;base64,' + this.verifyInfo.base64
+          // const base64 = await getBase64Image(this.verifyInfo.base64 + '?v=' + Math.random())
+          this.$refs.img.src = this.verifyInfo.base64
         }
 
       })
