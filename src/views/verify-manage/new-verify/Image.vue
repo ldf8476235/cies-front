@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-26 13:53:55
+ * @LastEditTime: 2021-02-26 14:44:40
 -->
 <template>
   <div class="new-verify">
@@ -16,14 +16,14 @@
           <el-form
             ref="verifyInfo"
             :model="verifyInfo"
-            :rules="rulesCaseInfo"
+            :rules="rulesVerifyInfo"
             label-width="120px"
             >
             <el-row class="row">
               <el-col :span="9" class="left-container">
                 <el-row class="left">
                   <el-col :span="24">
-                    <el-form-item label="链接设备：" prop="device_name">
+                    <el-form-item label="链接设备：" >
                       <el-input style="width:40%;margin-right:10px;" disabled v-model="deviceUrl"></el-input>
                       <el-dropdown @command='linkDevice'>
                       <el-button type="" @click="linkDeviceBtn">
@@ -131,7 +131,7 @@
                       </el-form-item>
                     </el-col>
                      <el-col :span="24">
-                      <el-form-item label="类型：">
+                      <el-form-item label="类型："  prop="imageRect">
                         <el-button @click="imgCollect">图像采集</el-button>
                         <el-button @click='verifyScope'>检验范围</el-button>
                       </el-form-item>
@@ -303,6 +303,13 @@ import WS_URL from '@/axios/C_L.js';
 export default {
   name: '',
   data() {
+    const imageRectValidator = (rule, value, callback) => {
+      if (!this.verifyInfo.inline_area || this.verifyInfo.outline_area.length === 0) {
+        callback(new Error('请选择完整采集图像或校验区域'))
+      } else {
+        callback()
+      }
+    }
     var timeout = (rule, value, callback) => {
       console.log(Number(value), value)
       if (value === '') {
@@ -356,7 +363,10 @@ export default {
         timeout: '0',
         outline_area: []
       },
-      rulesCaseInfo: {
+      rulesVerifyInfo: {
+        device_ip: [
+          { required: true, message: '请连接设备', trigger: 'blur' }
+        ],
         name: [
           { required: true, message: '请输入动作名称', trigger: 'blur' }
         ],
@@ -381,6 +391,10 @@ export default {
         ],
         desc: [
           { required: true, message: '请输入动作描述', trigger: 'blur' }
+        ],
+        imageRect: [
+          { validator: imageRectValidator, trigger: 'change' }
+          // { required: true, message: '请输入动作描述', trigger: 'blur' }
         ]
       },
       deviceId: 'android:',
@@ -450,7 +464,7 @@ export default {
   created() {
     this.imagePool = new ImagePool(100);
   },
-  async mounted() {
+  mounted() {
     this.getHasDevice()
     this.initPythonWebSocket()
     this.canvas.bg = document.querySelector('#bgCanvas')
@@ -459,7 +473,9 @@ export default {
       this.resizeScreen(this.img)
     }
     const uid = this.$route.query.uid
+    const type = this.$route.query.type
     if (uid) {
+      this.selectVal = type
       this.editData(uid)
     }
   },
@@ -550,7 +566,7 @@ export default {
         console.log(base64.split(','))
         this.$refs.img.src = base64
         this.verifyInfo.base64 = base64.split(',')[1]
-        this.selectVal = this.verifyInfo.type
+
         if (this.$route.query.copy) {
           this.verifyInfo.name = ''
         }
@@ -566,13 +582,14 @@ export default {
     },
     // 测试图像
     testImage() {
+      console.log(this.verifyInfo)
       this.testResult = ''
       const url = '/api/v1/algorithm'
       if (!this.deviceUrl) {
         this.$hintMsg('warning', '请连接设备')
         return
       }
-      if (!this.verifyInfo.inline_area && !this.verifyInfo.outline_area) {
+      if (!this.verifyInfo.inline_area && this.verifyInfo.outline_area.length === 0) {
         this.$hintMsg('warning', '请选择区域')
         return
       }
@@ -1405,6 +1422,10 @@ export default {
     // 保存数据
     save() {
       console.log('保存', this.verifyInfo)
+      if (!this.deviceUrl) {
+        this.$hintMsg('warning', '请链接设备')
+        return
+      }
       this.$refs.verifyInfo.validate(valid => {
         if (!valid) return
         this.verifyInfo.builder = 'admin'
