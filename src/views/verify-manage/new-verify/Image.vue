@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-26 10:40:24
+ * @LastEditTime: 2021-02-26 13:53:55
 -->
 <template>
   <div class="new-verify">
@@ -568,6 +568,10 @@ export default {
     testImage() {
       this.testResult = ''
       const url = '/api/v1/algorithm'
+      if (!this.deviceUrl) {
+        this.$hintMsg('warning', '请连接设备')
+        return
+      }
       if (!this.verifyInfo.inline_area && !this.verifyInfo.outline_area) {
         this.$hintMsg('warning', '请选择区域')
         return
