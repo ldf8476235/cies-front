@@ -1,7 +1,7 @@
 <!--
  * @Author: wh
  * @Date: 2020-11-30 17:34:55
- * @LastEditTime: 2021-02-25 09:55:25
+ * @LastEditTime: 2021-02-26 14:53:06
  * @LastEditors: wh
  * @Description: In User Settings Edit
  * @FilePath: \cies-front\src\views\case-manage\Index.vue
@@ -166,7 +166,7 @@ export default {
       this.$refs.func.visible = false
     },
     // 确认搜索
-    confirm() {
+    confirmSearch() {
       console.log(this.seachInfo)
     },
     // 获取case列表

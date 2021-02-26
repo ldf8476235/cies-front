@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 15:37:46
+ * @LastEditTime: 2021-02-26 14:52:14
 -->
 <template>
   <div class="new-case">
@@ -609,7 +609,7 @@ export default {
             url = '/case/edit/'
             method = 'PUT'
           }
-          this.caseInfo.builder = '啊啊啊admin'
+          this.caseInfo.builder = 'admin'
           // 临时action:['assd123123']
           const arr = []
           this.caseInfo.action.forEach(item => {
