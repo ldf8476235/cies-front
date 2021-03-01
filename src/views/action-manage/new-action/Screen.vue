@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-25 17:45:11
+ * @LastEditTime: 2021-02-26 18:01:02
 -->
 <template>
   <div class="new-screen">
@@ -335,8 +335,9 @@
                 </div>
                 <div class="screen" id="screen" ref="screen">
                   <svg-icon class="svgIcon" v-if="screenLoading" data_iconName='loading'></svg-icon>
-                  <span class='dot firstDot'></span>
-                  <span class='dot secondDot'></span>
+                  <span class='dot firstDot' ref='firstDot'></span>
+                  <span class='dot secondDot' ref='secondDot'></span>
+                  <canvas id='arrowCanvas' class='arrowCanvas' ref='arrowCanvas' :style="canvasStyle"></canvas>
                   <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
                   <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
                   <span class="finger finger-0" style="transform: translate3d(200px, 100px, 0px)"></span>
@@ -367,11 +368,11 @@
           title="提示"
           :visible.sync="swipeDialogVisible"
           width="30%">
-          <el-input v-model='x1' placeholder='X1' @change='x1'></el-input>
-          <el-input v-model='y1' placeholder='Y1' @change='y1'></el-input>
-          <el-input v-model='x2' placeholder='X2' @change='x2'></el-input>
-          <el-input v-model='y2' placeholder='Y2' @change='y2'></el-input>
-          <el-input v-model='t' placeholder='T' @change='t'></el-input>
+          <el-input v-model='x1' placeholder='X1' @change='x1Change'></el-input>
+          <el-input v-model='y1' placeholder='Y1' @change='y1Change'></el-input>
+          <el-input v-model='x2' placeholder='X2' @change='x2Change'></el-input>
+          <el-input v-model='y2' placeholder='Y2' @change='y2Change'></el-input>
+          <el-input v-model='t' placeholder='T' @change='tChange'></el-input>
           <span slot="footer" class="dialog-footer">
             <el-button @click="swipeDialogVisible = false">取 消</el-button>
             <el-button type="primary" @click="swipeDialogVisible = false">确 定</el-button>
@@ -395,6 +396,7 @@ import 'codemirror/addon/hint/show-hint';
 import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 import { GET, POST } from '@/utils/api';
+import { drawArrow } from '@/utils/canvas.js';
 import WS_URL from '@/axios/C_L.js';
 export default {
 
@@ -594,7 +596,36 @@ export default {
     }
   },
   methods: {
+    // 滑动输入第一个x1坐标
+    x1Change(x1) {
+      console.log(x1)
+      this.dotSite('firstDot', 'left', x1)
+    },
+    y1Change(y1) {
+      this.dotSite('firstDot', 'top', y1)
+    },
+    x2Change(x2) {
+      this.dotSite('secondDot', 'left', x2)
+    },
+    y2Change(y2) {
+      const canvas = this.$refs.arrowCanvas
+      const screen = this.$refs.screen
+      const ctx = canvas.getContext('2d')
+      console.log(screen.style.width, screen.style.height)
+      canvas.width = parseInt(screen.style.width)
+      canvas.height = parseInt(screen.style.height)
+      this.canvas.fg.style.zIndex = '9999'
+      canvas.style.zIndex = '999'
+      this.dotSite('secondDot', 'top', y2)
+      drawArrow(ctx, this.x1, this.y1, this.x2, this.y2, 10, 20, 5, '#f36')
+    },
+    tChange() {
 
+    },
+    // 控制滑动点坐标位置
+    dotSite(ele, direct, x) {
+      this.$refs[ele].style[direct] = x + 'px'
+    },
     // 刷新屏幕
     refreshDeviceScreen() {
       this.dumpHierarchy()
@@ -1619,13 +1650,19 @@ export default {
           display: inline-block;
           width:10px;
           height: 10px;
-          background: pink;
+
           border-radius: 50%;
           position: absolute;
           z-index: 9999;
         }
         .firstDot{
-
+          background: pink;
+        }
+        .secondDot{
+          background: royalblue;
+        }
+        .arrowCanvas{
+          position: absolute;
         }
         .canvas-fg {
           z-index: 1;
