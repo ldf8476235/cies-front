@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-26 18:01:02
+ * @LastEditTime: 2021-03-01 10:29:28
 -->
 <template>
   <div class="new-screen">
@@ -335,9 +335,9 @@
                 </div>
                 <div class="screen" id="screen" ref="screen">
                   <svg-icon class="svgIcon" v-if="screenLoading" data_iconName='loading'></svg-icon>
-                  <span class='dot firstDot' ref='firstDot'></span>
-                  <span class='dot secondDot' ref='secondDot'></span>
-                  <canvas id='arrowCanvas' class='arrowCanvas' ref='arrowCanvas' :style="canvasStyle"></canvas>
+                  <span v-if='false' class='dot firstDot' ref='firstDot'></span>
+                  <span v-if='false' class='dot secondDot' ref='secondDot'></span>
+                  <canvas  v-if='false' id='arrowCanvas' class='arrowCanvas' ref='arrowCanvas' :style="canvasStyle"></canvas>
                   <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
                   <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
                   <span class="finger finger-0" style="transform: translate3d(200px, 100px, 0px)"></span>
@@ -503,7 +503,7 @@ export default {
       clickMobileApp: [], // 收集点击手机app数据
       screenLoading: false, // 屏幕加载动画
       hasDeviceList: [], // 已有设备选择框
-      swipeDialogVisible: true, // 滑动坐标输入弹框
+      swipeDialogVisible: false, // 滑动坐标输入弹框
       x1: '', // 第一个点x坐标
       y1: '',
       x2: '',
@@ -875,6 +875,7 @@ export default {
         this.getCurrentScreen()
         this.loadLiveHierarchy()
       }).catch(err => {
+        this.$hintMsg('error', '连接设备失败')
         this.screenLoading = false
         console.log('doConnet-err', err)
       })
