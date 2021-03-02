@@ -4,11 +4,12 @@
  * @Date: 2020-11-30 17:12:31
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-05 10:56:22
+ * @LastEditTime: 2021-03-02 13:46:52
  */
 module.exports = {
   publicPath: './',
   lintOnSave: false,
+  productionSourceMap: false,
   chainWebpack: config => {
     // 清空默认svg规则
     config.module
