@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-03-04 10:06:38
+ * @LastEditTime: 2021-03-04 14:25:15
 -->
 <template>
   <div class="new-verify">
@@ -1354,7 +1354,12 @@ export default {
       } else {
         this.verifyInfo.inline_area = []
         this.verifyInfo.base64 = ''
-        this.verifyInfo.image_uid = ''
+        const uid = this.$route.query.uid
+        const type = this.$route.query.type
+        if (!uid || type !== 'Image') {
+          this.verifyInfo.image_uid = ''
+        }
+
       }
     },
     // 矩形框鼠标点击操作
