@@ -4,7 +4,7 @@
  * @Date: 2020-12-09 17:53:14
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-23 11:45:09
+ * @LastEditTime: 2021-03-04 10:04:34
 -->
 <template>
   <div class="new-voice">
@@ -31,16 +31,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="project">
-                    <!-- <el-select v-model="voiceInfo.project" placeholder="选择所属项目">
-                      <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value"
-                      >
-                      </el-option>
-                    </el-select> -->
+                  <el-form-item label="所属项目：" prop="">
                     <el-input
                       :suffix-icon="loading ? 'el-icon-loading' : ''"
                       v-model.trim="voiceInfo.project"
@@ -54,7 +45,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：" prop="version">
+                  <el-form-item label="软件版本：" prop="">
                     <el-input
                       v-model="voiceInfo.version"
                       placeholder="输入软件版本"
@@ -84,7 +75,7 @@
                 </el-col>
 
                 <el-col :span="12">
-                  <el-form-item label="动作描述：" prop="desc">
+                  <el-form-item label="动作描述：" prop="">
                     <el-input
                       type="textarea"
                       v-model="voiceInfo.desc"
@@ -228,6 +219,9 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       voiceInfo: {
+        project: '',
+        version: '',
+        desc: '',
         type: 'Voice',
         corpus: 'corpus',
         settings: [

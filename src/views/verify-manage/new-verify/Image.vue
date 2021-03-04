@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-26 14:44:40
+ * @LastEditTime: 2021-03-04 10:06:38
 -->
 <template>
   <div class="new-verify">
@@ -49,7 +49,7 @@
                     </el-form-item>
                   </el-col>
                   <el-col :span="24">
-                    <el-form-item label="所属项目：" prop="project">
+                    <el-form-item label="所属项目：" prop="">
                       <!-- <el-select v-model="verifyInfo.selectVal" placeholder="请选择">
                         <el-option
                           v-for="item in belongPreject"
@@ -67,7 +67,7 @@
                     </el-form-item>
                   </el-col>
                   <el-col :span="24">
-                    <el-form-item label="软件版本：" prop="version">
+                    <el-form-item label="软件版本：" prop="">
                       <el-input
                         v-model="verifyInfo.version"
                         placeholder=""
@@ -88,7 +88,7 @@
                     </el-form-item>
                   </el-col>
                   <el-col :span="24">
-                    <el-form-item label="校验点描述：" prop="desc">
+                    <el-form-item label="校验点描述：" prop="">
                       <el-input
                         type="textarea"
                         v-model="verifyInfo.desc"
@@ -356,6 +356,9 @@ export default {
       selectVal: 'Image', // 选中项
       tabClickIndex: '',
       verifyInfo: {
+        project: '',
+        version: '',
+        desc: '',
         type: 'Image',
         content: '',
         element: 'screenshots',

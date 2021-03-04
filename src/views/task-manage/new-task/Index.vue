@@ -4,7 +4,7 @@
  * @Date: 2020-12-01 13:49:42
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-22 18:16:55
+ * @LastEditTime: 2021-03-04 10:00:02
 -->
 <template>
   <div class="newTask">
@@ -31,7 +31,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：" prop="version">
+                  <el-form-item label="软件版本：" prop="">
                     <el-input
                       v-model="taskInfo.version"
                       placeholder="输入软件版本"
@@ -39,7 +39,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="project">
+                  <el-form-item label="所属项目：" prop="">
                     <!-- <el-select v-model="taskInfo.project" placeholder="选择所属项目">
                       <el-option
                         v-for="item in options"
@@ -73,7 +73,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="任务描述：" prop='desc'>
+                  <el-form-item label="任务描述：" prop=''>
                     <el-input
                       type="textarea"
                       v-model="taskInfo.desc"
@@ -326,7 +326,7 @@
               <el-table-column property="name" label="用例名称" width="200"></el-table-column>
               <el-table-column property="builder" label="创建人" width="100"></el-table-column>
               <el-table-column property="time_create" label="创建时间"></el-table-column>
-              <el-table-column property="verison" label="软件版本"></el-table-column>
+              <el-table-column property="version" label="软件版本"></el-table-column>
             </el-table>
           </Dialog>
         </div>
@@ -368,7 +368,9 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       taskInfo: {
-
+        version: '',
+        project: '',
+        desc: '',
         case_list: [
         ]
       },

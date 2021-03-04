@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 13:19:20
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-02-26 14:52:14
+ * @LastEditTime: 2021-03-04 10:01:30
 -->
 <template>
   <div class="new-case">
@@ -31,7 +31,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="软件版本：" prop="version">
+                  <el-form-item label="软件版本：" prop="">
                     <el-input
                       v-model="caseInfo.version"
                       placeholder="输入软件版本"
@@ -39,7 +39,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="所属项目：" prop="project">
+                  <el-form-item label="所属项目：" prop="">
                     <el-input
                       v-model="caseInfo.project"
                       placeholder="请输入所属项目"
@@ -47,7 +47,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                  <el-form-item label="用例描述：" prop="desc">
+                  <el-form-item label="用例描述：" prop="">
                     <el-input
                       type="textarea"
                       v-model="caseInfo.desc"
@@ -304,6 +304,9 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       caseInfo: {
+        version: '',
+        project: '',
+        desc: '',
         'action': [
         ]
       },

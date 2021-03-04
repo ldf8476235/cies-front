@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-03-01 10:29:28
+ * @LastEditTime: 2021-03-04 11:36:09
 -->
 <template>
   <div class="new-screen">
@@ -38,13 +38,13 @@
                           <el-form-item label="动作类型：">
                             <span>屏幕操作</span>
                           </el-form-item>
-                          <el-form-item label="所属项目：" prop="project">
+                          <el-form-item label="所属项目：" prop="">
                             <el-input
                               v-model.trim="actionInfo.project"
                               placeholder="输入所属项目"
                             ></el-input>
                           </el-form-item>
-                          <el-form-item label="软件版本：" prop='version'>
+                          <el-form-item label="软件版本：" prop=''>
                             <el-input
                               v-model="actionInfo.version"
                               placeholder="输入软件版本"
@@ -56,7 +56,7 @@
                               placeholder="输入超时时间（秒/s）"
                             ></el-input>
                           </el-form-item>
-                          <el-form-item label="动作描述：" prop='desc'>
+                          <el-form-item label="动作描述：" prop=''>
                             <el-input
                               type="textarea"
                               v-model="actionInfo.desc"
@@ -335,11 +335,8 @@
                 </div>
                 <div class="screen" id="screen" ref="screen">
                   <svg-icon class="svgIcon" v-if="screenLoading" data_iconName='loading'></svg-icon>
-                  <span v-if='false' class='dot firstDot' ref='firstDot'></span>
-                  <span v-if='false' class='dot secondDot' ref='secondDot'></span>
-                  <canvas  v-if='false' id='arrowCanvas' class='arrowCanvas' ref='arrowCanvas' :style="canvasStyle"></canvas>
-                  <canvas id="fgCanvas" class="canvas-fg" :style="canvasStyle"></canvas>
-                  <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"></canvas>
+                  <canvas v-show='hiddenFg' id="fgCanvas" class="canvas-fg" :style="canvasStyle" @click='longClick'></canvas>
+                  <canvas id="bgCanvas" class="canvas-bg" :style="canvasStyle"  @contextmenu.prevent="showFg" @mousedown.stop.prevent="mouseDownCanvas"></canvas>
                   <span class="finger finger-0" style="transform: translate3d(200px, 100px, 0px)"></span>
                   <span style='color:#fff;'>请先连接设备</span>
                 </div>
@@ -347,7 +344,7 @@
                   <el-button @click='power'>Power</el-button>
                   <el-button @click='home'>Home</el-button>
                   <el-button @click='back'>Back</el-button>
-                  <el-button>Menu</el-button>
+                  <el-button @click='menu'>Menu</el-button>
                   <el-button @click='volumeUp'>Volume+</el-button>
                   <el-button @click='volumeDown'>Volume-</el-button>
                   <el-button @click='sleep'>Sleep</el-button>
@@ -357,25 +354,23 @@
                 <!-- <el-button @click='doTapWidget'>Tap Widget</el-button> -->
                 <el-button @click='doTap'>Tap</el-button>
                 <el-button @click="doSendKeys('')">Send Keys</el-button>
-                <el-button>LongPress</el-button>
-                <el-button>ScrollWidget</el-button>
+                <el-button @click='longPress'>LongPress</el-button>
+                <el-button @click='scrollWidget'>ScrollWidget</el-button>
                 <el-button @click='swipe'>Swipe</el-button>
               </div>
             </div>
           </el-col>
         </el-row>
         <el-dialog
-          title="提示"
-          :visible.sync="swipeDialogVisible"
+          title="延时时长"
+          :visible.sync="scrollDialogVisible"
           width="30%">
-          <el-input v-model='x1' placeholder='X1' @change='x1Change'></el-input>
-          <el-input v-model='y1' placeholder='Y1' @change='y1Change'></el-input>
-          <el-input v-model='x2' placeholder='X2' @change='x2Change'></el-input>
-          <el-input v-model='y2' placeholder='Y2' @change='y2Change'></el-input>
-          <el-input v-model='t' placeholder='T' @change='tChange'></el-input>
+          <p>长按延时时长：</p>
+          <el-input v-model='delaye' @blur='delayeBlur' placeholder='请输入0~60'></el-input>
+          <p class='error' v-if='errorTip'>请输入0~60的数字</p>
           <span slot="footer" class="dialog-footer">
-            <el-button @click="swipeDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="swipeDialogVisible = false">确 定</el-button>
+            <el-button @click="scrollDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="affirm">确 定</el-button>
           </span>
         </el-dialog>
       </div>
@@ -396,7 +391,6 @@ import 'codemirror/addon/hint/show-hint';
 import VJstree from 'vue-jstree'
 import { b64toBlob, ImagePool } from '@/utils/common.js';
 import { GET, POST } from '@/utils/api';
-import { drawArrow } from '@/utils/canvas.js';
 import WS_URL from '@/axios/C_L.js';
 export default {
 
@@ -446,6 +440,9 @@ export default {
       selectVal: '', // 选中项
       tabClickIndex: '',
       actionInfo: {
+        project: '',
+        version: '',
+        desc: '',
         type: 'U3'
       },
       rulesActionInfo: {
@@ -503,12 +500,11 @@ export default {
       clickMobileApp: [], // 收集点击手机app数据
       screenLoading: false, // 屏幕加载动画
       hasDeviceList: [], // 已有设备选择框
-      swipeDialogVisible: false, // 滑动坐标输入弹框
-      x1: '', // 第一个点x坐标
-      y1: '',
-      x2: '',
-      y2: '',
-      t: '' // 延迟时间
+      scrollDialogVisible: false, // 滑动坐标输入弹框
+      delaye: 0.5, // longpress 延时
+      hiddenFg: true,
+      swipeArr: [],
+      errorTip: false
     };
   },
   created() {
@@ -548,9 +544,10 @@ export default {
         return this.originNodes
       }
     },
+    elem: function() {
+      return this.nodeSelected || {};
+    },
     elemXPathLite() {
-      // scan nodes
-      // this.mapAttrCount = {}
       this.nodes.forEach((n) => {
         this.incrAttrCount('label', n.label)
         this.incrAttrCount('resourceId', n.resourceId)
@@ -561,6 +558,7 @@ export default {
 
       let node = this.elem;
       const array = [];
+      console.log(node._parentId)
       while (node && node._parentId) {
         const parent = this.originNodeMaps[node._parentId]
         if (this.getAttrCount('label', node.label) === 1) {
@@ -596,35 +594,20 @@ export default {
     }
   },
   methods: {
-    // 滑动输入第一个x1坐标
-    x1Change(x1) {
-      console.log(x1)
-      this.dotSite('firstDot', 'left', x1)
+    delayeBlur() {
+      this.check(this.delaye)
     },
-    y1Change(y1) {
-      this.dotSite('firstDot', 'top', y1)
-    },
-    x2Change(x2) {
-      this.dotSite('secondDot', 'left', x2)
-    },
-    y2Change(y2) {
-      const canvas = this.$refs.arrowCanvas
-      const screen = this.$refs.screen
-      const ctx = canvas.getContext('2d')
-      console.log(screen.style.width, screen.style.height)
-      canvas.width = parseInt(screen.style.width)
-      canvas.height = parseInt(screen.style.height)
-      this.canvas.fg.style.zIndex = '9999'
-      canvas.style.zIndex = '999'
-      this.dotSite('secondDot', 'top', y2)
-      drawArrow(ctx, this.x1, this.y1, this.x2, this.y2, 10, 20, 5, '#f36')
-    },
-    tChange() {
-
-    },
-    // 控制滑动点坐标位置
-    dotSite(ele, direct, x) {
-      this.$refs[ele].style[direct] = x + 'px'
+    // 校验输入延时时长
+    check(value) {
+      const reg = /^[1-9]\d*$/;
+      var _this = this;
+      if (value) {
+        if (new RegExp(reg).test(value) == false) {
+          _this.errorTip = true;
+        } else {
+          this.errorTip = false;
+        }
+      }
     },
     // 刷新屏幕
     refreshDeviceScreen() {
@@ -691,6 +674,11 @@ export default {
     // 模拟手机返回
     back() {
       const type = 'back'
+      this.simulateBtn(type)
+    },
+    // 菜单
+    menu() {
+      const type = 'menu'
       this.simulateBtn(type)
     },
     // 音量加
@@ -776,10 +764,92 @@ export default {
       this.runPythonWithConnect(execute)
         .then(this.delayReload)
     },
+    // 延时确认按钮
+    affirm() {
+      if (this.errorTip) {
+        return
+      }
+      const code = this.editor.getValue() + '\n' + `d.long_click(${this.longX}, ${this.longY}, ${this.delaye})`
+      this.editor.setValue(code)
+      const execute = this.baseCode + '\n' + `d.long_click(${this.longX}, ${this.longY}, ${this.delaye})`
+      this.runPythonWithConnect(execute)
+        .then(this.delayReload)
+      this.scrollDialogVisible = false
+    },
+    // 模拟长按
+    longPress() {
+      this.scrollDialogVisible = true
+    },
+    // 滑动到指定位置
+    scrollWidget() {
+      // d(scrollable=True).scroll.to(resourceId="android:id/title", text="其他设置")
+      const node = this.nodeSelected
+      node.action = 'scrollWidget'
+      this.clickMobileApp.push(node)
+      var code = this.generateNodeSelectorCode(node)
+      const reg = /^\/\//
+      if (reg.test(code)) {
+        this.$hintMsg('error', 'xpath定位无效')
+        return
+      }
+      this.generatedCode = this.generatedCode + '\n' + `d(scrollable=True).scroll.to(${code})`
+      this.editor.setValue(this.generatedCode)
+      const codeComplate = this.baseCode + '\n' + code + `d(scrollable=True).scroll.to(${code})`
+      this.runPythonWithConnect(codeComplate)
+        .then(this.delayReload)
+      this.nodeSelected = null
+      this.nodeHovered = null
+      this.loadLiveHierarchy()
+    },
+    // 长按点击事件
+    longClick(e) {
+      if (!this.screenSize) {
+        return
+      }
+      const screen = this.$refs.screen
+      this.longX = Math.floor(e.offsetX / screen.offsetWidth * this.screenSize.width);
+      this.longY = Math.floor(e.offsetY / screen.offsetHeight * this.screenSize.height);
+      console.log(e.offsetX, e.offsetY, this.longX, this.longY)
+    },
     // 滑屏
     swipe() {
-      this.swipeDialogVisible = true
-      // this.canvas.fg.style.display = 'none'
+      this.hiddenFg = false
+    },
+    mouseDownCanvas(e) {
+      const obj = this.coordinate(e.offsetX, e.offsetY)
+      console.log(obj)
+      for (const key in obj) {
+        console.log(obj[key])
+        this.swipeArr.push(obj[key])
+        if (this.swipeArr.length === 4) {
+          console.log(this.swipeArr)
+          this.side()
+          this.swipeArr = []
+          this.showFg()
+        }
+      }
+    },
+    // 计算原图中对应坐标
+    coordinate(x, y) {
+      const screen = this.$refs.screen
+      const obj = {
+        x: Math.floor(x / screen.offsetWidth * this.screenSize.width),
+        y: Math.floor(y / screen.offsetHeight * this.screenSize.height)
+      }
+      return obj
+    },
+    // 模拟滑动
+    side() {
+      const code = `d.swipe(${this.swipeArr[0]}, ${this.swipeArr[1]}, ${this.swipeArr[2]}, ${this.swipeArr[3]}, 0.2)`
+      this.generatedCode = this.generatedCode + '\n' + code
+      this.editor.setValue(this.generatedCode)
+      const codeComplate = this.baseCode + '\n' + code
+      this.runPythonWithConnect(codeComplate)
+        .then(this.delayReload)
+    },
+    // 右键
+    showFg() {
+      this.hiddenFg = true
     },
     // 运行python代码
     runPythonWithConnect(code) {
@@ -839,7 +909,14 @@ export default {
         resolve()
       })
     },
-
+    getAttrCount(collectionKey, key) {
+      // eg: getAttrCount("resource-id", "tv_scan_text")
+      const mapCount = this.mapAttrCount[collectionKey];
+      if (!mapCount) {
+        return 0
+      }
+      return mapCount[key] || 0;
+    },
     incrAttrCount(collectionKey, key) {
       const flag = Object.prototype.hasOwnProperty.call(this.mapAttrCount, collectionKey)
       if (!flag) {
@@ -894,6 +971,10 @@ export default {
         fgcanvas.width = bgcanvas.width = img.width
         fgcanvas.height = bgcanvas.height = img.height
         _this.img = img
+        _this.screenSize = {
+          width: img.width,
+          height: img.height
+        }
         _this.resizeScreen(img)
         ctx.drawImage(img, 0, 0, img.width, img.height);
 
@@ -1105,9 +1186,6 @@ export default {
     },
     // 生成节点选择器
     generateNodeSelectorCode(node) {
-      if (this.useXPathOnly) {
-        return `d.xpath('${this.elemXPathLite}')`
-      }
       const kwargs = this.generateNodeSelectorKwargs(node)
       if (kwargs._count === 1) {
         const array = [];
@@ -1117,7 +1195,13 @@ export default {
           }
           array.push(this._combineKeyValue(key, value))
         }
+        if (node.action === 'scrollWidget') {
+          return array.join(', ')
+        }
         return `d(${array.join(', ')})`
+      }
+      if (node.action === 'scrollWidget') {
+        return this.elemXPathLite
       }
       return `d.xpath('${this.elemXPathLite}')`
     },
@@ -1647,24 +1731,6 @@ export default {
         justify-content: center;
         flex: 1;
         background-color: #4f4f4f;
-        .dot{
-          display: inline-block;
-          width:10px;
-          height: 10px;
-
-          border-radius: 50%;
-          position: absolute;
-          z-index: 9999;
-        }
-        .firstDot{
-          background: pink;
-        }
-        .secondDot{
-          background: royalblue;
-        }
-        .arrowCanvas{
-          position: absolute;
-        }
         .canvas-fg {
           z-index: 1;
           position: absolute;
@@ -1719,7 +1785,10 @@ export default {
 
     .el-input{
         margin-right: 5px;
-        width: 18%;
+        width: 30%;
+      }
+      .error{
+        color: red;
       }
   }
 }
