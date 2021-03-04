@@ -4,7 +4,7 @@
  * @Date: 2020-12-02 17:15:48
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-03-04 11:36:09
+ * @LastEditTime: 2021-03-04 15:06:06
 -->
 <template>
   <div class="new-screen">
@@ -742,9 +742,9 @@ export default {
       this.clickMobileApp.push(node)
       this.disposeActionSequence(this.clickMobileApp)
       var code = this.generateNodeSelectorCode(node)
-      this.generatedCode = this.generatedCode + '\n' + code + '.click(timeout=1)'
+      this.generatedCode = this.generatedCode + '\n' + code + '.click()'
       this.editor.setValue(this.generatedCode)
-      const codeComplate = this.baseCode + '\n' + code + '.click(timeout=1)'
+      const codeComplate = this.baseCode + '\n' + code + '.click()'
       this.runPythonWithConnect(codeComplate)
         .then(this.delayReload)
       this.nodeSelected = null
