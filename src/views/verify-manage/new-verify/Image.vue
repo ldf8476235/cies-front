@@ -4,7 +4,7 @@
  * @Date: 2020-12-10 16:06:41
  * @LastEditors: wh
  * @Description:
- * @LastEditTime: 2021-03-04 14:25:15
+ * @LastEditTime: 2021-03-04 14:30:28
 -->
 <template>
   <div class="new-verify">
@@ -1110,6 +1110,7 @@ export default {
         screenDiv.style.width = Math.floor((window.innerHeight - 210) * r) + 'px'
         screenDiv.style.height = (window.innerHeight - 210) + 'px' // '500px'
       }
+
     },
     // wh-鼠标移动，点击事件
     activeMouseControl() {
